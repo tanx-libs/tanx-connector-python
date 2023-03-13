@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "brine_wrapper"
 version = "0.0.1"
-dependencies = ["requests"]
+dependencies = ["requests", "web3", "ecdsa"]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "python-dotenv"]
