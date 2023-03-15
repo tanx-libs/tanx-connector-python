@@ -8,4 +8,7 @@ class Session(requests.Session):
 
     def request(self, method, url, **kwargs):
         modified_url = self.url_base + url
-        return super(Session, self).request(method, modified_url, **kwargs)
+        response = super(Session, self).request(method, modified_url, **kwargs)
+        response.raise_for_status()
+        return response
+    

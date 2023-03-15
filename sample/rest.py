@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brine_wrapper import client  # noqa: E402
 from src.brine_wrapper.bin.blockchain_utils import sign_msg  # noqa: E402
+import requests
 
 load_dotenv()
 private_key = os.environ['PRIVATE_KEY']
@@ -26,8 +27,10 @@ def main():
 
     # msg_hash = Client.sign_msg_hash(nonce['payload'], private_key)
     # print(Client.create_new_order(msg_hash))
-
-    print(Client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.0001, private_key))
+    try:
+        print(Client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.00001, private_key))
+    except requests.exceptions.HTTPError as exc:
+        print(exc.response.json())
 
 
 main()
