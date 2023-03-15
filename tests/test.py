@@ -3,19 +3,31 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brine_wrapper import client  # noqa: E402
-from src.brine_wrapper.blockchain_utils import sign_msg  # noqa: E402
+from src.brine_wrapper.bin.blockchain_utils import sign_msg  # noqa: E402
 
 load_dotenv()
 private_key = os.environ['PRIVATE_KEY']
 eth_address = os.environ['ETH_ADDRESS']
 
-Client = client.Client()
 
-Client.complete_login(eth_address, private_key)
+def main():
 
-nonce = Client.create_order_nonce('btcusdt', 'market', 29580.51, 'buy', 0.0001)
+    Client = client.Client()
 
-print(Client.sign_msg_hash(nonce['payload'], private_key))
+    trades = Client.get_recent_trades('btcusdt')
+    orderbook = Client.get_orderbook('btcusdt')
+    print(trades['message'])
+    print(orderbook['message'])
+    login = Client.complete_login(eth_address, private_key)
+    print(login['message'])
+    trades = Client.list_trades()
+    print(trades['message'])
+    # nonce = Client.create_order_nonce('btcusdt', 'market', 29580.51, 'buy', 0.0001)
+
+    # msg_hash = Client.sign_msg_hash(nonce['payload'], private_key)
+    # print(Client.create_new_order(msg_hash))
+
+    # print(Client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.0001, private_key))
 
 
-
+main()

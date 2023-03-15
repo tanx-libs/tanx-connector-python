@@ -10,3 +10,8 @@ def sign_msg(msg: str, private_key: str) -> str:
         message, private_key=private_key)
     return signed_message.signature.hex()
 
+
+def get_key_seed(signature: int) -> bytes:
+    key_seed = Web3.keccak(text=str(int(hex(signature), 16)))
+    # key_seed = Web3.solidityKeccak(['uint256'], [signature])
+    return key_seed
