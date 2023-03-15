@@ -27,7 +27,7 @@ def main():
     # msg_hash = Client.sign_msg_hash(nonce['payload'], private_key)
     # print(Client.create_new_order(msg_hash))
 
-    # print(Client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.0001, private_key))
+    print(Client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.0001, private_key))
 
 
 main()

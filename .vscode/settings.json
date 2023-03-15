@@ -1,5 +1,9 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.pycodestyleEnabled": true,
-    "python.formatting.provider": "autopep8"
+    "python.formatting.provider": "autopep8",
+    "files.exclude": {
+        "venv": true,
+        "**/__pycache__": true
+    }
 }

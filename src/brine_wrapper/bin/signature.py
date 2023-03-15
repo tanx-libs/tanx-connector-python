@@ -90,7 +90,6 @@ def stark_private_key_to_ec_point_on_stark_curve(stark_private_key: str) -> ECPo
 
 
 def stark_private_key_to_stark_public_key(stark_private_key: str) -> str:
-    print(stark_private_key_to_ec_point_on_stark_curve(stark_private_key))
     return hex(stark_private_key_to_ec_point_on_stark_curve(stark_private_key)[0])
 
 
@@ -105,13 +104,10 @@ def get_stark_key_pair_from_signature(
     :param signature: mandatory
     :type signature: str
     '''
-    print(f"signature: {signature}")
     signature_int = int(signature, 16)
     hashed_signature = blockchain_utils.get_key_seed(signature=signature_int)
-    print(f"keySeed: {hashed_signature.hex()}")
     # grind key
     grinded_key = grind_key(key_seed=int(hashed_signature.hex(), 16), key_value_limit=EC_ORDER)
-    print(f"grinded key: {grinded_key}")
     stark_private_key = hex(grinded_key)
     stark_public_key = stark_private_key_to_stark_public_key(
         stark_private_key=stark_private_key
