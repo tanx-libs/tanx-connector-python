@@ -6,9 +6,25 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "brine_wrapper"
+name = "brine-connector"
 version = "0.0.1"
+authors = [
+  { name="Brine" },
+]
+description = "A python connector for the Brine API"
+readme = "README.md"
+requires-python = ">=3.8"
 dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy"]
+
+[project.urls]
+"Homepage" = "https://github.com/upsurge0/brine-connector-python"
+"Bug Tracker" = "https://github.com/upsurge0/brine-connector-python/issues"
 
 [project.optional-dependencies]
 dev = ["pytest", "python-dotenv", "responses"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"brineconnector.bin" = ["*.json"]

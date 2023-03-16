@@ -5,7 +5,7 @@ import os
 import pytest
 import requests
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brine_wrapper.client import Client  # noqa: E402
+from src.brineconnector import Client  # noqa: E402
 BASE_URL = 'https://api-testnet.brine.fi'
 
 load_dotenv()  # load env variables from .env
