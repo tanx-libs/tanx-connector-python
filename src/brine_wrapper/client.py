@@ -8,7 +8,17 @@ from typing import Optional
 
 class Client:
     def __init__(self, base_url: str = "https://api-testnet.brine.fi"):
-        self.session = Session(base_url)
+        self.session = Session(self.retry_login, base_url)
+        self.eth_address: str = None
+        self.user_signature: str = None
+
+    def retry_login(self) -> dict or None:
+        if self.eth_address and self.user_signature:
+            return self.login(self.eth_address, self.user_signature)
+        
+    def set_token(self, token) -> None:
+        self.session.headers.update(
+                {'Authorization': f"JWT {token}"})
 
     def test_connection(self) -> dict:
         r = self.session.get('/sapi/v1/health/')
@@ -19,8 +29,7 @@ class Client:
                              params={market: market})
         return r.json()
 
-    def get_candlestick(self, market: str, limit: int = None,
-                        period: int = None, start_time: int = None,
+    def get_candlestick(self, market: str, limit: int = None, period: int = None, start_time: int = None,
                         end_time: int = None) -> dict:
         loc = locals()
         params = params_to_dict(loc)
@@ -30,6 +39,7 @@ class Client:
 
     def get_orderbook(self, market: str, asks_limit: int = None,
                       bids_limit: int = None) -> dict:
+
         loc = locals()
         params = params_to_dict(loc)
         r = self.session.get('/sapi/v1/market/orderbook/',
@@ -60,6 +70,8 @@ class Client:
         try:
             self.session.headers.update(
                 {'Authorization': f"JWT {js['token']['access']}"})
+            self.eth_address = eth_address
+            self.user_signature = user_signature
         except KeyError:
             raise AuthenticationException('Incorrect Credentials')
         return js
@@ -145,12 +157,12 @@ class Client:
 
     def get_order(self, order_id: int) -> dict:
         self.get_auth_status()
-        r = self.session.post(f'/sapi/v1/orders/{order_id}')
+        r = self.session.get(f'/sapi/v1/orders/{order_id}')
         return r.json()
 
     def list_orders(self) -> dict:
         self.get_auth_status()
-        r = self.session.post('/sapi/v1/orders')
+        r = self.session.get('/sapi/v1/orders')
         return r.json()
 
     def cancel_order(self, order_id: int) -> dict:

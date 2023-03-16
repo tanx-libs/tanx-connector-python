@@ -4,7 +4,8 @@ import asyncio
 import json
 from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brine_wrapper import wsclient, client  # noqa: E402
+from src.brine_wrapper.client import Client  # noqa: E402
+from src.brine_wrapper.wsclient import WsClient  # noqa: E402
 
 load_dotenv()
 private_key = os.environ['PRIVATE_KEY']
@@ -18,17 +19,17 @@ async def main():
     # await WsClient.subscribe(['btcusdc.trades',
     #                           'btcusdc.ob-inc',
     #                           'btcusdc.kline-5m',])
-    Client = client.Client()
-    login = Client.complete_login(eth_address, private_key)
-    WsClient = wsclient.WsClient('private', login['token']['access'])
-    await WsClient.connect()
-    await WsClient.subscribe(['trade', 'order'])
-    await WsClient.unsubscribe(['order'])
+    client = Client()
+    login = client.complete_login(eth_address, private_key)
+    wsClient = WsClient('private', login['token']['access'])
+    await wsClient.connect()
+    await wsClient.subscribe(['trade', 'order'])
+    await wsClient.unsubscribe(['order'])
 
-    async for message in WsClient.websocket:
+    async for message in wsClient.websocket:
         print(message)
 
-    await WsClient.disconnect()
+    await wsClient.disconnect()
 
 
 # async def handler(websocket):

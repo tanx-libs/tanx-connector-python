@@ -11,4 +11,4 @@ version = "0.0.1"
 dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy"]
 
 [project.optional-dependencies]
-dev = ["pytest", "python-dotenv"]
+dev = ["pytest", "python-dotenv", "responses"]
