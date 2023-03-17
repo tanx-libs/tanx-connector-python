@@ -14,7 +14,7 @@ authors = [
 description = "A python connector for the Brine API"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy"]
+dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy", "typing-extensions"]
 
 [project.urls]
 "Homepage" = "https://github.com/upsurge0/brine-connector-python"

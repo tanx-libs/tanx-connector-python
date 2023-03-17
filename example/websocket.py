@@ -27,8 +27,9 @@ async def main():
     await ws_client.unsubscribe(['btcusdc.trades'])
 
     # operate on ws member
-    async for message in ws_client.websocket:
-        print(message)
+    if ws_client.websocket:
+        async for message in ws_client.websocket:
+            print(message)
 
     # create a rest client instance if you need to create a private websocket
     client = Client()

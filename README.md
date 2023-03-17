@@ -107,9 +107,9 @@ login: `POST /sapi/v1/auth/login/`
 ```js
 from brineconnector import sign_msg
 
-nonce = client.get_nonce(eth_address)
-user_signature = sign_msg(nonce['payload'], private_key)
-login = client.login(eth_address, user_signature)
+nonce = client.get_nonce(ETH_ADDRESS)
+user_signature = sign_msg(nonce['payload'], PRIVATE_KEY)
+login = client.login(ETH_ADDRESS, user_signature)
 
 // or
 
@@ -219,7 +219,7 @@ ws_client = WsClient('public')
 ws_client = WsClient('public', null, BASE_URL)
 // or
 login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
-ws_client =  WsClient('private', loginRes['token']['access'])
+ws_client =  WsClient('private', login['token']['access'])
 ```
 
 #### Connect

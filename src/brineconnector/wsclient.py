@@ -1,7 +1,7 @@
 import asyncio
 import websockets.client, websockets.exceptions
 from typing import Optional
-from .exception import AuthenticationError
+from .exception import AuthenticationError, ConnectNotCalled
 import json
 import socket
 
@@ -9,7 +9,8 @@ import socket
 class WsClient:
     def __init__(self, type: str = 'public', jwt: Optional[str] = None,
                  base_url: Optional[str] = "wss://api-testnet.brine.fi"):
-        websocket: Optional[websockets.client.connect]
+        self.websocket: Optional[websockets.client.WebSocketClientProtocol] = None
+        self.connection: str
         if type == 'public':
             self.connection = f"{base_url}/public"
         else:
@@ -36,6 +37,8 @@ class WsClient:
             del self.websocket
 
     async def _send(self, data: dict) -> None:
+        if not self.websocket:
+            raise ConnectNotCalled("wsclient.connect() was not called")
         while not self.websocket:
             await asyncio.sleep(0.1)
         try:

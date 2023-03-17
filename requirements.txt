@@ -25,7 +25,7 @@ charset-normalizer==3.1.0
 cytoolz==0.12.1
     # via eth-utils
 ecdsa==0.18.0
-    # via brine-wrapper (pyproject.toml)
+    # via brine-connector (pyproject.toml)
 eth-abi==4.0.0b2
     # via
     #   eth-account
@@ -102,7 +102,7 @@ regex==2022.10.31
     # via parsimonious
 requests==2.28.2
     # via
-    #   brine-wrapper (pyproject.toml)
+    #   brine-connector (pyproject.toml)
     #   web3
 rlp==3.0.0
     # via
@@ -111,16 +111,18 @@ rlp==3.0.0
 six==1.16.0
     # via ecdsa
 sympy==1.11.1
-    # via brine-wrapper (pyproject.toml)
+    # via brine-connector (pyproject.toml)
 toolz==0.12.0
     # via cytoolz
+typing-extensions==4.5.0
+    # via brine-connector (pyproject.toml)
 urllib3==1.26.15
     # via requests
 web3==6.0.0
-    # via brine-wrapper (pyproject.toml)
+    # via brine-connector (pyproject.toml)
 websockets==10.4
     # via
-    #   brine-wrapper (pyproject.toml)
+    #   brine-connector (pyproject.toml)
     #   web3
 yarl==1.8.2
     # via aiohttp
