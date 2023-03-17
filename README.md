@@ -146,19 +146,27 @@ client.get_profit_and_loss()
 
 #### Create order (Private 🔒)
 
+Create Nonce Body
+
+```py
+from brineconnector.typings import CreateOrderNonceBody
+nonce: CreateOrderNonceBody = {'market': 'btcusdt', 'ord_type': 'market',
+                               'price': 29580.51, 'side': 'buy', 'volume': 0.0001}
+```
+
 Create Order
 
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
 ```ts
-nonce = client.create_order_nonce('btcusdt', 'market', 29580.51, 'buy', 0.0001)
-msg_hash = client.sign_msg_hash(nonce['payload'], private_key)
+nonce_res = client.create_order_nonce(nonce)
+msg_hash = client.sign_msg_hash(nonce_res['payload'], private_key)
 order = client.create_new_order(msg_hash)
 
 // or
 
-const order = client.create_complete_order('btcusdt', 'market', 29580.51, 'buy', 0.00001, PRIVATE_KEY) 
+const order = client.create_complete_order(nonce, private_key) 
 // calls above functions internally
 ```
 
