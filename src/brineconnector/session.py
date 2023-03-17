@@ -1,9 +1,10 @@
 import requests
-from typing import Callable
+from typing import Callable, Union
+from data_types import LoginResponse
 
 
 class Session(requests.Session):
-    def __init__(self, retry_login: Callable[[], dict or None], url_base=None, *args, **kwargs):
+    def __init__(self, retry_login: Callable[[], Union[LoginResponse, None]], url_base=None, *args, **kwargs):
         super(Session, self).__init__(*args, **kwargs)
         self.url_base = url_base
         self.retry_login = retry_login
@@ -15,11 +16,12 @@ class Session(requests.Session):
         if response.status_code == 401 and self.headers.get('Authorization'):
             del self.headers['Authorization']
             login = self.retry_login()
-            self.headers.update(
-                {'Authorization': f"JWT {login['token']['access']}"})
-            response.request.headers.update(
-                {'Authorization': f"JWT {login['token']['access']}"})
-            return self.send(response.request, verify=False)
+            if login:
+                self.headers.update(
+                    {'Authorization': f"JWT {login['token']['access']}"})
+                response.request.headers.update(
+                    {'Authorization': f"JWT {login['token']['access']}"})
+                return self.send(response.request, verify=False)
 
         response.raise_for_status()
         return response

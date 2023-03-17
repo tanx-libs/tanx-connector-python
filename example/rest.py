@@ -19,9 +19,10 @@ def main():
     # orderbook = client.get_orderbook('btcusdt')
     # print(trades['message'])
     # print(orderbook['message'])
+    t = client.test_connection()
     try:
         login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
-        print(login)
+        print(login['token']['access'])
     except requests.exceptions.HTTPError as exc:
         print(exc.response.json())
 
