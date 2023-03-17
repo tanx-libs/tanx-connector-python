@@ -1,4 +1,5 @@
 from typing import TypedDict, TypeVar, Generic, Dict, Tuple, Union, List
+from typing_extensions import TypedDict
 
 T = TypeVar("T")
 
@@ -81,9 +82,9 @@ class CreateNewOrderBody(CreateOrderNoncePayload):
 class CreateOrderNonceBody(TypedDict):
     market: str
     ord_type: str
-    price: int
+    price: float
     side: str
-    volume: int
+    volume: float
 
 class Order(TypedDict):
     id: int

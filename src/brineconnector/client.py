@@ -49,7 +49,7 @@ class Client:
         return r.json()
 
     def get_recent_trades(self, market: str, limit: Optional[int] = None,
-                          timestamp: Optional[int] = None, order_by: Optional[int] = None) -> Response[RecentTradesPayload]:
+                          timestamp: Optional[int] = None, order_by: Optional[int] = None) -> Response[List[RecentTradesPayload]]:
         loc = locals()
         params = params_to_dict(loc)
         r = self.session.get('/sapi/v1/market/trades/',
@@ -145,7 +145,6 @@ class Client:
 
     def create_complete_order(self, nonce: CreateOrderNonceBody,  private_key: str) -> Response[Order]:
         self.get_auth_status()
-        nonce_res: Optional[Response[CreateOrderNoncePayload]] = None
         nonce_res = self.create_order_nonce(nonce)
         msg_hash = self.sign_msg_hash(nonce_res['payload'], private_key)
         order = self.create_new_order(msg_hash)

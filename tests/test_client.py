@@ -4,8 +4,10 @@ import sys
 import os
 import pytest
 import requests
+from typing import List, cast
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
+from src.brineconnector.data_types import Balance  # noqa: E402
 BASE_URL = 'https://api-testnet.brine.fi'
 
 load_dotenv()  # load env variables from .env
@@ -98,7 +100,8 @@ def test_get_balance():
                   json={'status': 'success', 'message': 'Retrieved Successfully', 'payload': [{'currency': 'btc', 'balance': '0.0091892', 'locked': '0.0'}, {
                       'currency': 'eth', 'balance': '0.2179175', 'locked': '0.0'}, {'currency': 'usdc', 'balance': '56.354237624', 'locked': '0.0'}, {'currency': 'usdt', 'balance': '79.699671653', 'locked': '0.0'}]},
                   status=200)
-    assert "balance" in client.get_balance()['payload'][0]
+    r= cast(List[Balance], client.get_balance()['payload'])
+    assert "balance" in r[0]
 
 
 @responses.activate
@@ -125,9 +128,8 @@ def test_create_complete_order():
                    json={'status': 'success', 'message': 'Created Order Successfully',
                          'payload': {}},
                    status=200)
-
-    assert "Order" in client.create_complete_order(
-        'btcusdt', 'market', 29580.51, 'buy', 0.0001, PRIVATE_KEY)['message']
+    assert "Order" in client.create_complete_order({'market': 'btcusdt', 'ord_type': 'market',
+                                                    'price': 29580.51, 'side': 'buy', 'volume': 0.0001}, PRIVATE_KEY)['message']
 
 
 @responses.activate
@@ -137,8 +139,8 @@ def test_create_order_nonce_raises_400_error():
                        'status': 'error', 'message': 'Maximum decimals allowed for volume is 4 in btcusdt market', 'payload': ''},
                    status=400)
     with pytest.raises(requests.exceptions.HTTPError):
-        client.create_complete_order(
-            'btcusdt', 'market', 29580.51, 'buy', 0.00001, PRIVATE_KEY)['message']
+        client.create_complete_order({'market': 'btcusdt', 'ord_type': 'market',
+                                      'price': 29580.51, 'side': 'buy', 'volume': 0.0001}, PRIVATE_KEY)['message']
 
 
 @responses.activate

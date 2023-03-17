@@ -1,6 +1,6 @@
 import requests
 from typing import Callable, Union
-from data_types import LoginResponse
+from .data_types import LoginResponse
 
 
 class Session(requests.Session):
