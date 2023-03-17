@@ -1,10 +1,10 @@
 from .session import Session
 from .utils import params_to_dict
 from .bin.blockchain_utils import sign_msg
-from .exception import AuthenticationException
+from .exception import AuthenticationError
 from .bin.signature import sign, get_stark_key_pair_from_signature
 from typing import Optional, Union, List
-from .data_types import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order
+from .typings import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order
 
 
 class Client:
@@ -75,7 +75,7 @@ class Client:
             self.eth_address = eth_address
             self.user_signature = user_signature
         except KeyError:
-            raise AuthenticationException('Invalid Credentials')
+            raise AuthenticationError('Invalid Credentials')
         return js
 
     def complete_login(self, eth_address: str, private_key: str) -> LoginResponse:
@@ -84,7 +84,7 @@ class Client:
             user_signature = sign_msg(nonce['payload'], private_key)
             login = self.login(eth_address, user_signature)
         except KeyError:
-            raise AuthenticationException('Invalid Credentials')
+            raise AuthenticationError('Invalid Credentials')
         return login
 
     def get_profile_info(self) -> Response[ProfileInformationPayload]:
@@ -109,7 +109,7 @@ class Client:
             if self.session.headers['Authorization']:
                 return True
         except KeyError:
-            raise AuthenticationException(
+            raise AuthenticationError(
                 'This is a private endpoint... Please use login() or complete_login() first')
         return False
 

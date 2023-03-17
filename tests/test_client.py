@@ -7,7 +7,7 @@ import requests
 from typing import List, cast
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
-from src.brineconnector.data_types import Balance  # noqa: E402
+from brineconnector.typings import Balance  # noqa: E402
 BASE_URL = 'https://api-testnet.brine.fi'
 
 load_dotenv()  # load env variables from .env
