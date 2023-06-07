@@ -2,13 +2,13 @@ from .session import Session
 from .utils import params_to_dict
 from .bin.blockchain_utils import sign_msg
 from .exception import AuthenticationError
-from .bin.signature import sign, get_stark_key_pair_from_signature
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Literal
 from .typings import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order
 
 
 class Client:
-    def __init__(self, base_url: str = "https://api-testnet.brine.fi"):
+    def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
+        base_url = "https://api-testnet.brine.fi" if option == 'testnet' else 'https://api.brine.fi'
         self.session = Session(self.retry_login, base_url)
         self.eth_address: Optional[str] = None
         self.user_signature: Optional[str] = None
@@ -119,36 +119,11 @@ class Client:
                               json=body)
         return r.json()
 
-    def sign_msg_hash(self, nonce: CreateOrderNoncePayload, private_key: str) -> CreateNewOrderBody:
-        msg_to_be_signed = "Click sign to verify you're a human - Brine.finance"
-        signature = sign_msg(msg_to_be_signed, private_key)
-        stark_creds = get_stark_key_pair_from_signature(
-            signature=signature)
-        stark_private_key = stark_creds["stark_private_key"]
-        r, s = sign(msg_hash=int(nonce['msg_hash'], 16),
-                    stark_private_key=stark_private_key)
-        create_order_request_data: CreateNewOrderBody = {
-            "nonce": nonce['nonce'],
-            "msg_hash": nonce['msg_hash'],
-            "signature": {
-                "r": hex(r),
-                "s": hex(s)
-            }
-        }
-        return create_order_request_data
-
     def create_new_order(self, body: CreateNewOrderBody) -> Response[Order]:
         self.get_auth_status()
         r = self.session.post('/sapi/v1/orders/create/',
                               json=body)
         return r.json()
-
-    def create_complete_order(self, nonce: CreateOrderNonceBody,  private_key: str) -> Response[Order]:
-        self.get_auth_status()
-        nonce_res = self.create_order_nonce(nonce)
-        msg_hash = self.sign_msg_hash(nonce_res['payload'], private_key)
-        order = self.create_new_order(msg_hash)
-        return order
 
     def get_order(self, order_id: int) -> Response[OrderPayload]:
         self.get_auth_status()

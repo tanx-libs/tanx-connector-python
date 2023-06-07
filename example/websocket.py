@@ -13,7 +13,7 @@ eth_address = os.environ['ETH_ADDRESS']
 
 async def main():
     # create a public websocket instance
-    ws_client = WsClient('public')
+    ws_client = WsClient('public', 'testnet')
 
     # check to see if connected
     await ws_client.connect()
@@ -21,8 +21,8 @@ async def main():
     # subscribe to streams
     await ws_client.subscribe(['btcusdc.trades',
                               'btcusdc.ob-inc',
-                              'btcusdc.kline-5m',])
-    
+                               'btcusdc.kline-5m',])
+
     # unsubscribe to streams
     await ws_client.unsubscribe(['btcusdc.trades'])
 
@@ -38,7 +38,7 @@ async def main():
     login = client.complete_login(eth_address, private_key)
 
     # create a private websocket instance
-    ws_client_priv = WsClient('private', login['token']['access'])
+    ws_client_priv = WsClient('private', 'mainnet', login['token']['access'])
 
     # check if connected
     await ws_client_priv.connect()

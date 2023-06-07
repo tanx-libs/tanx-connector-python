@@ -2,13 +2,7 @@
 
 ## _A Python Connector for the Brine API_
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/logo-white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/krypto-logo-dark.png">
-  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://www.brine.finance/img/brine-logo-dark.png" width="300">
-</picture>
-
-Brine-connector-python is a Python connector/wrapper for the [Brine API](https://docs.brine.finance/docs/introduction).
+Brine-connector-python is a Python connector/wrapper for the [Brine API](https://docs.brine.fi/api-documentation).
 
 ## Features
 
@@ -33,7 +27,7 @@ pip install brine-connector
 
 ## Getting Started
 
-The default base url is https://api-testnet.brine.fi .You can change it by providing a base_url through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
+The default base url for mainnet is https://api.brine.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. The default is mainnet. All REST apis, WebSockets are handled by Client, WsClient classes respectively.
 
 ### Workflow
 
@@ -52,7 +46,8 @@ Create a new instance
 ```ts
 client = Client()
 // or
-client = Client(BASE_URL)
+client = Client('testnet') 
+// default is mainnet
 ```
 
 ### General Endpoints
@@ -159,15 +154,14 @@ Create Order
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
+Currently generating L2 Key Pairs (stark keys) are only supported with the [NodeJS SDK](https://github.com/Brine-Finance-Libs/brine-connector-nodejs#create-l2-key-pair)
+
 ```ts
+from brineconnector import sign_order_with_stark_private_key
+
 nonce_res = client.create_order_nonce(nonce)
-msg_hash = client.sign_msg_hash(nonce_res['payload'], private_key)
+msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res['payload'])
 order = client.create_new_order(msg_hash)
-
-// or
-
-const order = client.create_complete_order(nonce, private_key) 
-// calls above functions internally
 ```
 
 #### Get Order (Private 🔒)
@@ -216,10 +210,11 @@ Create a new instance
 ```ts
 ws_client = WsClient('public')
 // or
-ws_client = WsClient('public', null, BASE_URL)
+ws_client = WsClient('public', 'mainnet')
+// default is mainnet
 // or
 login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
-ws_client =  WsClient('private', login['token']['access'])
+ws_client =  WsClient('private', 'mainnet', login['token']['access'])
 ```
 
 #### Connect

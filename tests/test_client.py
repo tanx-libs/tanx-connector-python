@@ -7,8 +7,9 @@ import requests
 from typing import List, cast
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
+from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
-BASE_URL = 'https://api-testnet.brine.fi'
+BASE_URL = 'https://api.brine.fi'
 
 load_dotenv()  # load env variables from .env
 PRIVATE_KEY = os.environ['PRIVATE_KEY']
@@ -22,11 +23,11 @@ def test_ping():
 
 
 def test_get_24h_price():
-    assert "btcusdt" in client.get_24h_price('btcusdt')['payload']
+    assert "btcusdc" in client.get_24h_price('btcusdc')['payload']
 
 
 def test_get_candlestick():
-    assert "Retrieval" in client.get_candlestick('btcusdt')['message']
+    assert "Retrieval" in client.get_candlestick('btcusdc')['message']
 
 
 def test_get_candlestick_raises_400_error():
@@ -35,7 +36,9 @@ def test_get_candlestick_raises_400_error():
 
 
 def test_get_orderbook():
-    assert "asks" in client.get_orderbook('btcusdt')['payload']
+    payload = client.get_orderbook('btcusdc')['payload']
+    assert "asks" in payload
+    assert "bids" in payload
 
 
 def test_get_orderbook_raises_type_error():
@@ -44,7 +47,7 @@ def test_get_orderbook_raises_type_error():
 
 
 def test_get_recent_trades():
-    assert "amount" in client.get_recent_trades('btcusdt')['payload'][0]
+    assert "amount" in client.get_recent_trades('btcusdc')['payload'][0]
 
 
 @responses.activate
@@ -100,7 +103,7 @@ def test_get_balance():
                   json={'status': 'success', 'message': 'Retrieved Successfully', 'payload': [{'currency': 'btc', 'balance': '0.0091892', 'locked': '0.0'}, {
                       'currency': 'eth', 'balance': '0.2179175', 'locked': '0.0'}, {'currency': 'usdc', 'balance': '56.354237624', 'locked': '0.0'}, {'currency': 'usdt', 'balance': '79.699671653', 'locked': '0.0'}]},
                   status=200)
-    r= cast(List[Balance], client.get_balance()['payload'])
+    r = cast(List[Balance], client.get_balance()['payload'])
     assert "balance" in r[0]
 
 
@@ -128,8 +131,13 @@ def test_create_complete_order():
                    json={'status': 'success', 'message': 'Created Order Successfully',
                          'payload': {}},
                    status=200)
-    assert "Order" in client.create_complete_order({'market': 'btcusdt', 'ord_type': 'market',
-                                                    'price': 29580.51, 'side': 'buy', 'volume': 0.0001}, PRIVATE_KEY)['message']
+    nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
+                                           'price': 29580.51, 'side': 'buy', 'volume': 0.0001})
+    stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'  # replace with your stark private key
+    msg_hash = sign_order_with_stark_private_key(
+        stark_private_key, nonce_res['payload'])
+    # msg_hash = sign_msg_hash(nonce_res['payload'], PRIVATE_KEY, 'testnet')
+    assert "Order" in client.create_new_order(msg_hash)['message']
 
 
 @responses.activate
@@ -139,8 +147,12 @@ def test_create_order_nonce_raises_400_error():
                        'status': 'error', 'message': 'Maximum decimals allowed for volume is 4 in btcusdt market', 'payload': ''},
                    status=400)
     with pytest.raises(requests.exceptions.HTTPError):
-        client.create_complete_order({'market': 'btcusdt', 'ord_type': 'market',
-                                      'price': 29580.51, 'side': 'buy', 'volume': 0.0001}, PRIVATE_KEY)['message']
+        nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
+                                           'price': 29580.51, 'side': 'buy', 'volume': 0.00001})
+        stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'  # replace with your stark private key
+        msg_hash = sign_order_with_stark_private_key(
+            stark_private_key, nonce_res['payload'])
+        client.create_new_order(msg_hash)['message']
 
 
 @responses.activate

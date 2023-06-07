@@ -1,14 +1,16 @@
 import asyncio
-import websockets.client, websockets.exceptions
-from typing import Optional
+import websockets.client
+import websockets.exceptions
+from typing import Optional, Literal
 from .exception import AuthenticationError, ConnectNotCalled
 import json
 import socket
 
 
 class WsClient:
-    def __init__(self, type: str = 'public', jwt: Optional[str] = None,
-                 base_url: Optional[str] = "wss://api-testnet.brine.fi"):
+    def __init__(self, type: str = 'public',
+                 option: Literal['mainnet', 'testnet'] = 'mainnet', jwt: Optional[str] = None):
+        base_url = "wss://api.brine.fi" if option == 'mainnet' else 'wss://api-testnet.brine.fi'
         self.websocket: Optional[websockets.client.WebSocketClientProtocol] = None
         self.connection: str
         if type == 'public':
