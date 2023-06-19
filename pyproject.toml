@@ -7,24 +7,37 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brine-connector"
-version = "0.0.1"
+version = "0.8.0"
 authors = [
   { name="Brine" },
 ]
-description = "A python connector for the Brine API"
+license = { file = "LICENSE" }
+description = "The official Python connector for Brine's API"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy==1.12", "typing-extensions"]
+dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy", "typing-extensions"]
+keywords = ["brine", "connector", "finance", "api", "wrapper", "python" ]
 
 [project.urls]
-"Homepage" = "https://github.com/upsurge0/brine-connector-python"
-"Bug Tracker" = "https://github.com/upsurge0/brine-connector-python/issues"
+"Homepage" = "https://github.com/brine-finance/brine-connector-python"
+"Bug Tracker" = "https://github.com/brine-finance/brine-connector-python/issues"
 
 [project.optional-dependencies]
-dev = ["pytest", "responses"]
+dev = ["pytest", "responses", "pip-tools", "bumpver", "build", "twine"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "brineconnector.bin" = ["*.json"]
+
+[tool.bumpver]
+current_version = "0.8.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "version: v{old_version} -> v{new_version}"
+commit = true
+tag = true
+push = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']

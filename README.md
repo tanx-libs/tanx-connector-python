@@ -1,8 +1,17 @@
-# Brine Connector Python
+<h1 align="center">Brine Connector Python</h1>
 
-## _A Python Connector for the Brine API_
+<p align="center">
+  The official Python connector for <a href="https://docs.brine.fi/api-documentation">Brine's API</a> 🚀
+</p>
 
-Brine-connector-python is a Python connector/wrapper for the [Brine API](https://docs.brine.fi/api-documentation).
+<!-- <div align="center">
+
+  [![npm version](https://img.shields.io/npm/v/@brine-fi/brine-connector)](https://www.npmjs.org/package/@brine-fi/brine-connector)
+  [![Build status](https://img.shields.io/github/actions/workflow/status/Brine-Finance-Libs/brine-connector-nodejs/main.yml)](https://github.com/Brine-Finance-Libs/brine-connector-nodejs/actions/workflows/main.yml)
+  [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@brine-fi/brine-connector)](https://bundlephobia.com/package/@brine-fi/brine-connector@latest)
+
+</div> -->
+
 
 ## Features
 
@@ -300,6 +309,6 @@ try:
 except brineconnector.exception.AuthenticationError as exc:
     print(exc)
 except requests.exceptions.HTTPError as exc:
-    print(exc)
+    print(exc.response.json())
 ```
 
