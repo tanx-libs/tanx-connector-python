@@ -11,7 +11,7 @@ Brine-connector-python is a Python connector/wrapper for the [Brine API](https:/
 - High level abstraction for ease of use.
 - Easy authentication
 - Automatically sets JWT token internally
-- Auto re-login when JWT expires
+- Auto refresh tokens when access token expires
 
 Brine-connector-python includes utility/connector functions which can be used to interact with the Brine API. It uses requests internally to handle all requests.
 
@@ -94,7 +94,7 @@ client.get_recent_trades('btcusdt')
 
 #### Login
 
-Both login() and complete_Login() sets JWT as Authorization Token. Optionally, set_token() can be used to set JWT token directly, but this will not allow client to auto-relogin on token expiry.
+Both login() and complete_Login() sets tokens internally. Optionally, set_access_token() and set_refresh_token() can be used to set tokens directly.
 
 getNonce: `POST /sapi/v1/auth/nonce/`  
 login: `POST /sapi/v1/auth/login/`
@@ -112,7 +112,27 @@ client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  // calls above functions intern
 
 // or
 
-client.set_token(jwt)
+client.set_access_token(token)
+client.set_refresh_token(token)
+// these functions are called internally when you use login or complete_login
+```
+
+#### Refresh Token
+
+`POST /sapi/v1/auth/token/refresh/`
+
+If refresh token is set (manually or by using login functions), the refresh endpoint is called automatically when access token expires. Optionally, you can call `refresh_tokens` manually by passing in refresh_token (passing it is optional, it'll work if has been set before).
+
+```ts
+res = client.refresh_tokens(refresh_token)
+```
+
+#### Logout
+
+Sets tokens to null
+
+```ts
+client.logout()
 ```
 
 #### Profile Information (Private 🔒)

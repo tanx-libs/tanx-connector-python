@@ -3,23 +3,38 @@ from .utils import params_to_dict
 from .bin.blockchain_utils import sign_msg
 from .exception import AuthenticationError
 from typing import Optional, Union, List, Literal
-from .typings import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order
+from .typings import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order, TokenType
 
 
 class Client:
     def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
         base_url = "https://api-testnet.brine.fi" if option == 'testnet' else 'https://api.brine.fi'
-        self.session = Session(self.retry_login, base_url)
-        self.eth_address: Optional[str] = None
-        self.user_signature: Optional[str] = None
+        self.session = Session(self.refresh_tokens, base_url)
+        self.access_token: Optional[str] = None
+        self.refresh_token: Optional[str] = None
 
-    def retry_login(self) -> Union[LoginResponse, None]:
-        if self.eth_address and self.user_signature:
-            return self.login(self.eth_address, self.user_signature)
+    def refresh_tokens(self, refresh_token: Optional[str] = None) -> Union[Response[TokenType], None]:
+        if refresh_token or self.refresh_token:
+            r = self.session.post('/sapi/v1/auth/token/refresh/', {
+                "refresh": refresh_token if refresh_token else self.refresh_token
+            })
+            self.set_access_token(r.json()['payload']['access'])
+            self.set_refresh_token(r.json()['payload']['refresh'])
+            return r.json()
 
-    def set_token(self, token) -> None:
+    def set_access_token(self, token: str) -> None:
+        self.access_token = token
         self.session.headers.update(
             {'Authorization': f"JWT {token}"})
+        
+    def set_refresh_token(self, token: str) -> None:
+        self.refresh_token = token
+
+    def logout(self) -> None:
+        self.access_token = None
+        self.refresh_token = None
+        if self.session.headers.get('Authorization'):
+            del self.session.headers['Authorization']
 
     def test_connection(self) -> Response[str]:
         r = self.session.get('/sapi/v1/health/')
@@ -72,8 +87,7 @@ class Client:
         try:
             self.session.headers.update(
                 {'Authorization': f"JWT {js['token']['access']}"})
-            self.eth_address = eth_address
-            self.user_signature = user_signature
+            self.set_refresh_token(js['token']['refresh'])
         except KeyError:
             raise AuthenticationError('Invalid Credentials')
         return js

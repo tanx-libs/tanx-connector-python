@@ -1,41 +1,152 @@
 import responses
-from dotenv import load_dotenv
 import sys
 import os
 import pytest
 import requests
 from typing import List, cast
+from responses import matchers
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
 BASE_URL = 'https://api.brine.fi'
 
-load_dotenv()  # load env variables from .env
-PRIVATE_KEY = os.environ['PRIVATE_KEY']
-ETH_ADDRESS = os.environ['ETH_ADDRESS']
+# load_dotenv()  # load env variables from .env
+PRIVATE_KEY = '7d6384d6877be027aa25bd458f2058e3f7ff68347dc583a9baf96f5f97b413a8'
+ETH_ADDRESS = '0x713Cf80b7c71440E7a09Dede1ee23dCBf862fB66'
 
 client = Client()
+client2 = Client()
 
 
+@responses.activate
 def test_ping():
+    responses.get(f'{BASE_URL}/sapi/v1/health/', json={
+        "status": 'success',
+        "message": 'Working fine!',
+        "payload": '',
+    })
     assert "Working" in client.test_connection()['message']
 
 
+@responses.activate
 def test_get_24h_price():
+    responses.get(f'{BASE_URL}/sapi/v1/market/tickers/',
+                  json={
+                      "status": 'success',
+                      "message": 'Retrieval Successful',
+                      "payload": {
+                          "btcusdc": {"at": '1681903275', "ticker": [{}]},
+                          "btcusdt": {"at": '1681903275', "ticker": [{}]},
+                          "ethusdc": {"at": '1681903275', "ticker": [{}]},
+                          "ethusdt": {"at": '1681903275', "ticker": [{}]},
+                          "usdcusdt": {"at": '1681903275', "ticker": [{}]},
+                      },
+                  }
+                  )
     assert "btcusdc" in client.get_24h_price('btcusdc')['payload']
 
 
+@responses.activate
 def test_get_candlestick():
+    responses.get(f'{BASE_URL}/sapi/v1/market/kline/', json={
+        "status": 'success',
+        "message": 'Retrieval Successful',
+        "payload": [
+            [1681689600, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681696800, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681704000, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681711200, 2014.02, 2014.02, 2014.02, 2014.02, 0.01],
+            [1681718400, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681725600, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681732800, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681740000, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681747200, 2014.02, 2014.02, 2014.02, 2014.02, 0.1618],
+            [1681754400, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681761600, 2014.02, 2014.02, 2014.02, 2014.02, 0.008400000000000001],
+            [1681768800, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681776000, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681783200, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681790400, 2014.02, 2014.02, 2014.02, 2014.02, 0.1],
+            [1681797600, 2014.02, 2014.02, 2014.02, 2014.02, 0.3694],
+            [1681804800, 2014.02, 2014.02, 2014.02, 2014.02, 0.05],
+            [1681812000, 2014.02, 2014.02, 2014.02, 2014.02, 0.0993],
+            [1681819200, 2014.02, 2014.02, 2014.02, 2014.02, 0.015],
+            [1681826400, 2014.02, 2014.02, 2014.02, 2014.02, 0.0066],
+            [1681833600, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681840800, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681848000, 2014.02, 2014.02, 2014.02, 2014.02, 0.0005],
+            [1681855200, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681862400, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681869600, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681876800, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+            [1681884000, 2014.02, 2014.02, 2014.02, 2014.02, 0.01],
+            [1681891200, 2014.02, 2014.02, 2014.02, 2014.02, 0.0993],
+            [1681898400, 2014.02, 2014.02, 2014.02, 2014.02, 0],
+        ],
+    })
     assert "Retrieval" in client.get_candlestick('btcusdc')['message']
 
 
+@responses.activate
 def test_get_candlestick_raises_400_error():
+    responses.get(f'{BASE_URL}/sapi/v1/market/kline/', json={
+        "status": 'error',
+        "message": 'please enter a valid market',
+        "payload": '',
+    }, status=400)
     with pytest.raises(requests.exceptions.HTTPError):
         client.get_candlestick('test')['message']
 
 
+@responses.activate
 def test_get_orderbook():
+    responses.get(f'{BASE_URL}/sapi/v1/market/orderbook/', json={
+        "status": 'success',
+        "message": 'Retrieval Successful',
+        "payload": {
+            "asks": [
+                {
+                    "id": 100,
+                    "uuid": '6f11fcb2-1ef5-4fe3-852d-c73ddc28a8d1',
+                    "side": 'sell',
+                    "ord_type": 'limit',
+                    "price": '2000.0',
+                    "avg_price": '0.0',
+                    "state": 'wait',
+                    "market": 'ethusdc',
+                    "created_at": '2023-04-19T11:02:50+02:00',
+                    "updated_at": '2023-04-19T11:02:51+02:00',
+                    "origin_volume": '0.001',
+                    "remaining_volume": '0.001',
+                    "executed_volume": '0.0',
+                    "maker_fee": '0.001',
+                    "taker_fee": '0.001',
+                    "trades_count": 0,
+                }
+            ],
+            "bids": [
+                {
+                    "id": 94,
+                    "uuid": '06755d51-fcee-4936-b847-2d4da33588ba',
+                    "side": 'buy',
+                    "ord_type": 'limit',
+                    "price": '1990.0',
+                    "avg_price": '0.0',
+                    "state": 'wait',
+                    "market": 'ethusdc',
+                    "created_at": '2023-04-19T11:01:18+02:00',
+                    "updated_at": '2023-04-19T11:01:18+02:00',
+                    "origin_volume": '0.001',
+                    "remaining_volume": '0.001',
+                    "executed_volume": '0.0',
+                    "maker_fee": '0.001',
+                    "taker_fee": '0.001',
+                    "trades_count": 0,
+                },
+            ],
+        },
+    })
     payload = client.get_orderbook('btcusdc')['payload']
     assert "asks" in payload
     assert "bids" in payload
@@ -46,7 +157,22 @@ def test_get_orderbook_raises_type_error():
         client.get_orderbook()['payload']
 
 
+@responses.activate
 def test_get_recent_trades():
+    responses.get(f'{BASE_URL}/sapi/v1/market/trades/', json={
+        "status": 'success',
+        "message": 'Retrieval Successful',
+        "payload": [
+            {
+                "id": 40,
+                "price": 1990,
+                "amount": 0.001,
+                "total": 1.99,
+                "market": 'ethusdc',
+                "created_at": 1681894870,
+                "taker_type": 'buy',
+            }
+        ]})
     assert "amount" in client.get_recent_trades('btcusdc')['payload'][0]
 
 
@@ -61,6 +187,7 @@ def test_complete_login():
                        'uid': ''}, 'token': {'refresh': 'test', 'access': 'test'}},
                    status=200)
     assert "token" in client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
+    assert "token" in client2.complete_login(ETH_ADDRESS, PRIVATE_KEY)
 
 
 @responses.activate
@@ -108,6 +235,71 @@ def test_get_balance():
 
 
 @responses.activate
+def test_get_balance_expired_access_token():
+
+    responses.get(url=f"{BASE_URL}/sapi/v1/user/balance/",
+                  json={
+                      "status": 'error',
+                      "message": 'Given token not valid for any token type',
+                      "payload": {
+                          "token_class": 'AccessToken',
+                          "token_type": 'access',
+                          "message": 'Token is invalid or expired',
+                          "code": 'token_not_valid',
+                      },
+                  },
+                  status=401)
+
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/token/refresh/", 
+                   json={
+                        "status": 'success',
+                        "message": '',
+                        "payload": {
+                            "access": 'ferasdfklre',
+                            "refresh": 'fekcjicbd',
+                        },
+                    },
+                    status=200)
+                
+    responses.get(url=f"{BASE_URL}/sapi/v1/user/balance/",
+                json={'status': 'success', 'message': 'Retrieved Successfully', 'payload': [{'currency': 'btc', 'balance': '0.0091892', 'locked': '0.0'}, {
+                    'currency': 'eth', 'balance': '0.2179175', 'locked': '0.0'}, {'currency': 'usdc', 'balance': '56.354237624', 'locked': '0.0'}, {'currency': 'usdt', 'balance': '79.699671653', 'locked': '0.0'}]},
+                status=200)
+    
+    r = cast(List[Balance], client2.get_balance()['payload'])
+
+    assert "balance" in r[0]
+
+@responses.activate
+def test_get_balance_expired_refresh_token():
+    responses.get(url=f"{BASE_URL}/sapi/v1/user/balance/",
+                  json={
+                      "status": 'error',
+                      "message": 'Given token not valid for any token type',
+                      "payload": {
+                          "token_class": 'AccessToken',
+                          "token_type": 'access',
+                          "message": 'Token is invalid or expired',
+                          "code": 'token_not_valid',
+                      },
+                  },
+                 status=401)
+
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/token/refresh/", json={
+        "status": "error",
+        "message": "Token is invalid or expired",
+        "payload": {
+            "code": "token_not_valid"
+        }
+    },
+      status=401)
+    
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        r = client2.get_balance()['payload']
+
+
+@responses.activate
 def test_get_profit_and_loss():
     responses.get(url=f"{BASE_URL}/sapi/v1/user/pnl/",
                   json={'status': 'success',
@@ -133,7 +325,8 @@ def test_create_complete_order():
                    status=200)
     nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
                                            'price': 29580.51, 'side': 'buy', 'volume': 0.0001})
-    stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'  # replace with your stark private key
+    # replace with your stark private key
+    stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
     msg_hash = sign_order_with_stark_private_key(
         stark_private_key, nonce_res['payload'])
     # msg_hash = sign_msg_hash(nonce_res['payload'], PRIVATE_KEY, 'testnet')
@@ -148,8 +341,9 @@ def test_create_order_nonce_raises_400_error():
                    status=400)
     with pytest.raises(requests.exceptions.HTTPError):
         nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
-                                           'price': 29580.51, 'side': 'buy', 'volume': 0.00001})
-        stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'  # replace with your stark private key
+                                               'price': 29580.51, 'side': 'buy', 'volume': 0.00001})
+        # replace with your stark private key
+        stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
         msg_hash = sign_order_with_stark_private_key(
             stark_private_key, nonce_res['payload'])
         client.create_new_order(msg_hash)['message']

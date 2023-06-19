@@ -128,7 +128,7 @@ rlp==3.0.0
     #   eth-rlp
 six==1.16.0
     # via ecdsa
-sympy==1.11.1
+sympy==1.12
     # via brine-connector (pyproject.toml)
 tomli==2.0.1
     # via pytest

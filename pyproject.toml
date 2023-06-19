@@ -14,14 +14,14 @@ authors = [
 description = "A python connector for the Brine API"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy", "typing-extensions"]
+dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy==1.12", "typing-extensions"]
 
 [project.urls]
 "Homepage" = "https://github.com/upsurge0/brine-connector-python"
 "Bug Tracker" = "https://github.com/upsurge0/brine-connector-python/issues"
 
 [project.optional-dependencies]
-dev = ["pytest", "python-dotenv", "responses"]
+dev = ["pytest", "responses"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
