@@ -144,9 +144,11 @@ class Client:
         r = self.session.get(f'/sapi/v1/orders/{order_id}')
         return r.json()
 
-    def list_orders(self) -> Response[List[OrderPayload]]:
+    def list_orders(self, limit: Optional[int] = 50, page: Optional[int] = None, market: Optional[str] = None, ord_type: Optional[str] = None, state: Optional[str] = None, base_unit: Optional[str] = None, quote_unit: Optional[str] = None, start_time: Optional[int] = None, end_time: Optional[int] = None, side: Optional[str] = None) -> Response[List[OrderPayload]]:
         self.get_auth_status()
-        r = self.session.get('/sapi/v1/orders')
+        loc = locals()
+        params = params_to_dict(loc)
+        r = self.session.get('/sapi/v1/orders', params=params)
         return r.json()
 
     def cancel_order(self, order_id: int) -> Response[CancelOrder]:

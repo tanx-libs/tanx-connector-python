@@ -206,7 +206,17 @@ client.get_order(order_id)
 `GET /sapi/v1/orders/`
 
 ```ts
-client.list_orders()
+client.list_orders(
+  limit=50,
+  page=1,
+  market='btcusdc',
+  state='wait',
+  base_unit='btc',
+  quote_unit='usdc',
+  start_time=1694785739,
+  end_time=1694785839,
+  side='buy'
+)
 ```
 
 #### Cancel Order (Private 🔒)
