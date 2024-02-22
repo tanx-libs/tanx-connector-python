@@ -1,17 +1,49 @@
 from .session import Session
-from .utils import params_to_dict
+from .utils import *
 from .bin.blockchain_utils import sign_msg
-from .exception import AuthenticationError
+from .exception import *
+import subprocess
 from typing import Optional, Union, List, Literal
-from .typings import Response, LoginResponse, FullDayPricePayload, CandleStickPayload, OrderBookPayload, RecentTradesPayload, ProfileInformationPayload, Balance, ProfitAndLossPayload, CreateOrderNoncePayload, CreateNewOrderBody, OrderPayload, CreateOrderNonceBody, CancelOrder, TradePayload, Order, TokenType
+from .typings import (
+    Response,
+    LoginResponse,
+    FullDayPricePayload,
+    CandleStickPayload,
+    OrderBookPayload,
+    RecentTradesPayload,
+    ProfileInformationPayload,
+    Balance,
+    ProfitAndLossPayload,
+    CreateOrderNoncePayload,
+    CreateNewOrderBody,
+    OrderPayload,
+    CreateOrderNonceBody,
+    CancelOrder,
+    TradePayload,
+    Order,
+    TokenType,
+    CoinStat,
+    CoinStatPayload
+)
+from web3 import Web3, Account
+from .constants import Config
+from decimal import Decimal
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
+rpc_provider = os.environ['RPC_PROVIDER']
+
+my_provider = Web3.HTTPProvider(rpc_provider)
+w3 = Web3(my_provider)
 
 class Client:
     def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
-        base_url = "https://api-testnet.brine.fi" if option == 'testnet' else 'https://api.brine.fi'
+        base_url = "https://api-testnet.tanx.fi" if option == 'testnet' else 'https://api.tanx.fi'
         self.session = Session(self.refresh_tokens, base_url)
         self.access_token: Optional[str] = None
         self.refresh_token: Optional[str] = None
+        self.option = option
 
     def refresh_tokens(self, refresh_token: Optional[str] = None) -> Union[Response[TokenType], None]:
         if refresh_token or self.refresh_token:
@@ -74,14 +106,14 @@ class Client:
     def get_nonce(self, eth_address: str) -> Response[str]:
         loc = locals()
         body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/auth/nonce/',
+        r = self.session.post('/sapi/v1/auth/v2/nonce/',
                               json=body)
         return r.json()
 
     def login(self, eth_address: str, user_signature: str) -> LoginResponse:
         loc = locals()
         body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/auth/login/',
+        r = self.session.post('/sapi/v1/auth/v2/login/',
                               json=body)
         js = r.json()
         try:
@@ -164,3 +196,172 @@ class Client:
         body = params_to_dict(loc)
         r = self.session.get('/sapi/v1/trades/', json=body)
         return r.json()
+
+    def get_coin_stats(self):
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.post('/main/stat/v2/coins/', json=body)
+        return r.json()
+
+    def get_vault_id(self, coin: str):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.post('/main/user/create_vault/', json=body)
+        return r.json()
+
+    def get_token_balance(self, provider: Web3, eth_address: str, currency: str):
+        if currency == 'eth':
+            balance_wei = provider.eth.get_balance(eth_address) # type: ignore
+            balance_eth = w3.fromWei(balance_wei, 'ether')
+            return balance_eth
+
+        coin_stats =  self.get_coin_stats()
+        print(coin_stats)
+        current_coin = filter_ethereum_coin(coin_stats['payload'], currency)
+        token_contract = current_coin['token_contract']
+        decimal = current_coin['decimal']
+        
+        contract = provider.eth.contract(address=token_contract, abi=Config.ERC20_ABI) # type:ignore
+        balance = contract.functions.balanceOf(eth_address).call()
+        normal_balance = int(balance) / (10 ** int(decimal)) # type:ignore
+        return normal_balance
+
+    def crypto_deposit_start(self, amount, stark_asset_id, stark_public_key, deposit_blockchain_hash, deposit_blockchain_nonce, vault_id):
+        amount_to_string = str(amount)
+        payload = {
+            'amount': amount_to_string,
+            'token_id': stark_asset_id,
+            'stark_key': stark_public_key,
+            'deposit_blockchain_hash': deposit_blockchain_hash,
+            'deposit_blockchain_nonce': deposit_blockchain_nonce,
+            'vault_id': vault_id
+        }
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.post('/sapi/v1/payment/stark/start/', json=payload)
+        return r.json()
+
+    def approve_unlimited_allowance_ethereum_network(self, coin, signer):
+        coin_stats = self.get_coin_stats()
+        current_coin = filter_ethereum_coin(coin_stats['payload'], coin)
+        token_contract = current_coin['token_contract']
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        res = approve_unlimited_allowance_util(stark_contract, token_contract, signer)
+        return res
+
+
+    def deposit_from_ethereum_network_with_starkKey(self, signer, provider, stark_public_key, amount, currency: str):
+        amount = Decimal(amount)
+        if amount <= 0:
+            raise ValueError("Please enter a valid amount. It should be a numerical value greater than zero.")
+
+        self.get_auth_status()
+        coin_stats = self.get_coin_stats()['payload']
+        current_coin = filter_ethereum_coin(coin_stats, currency)
+        quanitization = current_coin['quanitization']
+        decimal = current_coin['decimal']
+        token_contract = current_coin['token_contract']
+        stark_asset_id = current_coin['stark_asset_id']
+
+        quantized_amount = amount*(10**int(quanitization))
+
+        vault = self.get_vault_id(currency)
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        stark_abi = Config.STARK_ABI[self.option]
+
+        contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
+        parsed_amount = w3.toWei(amount, 'ether')
+        gwei = w3.toWei(amount, 'gwei')
+
+        overrides = {
+            'from': signer.address,
+            'value': w3.toWei(amount, 'ether'),
+            'nonce': get_nonce(signer, provider)
+        }
+
+
+        balance = self.get_token_balance(provider, signer.address, currency)
+
+        if balance < amount:
+            raise BalanceTooLowError(f'Current Balance ({balance}) for "{currency}" is too low, please add balance before deposit')
+
+        stark_public_key_uint = int(get_0x0_to_0x(stark_public_key), 16)
+        stark_asset_id_uint = int(get_0x0_to_0x(stark_asset_id), 16)
+        if currency == 'eth':
+            transaction_pre_build = contract_instance.functions.depositEth(
+                stark_public_key_uint,
+                stark_asset_id_uint,
+                vault['payload']['id']
+            )
+
+        else:
+            print('here')
+            allowance = get_allowance(signer.address, stark_contract, token_contract, decimal, provider)
+            print(signer.address)
+            if allowance < amount:
+                raise ValueError(f"Current Allowance ({allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()")
+            transaction_pre_build = contract_instance.functions.depositERC20(
+                stark_public_key_uint,
+                stark_asset_id_uint,
+                vault['payload']['id'],
+                int(quantized_amount)
+            )
+
+        transaction = transaction_pre_build.buildTransaction(overrides)
+        signed_tx = signer.sign_transaction(transaction)
+        # send this signed transaction to blockchain
+        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        deposit_response = signed_tx
+
+        res = self.crypto_deposit_start(
+            gwei * 10 if currency == 'eth' else quantized_amount,
+            get_0x0_to_0x(stark_asset_id),
+            get_0x0_to_0x(stark_public_key),
+            deposit_response['hash'].hex(),
+            transaction['nonce'],
+            vault['payload']['id']
+        )
+
+        res['payload'] = {'transaction_hash': deposit_response['hash'].hex()}
+
+        return res
+
+    def deposit_from_ethereum_network(self, rpc_url, eth_private_key, network, currency, amount):
+        self.get_auth_status()
+        user_signature = create_user_signature(eth_private_key, network)
+        key_pair = get_stark_key_pair_from_signature(user_signature)
+        stark_public_key = key_pair['stark_public_key']
+        provider = Web3(Web3.HTTPProvider(rpc_url))
+        signer = Account.from_key(eth_private_key)
+        return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', str(amount), currency)
+
+
+    def call_nodejs_method(self, private_key, option='testnet'):
+        node_script = """
+        const createUserSignature = (
+        privateKey,
+        option = 'mainnet',
+        ) => {
+        const msgToBeSigned =
+            option === 'testnet'
+            ? "Click sign to verify you're a human - TanX Finance"
+            : 'Get started with TanX. Make sure the origin is https://trade.tanx.fi';
+        return msgToBeSigned;
+        };
+        const result = createUserSignature('{}', '{}');
+        console.log(result);
+        """.format(private_key, option)
+
+        result = subprocess.run(
+            ["node", "-e", node_script],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode == 0:
+            signature = result.stdout.strip()
+            # print("Signature:", signature)
+            return signature
+        else:
+            print("Error:", result.stderr)
