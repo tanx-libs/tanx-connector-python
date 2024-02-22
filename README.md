@@ -1,14 +1,14 @@
-<h1 align="center">Brine Connector Python</h1>
+<h1 align="center">tanX Connector Python</h1>
 
 <p align="center">
-  The official Python connector for <a href="https://docs.brine.fi/api-documentation">Brine's API</a> 🚀
+  The official Python connector for <a href="https://docs.tanx.fi/tech/api-documentation">tanX's API</a> 🚀
 </p>
 
 <!-- <div align="center">
 
-  [![npm version](https://img.shields.io/npm/v/@brine-fi/brine-connector)](https://www.npmjs.org/package/@brine-fi/brine-connector)
-  [![Build status](https://img.shields.io/github/actions/workflow/status/Brine-Finance-Libs/brine-connector-nodejs/main.yml)](https://github.com/Brine-Finance-Libs/brine-connector-nodejs/actions/workflows/main.yml)
-  [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@brine-fi/brine-connector)](https://bundlephobia.com/package/@brine-fi/brine-connector@latest)
+  [![npm version](https://img.shields.io/npm/v/@tanx-fi/tanx-connector)](https://www.npmjs.org/package/@tanx-fi/tanx-connector)
+  [![Build status](https://img.shields.io/github/actions/workflow/status/tanx-Libs/tanx-connector-nodejs/main.yml)](https://github.com/tanX-Finance-Libs/tanX-connector-nodejs/actions/workflows/main.yml)
+  [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@tanx-fi/tanx-connector)](https://bundlephobia.com/package/@tanx-fi/tanx-connector@latest)
 
 </div> -->
 
@@ -22,21 +22,15 @@
 - Automatically sets JWT token internally
 - Auto refresh tokens when access token expires
 
-Brine-connector-python includes utility/connector functions which can be used to interact with the Brine API. It uses requests internally to handle all requests.
+Tanx-connector-python includes utility/connector functions which can be used to interact with the Brine API. It uses requests internally to handle all requests.
 
 ## Installation
 
-First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
-
-Install the package.
-
-```sh
-pip install brine-connector
-```
+First go to the [tanX Website](https://www.tanx.fi/) and create an account with your wallet.
 
 ## Getting Started
 
-The default base url for mainnet is https://api.brine.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. The default is mainnet. All REST apis, WebSockets are handled by Client, WsClient classes respectively.
+The default base url for mainnet is https://api.tanx.fi and testnet is https://api-testnet.tanx.fi. You can choose between mainnet and testnet by providing it through the constructor. The default is mainnet. All REST apis, WebSockets are handled by Client, WsClient classes respectively.
 
 ### Workflow
 
@@ -47,7 +41,7 @@ Check out the [example files](./example) to see an example workflow.
 Import the REST Client
 
 ```py
-from brineconnector import Client
+from tanxconnector import Client
 ```
 
 Create a new instance
@@ -316,7 +310,7 @@ Example
 ```py
 try:
     # call methods
-except brineconnector.exception.AuthenticationError as exc:
+except tanxconnector.exception.AuthenticationError as exc:
     print(exc)
 except requests.exceptions.HTTPError as exc:
     print(exc.response.json())
