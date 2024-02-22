@@ -154,7 +154,7 @@ def test_get_orderbook():
 
 def test_get_orderbook_raises_type_error():
     with pytest.raises(TypeError):
-        client.get_orderbook()['payload']
+        client.get_orderbook()['payload'] # type:ignore
 
 
 @responses.activate
