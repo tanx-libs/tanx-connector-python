@@ -217,7 +217,6 @@ class Client:
             return balance_eth
 
         coin_stats =  self.get_coin_stats()
-        print(coin_stats)
         current_coin = filter_ethereum_coin(coin_stats['payload'], currency)
         token_contract = current_coin['token_contract']
         decimal = current_coin['decimal']
@@ -268,15 +267,20 @@ class Client:
 
         vault = self.get_vault_id(currency)
         stark_contract = Config.STARK_CONTRACT[self.option]
+        # ABI is what defines the intrinsic properties of a smart contract
         stark_abi = Config.STARK_ABI[self.option]
 
         contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
         parsed_amount = w3.toWei(amount, 'ether')
         gwei = w3.toWei(amount, 'gwei')
 
+        # In the context of building transactions on the Ethereum network, 
+        # "overrides" typically refer to parameters that allow you to customize 
+        # the behavior of a transaction. These overrides can be used when interacting 
+        # with smart contracts, and they provide a way to specify details such as 
+        # the amount of gas to use, the gas price, the recipient address, and the value to send.
         overrides = {
             'from': signer.address,
-            'value': w3.toWei(amount, 'ether'),
             'nonce': get_nonce(signer, provider)
         }
 
@@ -289,6 +293,13 @@ class Client:
         stark_public_key_uint = int(get_0x0_to_0x(stark_public_key), 16)
         stark_asset_id_uint = int(get_0x0_to_0x(stark_asset_id), 16)
         if currency == 'eth':
+            # On the smart contracts itself (not override parameter)
+            # - For transactions involving Ether (ETH), the value is implicit and 
+            #     doesn't need to be explicitly specified.
+            # - For transactions involving other tokens on the Ethereum network, 
+            #     you typically interact with smart contracts, and you need to explicitly specify 
+            #     the value and other parameters required by the contract.
+            overrides['value'] = w3.toWei(amount, 'ether'),
             transaction_pre_build = contract_instance.functions.depositEth(
                 stark_public_key_uint,
                 stark_asset_id_uint,
@@ -296,9 +307,7 @@ class Client:
             )
 
         else:
-            print('here')
             allowance = get_allowance(signer.address, stark_contract, token_contract, decimal, provider)
-            print(signer.address)
             if allowance < amount:
                 raise ValueError(f"Current Allowance ({allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()")
             transaction_pre_build = contract_instance.functions.depositERC20(

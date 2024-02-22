@@ -18,7 +18,7 @@ class Config:
     STARK_CONTRACT = {
         "mainnet": "0x1390f521A79BaBE99b69B37154D63D431da27A07",
         "testnet": "0xA2eC709125Ea693f5522aEfBBC3cb22fb9146B52",
-        # "testnet": "0x87eB0b1B5958c7fD034966925Ea026ad8Bf3d6dD",
+        # "testnet": "0x87eB0b1B5958c7fD034966925Ea026ad8Bf3d6dD", # old adress used at the time of goerli
     }
     STARK_ABI = {
         "mainnet": starkex_abi_main,

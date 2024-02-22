@@ -4,14 +4,13 @@ from .typings import CreateOrderNoncePayload, CreateNewOrderBody, CoinStatPayloa
 from .exception import CoinNotFoundError
 from .constants import Config, MAX_INT_ALLOWANCE
 from typing import Literal
-from web3 import Web3
+from web3 import Web3, Account
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 rpc_provider = os.environ['RPC_PROVIDER']
 w3 = Web3(Web3.HTTPProvider(rpc_provider))
-print(rpc_provider)
 
 def params_to_dict(dict: dict) -> dict:
     del dict['self']
@@ -79,9 +78,7 @@ def get_allowance(user_address, stark_contract, token_contract, decimal, provide
 
 def approve_unlimited_allowance_util(contract_address, token_contract, signer):
     gas_price = w3.eth.gas_price
-    print('token contract is:', token_contract)
     contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI)
-    print('contract address is:', contract_address)
 
     gas_limit = contract_instance.functions.approve(
         contract_address,
@@ -89,10 +86,10 @@ def approve_unlimited_allowance_util(contract_address, token_contract, signer):
     ).estimateGas({"from": token_contract})
     # so basically, if token contract is not provided, it'll try to approve from 0 address account,
     # so providing a from account, other way is to initialize web3 using private key
-    print(gas_limit, gas_price)
     overrides = {
         'gas': gas_limit,
-        'gasPrice': gas_price
+        'gasPrice': gas_price,
+        'nonce': get_nonce(signer=signer, provider=w3),
     }
     amount = int(MAX_INT_ALLOWANCE)
     transaction_pre_build = contract_instance.functions.approve(contract_address, amount)
@@ -101,6 +98,5 @@ def approve_unlimited_allowance_util(contract_address, token_contract, signer):
     # send this signed transaction to blockchain
     w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
     approval = signed_tx
-    print('yello')
     return approval
 
