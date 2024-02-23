@@ -2,7 +2,6 @@ from .session import Session
 from .utils import *
 from .bin.blockchain_utils import sign_msg
 from .exception import *
-import subprocess
 from typing import Optional, Union, List, Literal
 from .typings import (
     Response,
@@ -22,13 +21,10 @@ from .typings import (
     TradePayload,
     Order,
     TokenType,
-    CoinStat,
-    CoinStatPayload
 )
 from web3 import Web3, Account
 from .constants import Config
 from decimal import Decimal
-import os
 
 class Client:
     def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
@@ -339,32 +335,3 @@ class Client:
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', str(amount), currency)
 
-
-    def call_nodejs_method(self, private_key, option='testnet'):
-        node_script = """
-        const createUserSignature = (
-        privateKey,
-        option = 'mainnet',
-        ) => {
-        const msgToBeSigned =
-            option === 'testnet'
-            ? "Click sign to verify you're a human - TanX Finance"
-            : 'Get started with TanX. Make sure the origin is https://trade.tanx.fi';
-        return msgToBeSigned;
-        };
-        const result = createUserSignature('{}', '{}');
-        console.log(result);
-        """.format(private_key, option)
-
-        result = subprocess.run(
-            ["node", "-e", node_script],
-            capture_output=True,
-            text=True
-        )
-
-        if result.returncode == 0:
-            signature = result.stdout.strip()
-            # print("Signature:", signature)
-            return signature
-        else:
-            print("Error:", result.stderr)
