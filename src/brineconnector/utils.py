@@ -6,11 +6,6 @@ from .constants import Config, MAX_INT_ALLOWANCE
 from typing import Literal
 from web3 import Web3, Account
 import os
-from dotenv import load_dotenv
-load_dotenv()
-
-rpc_provider = os.environ['RPC_PROVIDER']
-w3 = Web3(Web3.HTTPProvider(rpc_provider))
 
 def params_to_dict(dict: dict) -> dict:
     del dict['self']
@@ -70,13 +65,13 @@ def dequantize(number, decimals):
     factor = 10**decimals
     return number/factor
 
-def get_allowance(user_address, stark_contract, token_contract, decimal, provider):
+def get_allowance(user_address, stark_contract, token_contract, decimal, w3):
     contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI) # type:ignore
     allowance = contract_instance.functions.allowance(user_address, stark_contract).call()
     allowance_decimal = dequantize(int(allowance), int(decimal))
     return allowance_decimal
 
-def approve_unlimited_allowance_util(contract_address, token_contract, signer):
+def approve_unlimited_allowance_util(contract_address, token_contract, signer, w3):
     gas_price = w3.eth.gas_price
     contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI)
 

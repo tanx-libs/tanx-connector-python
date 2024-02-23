@@ -28,14 +28,7 @@ from .typings import (
 from web3 import Web3, Account
 from .constants import Config
 from decimal import Decimal
-from dotenv import load_dotenv
 import os
-load_dotenv()
-
-rpc_provider = os.environ['RPC_PROVIDER']
-
-my_provider = Web3.HTTPProvider(rpc_provider)
-w3 = Web3(my_provider)
 
 class Client:
     def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
@@ -213,7 +206,7 @@ class Client:
     def get_token_balance(self, provider: Web3, eth_address: str, currency: str):
         if currency == 'eth':
             balance_wei = provider.eth.get_balance(eth_address) # type: ignore
-            balance_eth = w3.fromWei(balance_wei, 'ether')
+            balance_eth = provider.fromWei(balance_wei, 'ether')
             return balance_eth
 
         coin_stats =  self.get_coin_stats()
@@ -241,16 +234,17 @@ class Client:
         r = self.session.post('/sapi/v1/payment/stark/start/', json=payload)
         return r.json()
 
-    def approve_unlimited_allowance_ethereum_network(self, coin, signer):
+    def approve_unlimited_allowance_ethereum_network(self, coin, signer, w3):
         coin_stats = self.get_coin_stats()
         current_coin = filter_ethereum_coin(coin_stats['payload'], coin)
         token_contract = current_coin['token_contract']
         stark_contract = Config.STARK_CONTRACT[self.option]
-        res = approve_unlimited_allowance_util(stark_contract, token_contract, signer)
+        res = approve_unlimited_allowance_util(contract_address=stark_contract, token_contract=token_contract, signer=signer, w3=w3)
         return res
 
 
     def deposit_from_ethereum_network_with_starkKey(self, signer, provider, stark_public_key, amount, currency: str):
+        w3 = provider
         amount = Decimal(amount)
         if amount <= 0:
             raise ValueError("Please enter a valid amount. It should be a numerical value greater than zero.")
@@ -299,7 +293,7 @@ class Client:
             # - For transactions involving other tokens on the Ethereum network, 
             #     you typically interact with smart contracts, and you need to explicitly specify 
             #     the value and other parameters required by the contract.
-            overrides['value'] = w3.toWei(amount, 'ether'),
+            overrides['value'] = w3.toWei(amount, 'ether')
             transaction_pre_build = contract_instance.functions.depositEth(
                 stark_public_key_uint,
                 stark_asset_id_uint,
@@ -307,7 +301,7 @@ class Client:
             )
 
         else:
-            allowance = get_allowance(signer.address, stark_contract, token_contract, decimal, provider)
+            allowance = get_allowance(user_address=signer.address, stark_contract=stark_contract, token_contract=token_contract, decimal=decimal, w3=provider)
             if allowance < amount:
                 raise ValueError(f"Current Allowance ({allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()")
             transaction_pre_build = contract_instance.functions.depositERC20(
