@@ -1,8 +1,11 @@
 from .bin.signature import sign, get_stark_key_pair_from_signature
 from .bin.blockchain_utils import sign_msg
-from .typings import CreateOrderNoncePayload, CreateNewOrderBody
+from .typings import CreateOrderNoncePayload, CreateNewOrderBody, CoinStatPayload
+from .exception import CoinNotFoundError
+from .constants import Config, MAX_INT_ALLOWANCE
 from typing import Literal
-
+from web3 import Web3, Account
+import os
 
 def params_to_dict(dict: dict) -> dict:
     del dict['self']
@@ -22,7 +25,7 @@ def sign_msg_hash(nonce: CreateOrderNoncePayload, private_key: str, option: Lite
 
 
 def create_user_signature(private_key: str, option: Literal['mainnet', 'testnet'] = 'mainnet') -> str:
-    msg_to_be_signed = "Click sign to verify you're a human - Brine.finance" if option == 'testnet' else 'Get started with Brine. Make sure the origin is https://trade.brine.fi'
+    msg_to_be_signed = "Click sign to verify you\'re a human - TanX Finance" if option == 'testnet' else 'Get started with Brine. Make sure the origin is https://trade.brine.fi'
     user_signature = sign_msg(msg_to_be_signed, private_key)
     return user_signature
 

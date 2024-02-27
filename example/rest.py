@@ -1,6 +1,7 @@
 import requests
 import sys
 import os
+from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_msg  # noqa: E402
@@ -108,9 +109,6 @@ def ethereumDeposit():
         #     0.00001
         # )
         # print(deposit_res_with_private_key)
-
-    except Exception as e:
-        print(e)
 
         # # approval for unlimited allowance for ERC20 contracts
         # allowance = client.approve_unlimited_allowance_ethereum_network('usdc', signer)

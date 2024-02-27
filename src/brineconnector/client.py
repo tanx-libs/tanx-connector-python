@@ -1,7 +1,7 @@
 from .session import Session
-from .utils import params_to_dict
+from .utils import *
 from .bin.blockchain_utils import sign_msg
-from .exception import AuthenticationError
+from .exception import *
 from typing import Optional, Union, List, Literal
 from .typings import (
     Response,
@@ -29,10 +29,11 @@ from web3.middleware.geth_poa import geth_poa_middleware
 
 class Client:
     def __init__(self, option: Literal['mainnet', 'testnet'] = 'mainnet'):
-        base_url = "https://api-testnet.brine.fi" if option == 'testnet' else 'https://api.brine.fi'
+        base_url = "https://api-testnet.tanx.fi" if option == 'testnet' else 'https://api.tanx.fi'
         self.session = Session(self.refresh_tokens, base_url)
         self.access_token: Optional[str] = None
         self.refresh_token: Optional[str] = None
+        self.option = option
 
     def refresh_tokens(self, refresh_token: Optional[str] = None) -> Union[Response[TokenType], None]:
         if refresh_token or self.refresh_token:
@@ -95,14 +96,14 @@ class Client:
     def get_nonce(self, eth_address: str) -> Response[str]:
         loc = locals()
         body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/auth/nonce/',
+        r = self.session.post('/sapi/v1/auth/v2/nonce/',
                               json=body)
         return r.json()
 
     def login(self, eth_address: str, user_signature: str) -> LoginResponse:
         loc = locals()
         body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/auth/login/',
+        r = self.session.post('/sapi/v1/auth/v2/login/',
                               json=body)
         js = r.json()
         try:
