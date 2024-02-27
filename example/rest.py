@@ -108,7 +108,7 @@ def ethereumDeposit():
 
 
         # # approval for unlimited allowance for ERC20 contracts
-        # allowance = client.approve_unlimited_allowance_ethereum_network('usdc', signer)
+        # allowance = client.approve_unlimited_allowance_ethereum_network('usdc', signer, provider)
         # print(allowance)
 
         # # deposit with L2 key
