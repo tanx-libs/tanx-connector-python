@@ -335,3 +335,50 @@ class Client:
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', str(amount), currency)
 
+    def start_normal_withdrawl(self, body):
+        payload = {
+            'amount': body['amount'],
+            'token_id': body['symbol']
+        }
+        r = self.session.post('/sapi/v1/payment/withdrawals/v1/initiate/', json=payload)
+        return r.json()
+
+    def validate_normal_withdrawal(self, body):
+        r = self.session.post('/sapi/v1/payment/withdrawals/v1/validate/', json=body)
+        return r.json()
+
+    def initiate_normal_withdrawl(self, key_pair, amount, coin_symbol):
+        if Decimal(amount)<=0:
+            raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
+        self.get_auth_status()
+        initiate_response = self.start_normal_withdrawl({'amount': amount, 'symbol': coin_symbol})
+        print(initiate_response)
+        signature = sign_withdrawal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
+        msg_hex = initiate_response['payload']['msg_hash']
+        msg_hex = hex(int(msg_hex))
+
+        validate_response = self.validate_normal_withdrawal({
+            'msg_hash': str(msg_hex[2:]),
+            'signature': signature,
+            'nonce': initiate_response['payload']['nonce']
+        })
+        return validate_response
+
+    def get_pending_normal_withdrawal_amount_by_coin(self, coin_symbol, user_public_eth_address, signer, provider):
+        self.get_auth_status()
+        w3 = provider
+        coin_stats = self.get_coin_stats()['payload']
+        current_coin = filter_ethereum_coin(coin_stats_payload=coin_stats, coin=coin_symbol)
+        stark_asset_id = current_coin['stark_asset_id']
+        blockchain_decimal = current_coin['blockchain_decimal']
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        stark_abi = Config.STARK_ABI[self.option]
+
+        contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
+        
+        balance = contract_instance.functions.getWithdrawalBalance(
+            int(user_public_eth_address, 16),
+            int(stark_asset_id, 16)
+        ).call()
+
+        return format_withdrawal_amount(amount=balance, decimals=Decimal(blockchain_decimal), symbol=coin_symbol)

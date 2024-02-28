@@ -58,7 +58,7 @@ def main():
     # # cancel order (private)
     # nonce_res_for_order_to_cancel = client.create_order_nonce(nonce)
     # msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res_for_order_to_cancel['payload'])
-    # # msg_hash = sign_msg_hash(nonce_res_for_order_to_cancel['payload'], PRIVATE_KEY, 'testnet')
+    # msg_hash = sign_msg_hash(nonce_res_for_order_to_cancel['payload'], PRIVATE_KEY, 'testnet')
     # try:
     #     order_to_cancel = client.create_new_order(msg_hash)
     #     cancelled_order = client.cancel_order(order_to_cancel['payload']['id'])
@@ -77,7 +77,7 @@ def main():
 # main()
 
 # Deposits
-def ethereumDeposit():
+def ethereum_deposit_and_withdrawal():
     try:
         client = Client('testnet')
         try:
@@ -121,7 +121,23 @@ def ethereumDeposit():
         # )
         # print(deposit_res_with_stark_keys)
 
+        # # Withdrawals
+        # # Normal withdrawal
+        # # 1. Initiate your withdrawal request by calling "initiateNormalWithdrawal".
+        # withdrawal_res = client.initiate_normal_withdrawl(key_pair=key_pair, amount=0.0001, coin_symbol='usdc')
+        # print(withdrawal_res)
+        # # 2. WAIT for up to 24 hours.
+        # # 3. Call the function "get_pending_normal_withdrawal_amount_by_coin" by passing the required parameter
+        # #    to check whether the withdrawn balance is pending
+        # pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(coin_symbol='eth', user_public_eth_address=ETH_ADDRESS,
+        #                                                                         signer=signer, provider=provider)
+        # print(pending_balance)
+        # # 4. Final step - if you find the balance is more than 0, you can call "completeNormalWithdrawal"
+        # #    to withdraw the cumulative amount to your ETH wallet.
+
+
+
     except Exception as e:
         print(e)
 
-ethereumDeposit()
+ethereum_deposit_and_withdrawal()
