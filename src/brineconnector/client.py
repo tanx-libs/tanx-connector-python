@@ -348,7 +348,7 @@ class Client:
         return r.json()
 
     def initiate_normal_withdrawl(self, key_pair, amount, coin_symbol):
-        if Decimal(amount)<=0:
+        if float(amount)<=0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
         initiate_response = self.start_normal_withdrawl({'amount': amount, 'symbol': coin_symbol})
@@ -381,7 +381,7 @@ class Client:
             int(stark_asset_id, 16)
         ).call()
 
-        return format_withdrawal_amount(amount=balance, decimals=Decimal(blockchain_decimal), symbol=coin_symbol)
+        return format_withdrawal_amount(amount=balance, decimals=float(blockchain_decimal), symbol=coin_symbol)
 
     def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
         self.get_auth_status()
