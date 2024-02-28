@@ -21,6 +21,7 @@ from .typings import (
     TradePayload,
     Order,
     TokenType,
+    ListDepositParams,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -196,6 +197,13 @@ class Client:
         loc = locals()
         body = params_to_dict(loc)
         r = self.session.post('/main/user/create_vault/', json=body)
+        return r.json()
+
+    def list_deposits(self, params: ListDepositParams):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.get('/sapi/v1/deposits/', json=body)
         return r.json()
 
     def get_token_balance(self, provider: Web3, eth_address: str, currency: str):

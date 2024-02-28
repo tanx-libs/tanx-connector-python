@@ -96,15 +96,15 @@ def ethereumDeposit():
         provider = Web3(Web3.HTTPProvider(rpc_provider))
         signer = Account.from_key(PRIVATE_KEY)
 
-        # deposit with eth private key
-        deposit_res_with_private_key = client.deposit_from_ethereum_network(
-            rpc_provider,
-            PRIVATE_KEY,
-            'testnet',
-            'eth',
-            0.00001
-        )
-        print(deposit_res_with_private_key)
+        # # deposit with eth private key
+        # deposit_res_with_private_key = client.deposit_from_ethereum_network(
+        #     rpc_provider,
+        #     PRIVATE_KEY,
+        #     'testnet',
+        #     'eth',
+        #     0.00001
+        # )
+        # print(deposit_res_with_private_key)
 
 
         # # approval for unlimited allowance for ERC20 contracts
@@ -120,6 +120,13 @@ def ethereumDeposit():
         #     'usdc'
         # )
         # print(deposit_res_with_stark_keys)
+
+        deposit_list = client.list_deposits({
+            'page': 1,
+            'limit': 1,
+            'network': 'ETHEREUM'
+        })
+        print(deposit_list)
 
     except Exception as e:
         print(e)
