@@ -382,3 +382,26 @@ class Client:
         ).call()
 
         return format_withdrawal_amount(amount=balance, decimals=Decimal(blockchain_decimal), symbol=coin_symbol)
+
+    def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
+        self.get_auth_status()
+        w3 = provider
+        coin_stats = self.get_coin_stats()['payload']
+        current_coin = filter_ethereum_coin(coin_stats_payload=coin_stats, coin=coin_symbol)
+        stark_asset_id = current_coin['stark_asset_id']
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        stark_abi = Config.STARK_ABI[self.option]
+
+        contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
+
+        transaction_pre_build = contract_instance.functions.withdraw(int(user_public_eth_address, 16), int(stark_asset_id, 16))
+
+        overrides = {
+            'nonce': get_nonce(signer, provider)
+        }
+        transaction = transaction_pre_build.buildTransaction(overrides)
+        signed_tx = signer.sign_transaction(transaction)
+        # send this signed transaction to blockchain
+        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        res = signed_tx
+        return res

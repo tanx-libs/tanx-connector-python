@@ -132,8 +132,15 @@ def ethereum_deposit_and_withdrawal():
         # pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(coin_symbol='eth', user_public_eth_address=ETH_ADDRESS,
         #                                                                         signer=signer, provider=provider)
         # print(pending_balance)
-        # # 4. Final step - if you find the balance is more than 0, you can call "completeNormalWithdrawal"
-        # #    to withdraw the cumulative amount to your ETH wallet.
+        # 4. Final step - if you find the balance is more than 0, you can call "completeNormalWithdrawal"
+        #    to withdraw the cumulative amount to your ETH wallet.
+        # complete_normal_withdrawal_res = client.complete_normal_withdrawal(
+        #     'eth',
+        #     ETH_ADDRESS,
+        #     signer,
+        #     provider
+        # )
+        # print(complete_normal_withdrawal_res)
 
 
 
