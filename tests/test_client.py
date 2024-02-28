@@ -178,11 +178,11 @@ def test_get_recent_trades():
 
 @responses.activate
 def test_complete_login():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
                          'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
                    status=200)
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/login/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={'status': 'success', 'message': 'Login Successful', 'payload': {
                        'uid': ''}, 'token': {'refresh': 'test', 'access': 'test'}},
                    status=200)
@@ -192,7 +192,7 @@ def test_complete_login():
 
 @responses.activate
 def test_complete_login_raises_invalid_eth_address_400_error():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={
                        'status': 'error', 'message': 'Ensure eth_address has at least 30 characters.', 'payload': ''},
                    status=400)
@@ -202,11 +202,11 @@ def test_complete_login_raises_invalid_eth_address_400_error():
 
 @responses.activate
 def test_complete_login_raises_incorrect_eth_address_400_error():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
                          'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
                    status=200)
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/login/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={
                        'status': 'error', 'message': 'Invalid Credentials or Token Expired, Kindly login again.', 'payload': ''},
                    status=400)
