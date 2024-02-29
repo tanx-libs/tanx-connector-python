@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
-from tests.mock_responses import list_deposits_response
+from tests.mock_responses import list_deposits_response, list_polygon_deposits_response
 BASE_URL = 'https://api.tanx.fi'
 
 # load_dotenv()  # load env variables from .env
@@ -422,3 +422,42 @@ def test_list_deposits():
     assert 'status' in data
     assert data['status'] == 'success'
     assert 'payload' in data
+
+@responses.activate
+def test_start_polygon_deposits_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/deposits/crosschain/create/',
+                    json={'status': 'success',
+                        'message': 'Success! Awaiting Blockchain Confirmation',
+                        'payload': {
+                            'transaction_hash': ''
+                        },
+                    })
+
+    res = client.cross_chain_deposit_start('100000','0x27..','0x67..','930',)
+
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+
+@responses.activate
+def test_start_polygon_deposits_failure():
+    responses.post(url=f'{BASE_URL}/sapi/v1/deposits/crosschain/create/',
+                    json={'status': 'error',
+                        'message': 'Essential parameters are missing',
+                        'payload': '',
+                    })
+    
+    data = client.cross_chain_deposit_start('100000','0x27..','0x67..','930',)
+    assert 'status' in data
+    assert data['status'] == 'error'
+    assert 'Essential parameters' in data['message']
+
+@responses.activate
+def test_list_polygon_deposits():
+    responses.get(url=f'{BASE_URL}/sapi/v1/deposits/',
+                    json=list_polygon_deposits_response)
+
+    res = client.list_deposits({'network': 'POLYGON'})      # type:ignore
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
