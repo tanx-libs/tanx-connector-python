@@ -369,7 +369,7 @@ class Client:
         normal_balance = balance / (10 ** int(decimal))
         return normal_balance
 
-    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
+    def cross_chain_deposit_start(self, amount: int, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
         loc = locals()
         body = {
@@ -415,6 +415,7 @@ class Client:
         token_contract = current_coin.get('token_contract')
 
         quantized_amount = amount*(10**int(decimal))
+        quantized_amount = int(quantized_amount)
 
         polygon_contract = w3.eth.contract(address=contract_address, abi=Config.POLYGON_ABI['abi'])
 
@@ -452,9 +453,8 @@ class Client:
         # send this signed transaction to blockchain
         w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
-        print(deposit_response)
         res = self.cross_chain_deposit_start(
-            amount,
+            int(amount),
             currency,
             deposit_response['hash'].hex(),
             transaction['nonce']    # type:ignore
