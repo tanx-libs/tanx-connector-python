@@ -345,7 +345,7 @@ class Client:
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', amount, currency)
 
-    def start_normal_withdrawl(self, body):
+    def start_normal_withdrawl(self, body: dict):
         payload = {
             'amount': body['amount'],
             'token_id': body['symbol']
@@ -353,11 +353,11 @@ class Client:
         r = self.session.post('/sapi/v1/payment/withdrawals/v1/initiate/', json=payload)
         return r.json()
 
-    def validate_normal_withdrawal(self, body):
+    def validate_normal_withdrawal(self, body: dict):
         r = self.session.post('/sapi/v1/payment/withdrawals/v1/validate/', json=body)
         return r.json()
 
-    def initiate_normal_withdrawl(self, key_pair, amount, coin_symbol):
+    def initiate_normal_withdrawl(self, key_pair: dict, amount: float, coin_symbol: str):
         if float(amount)<=0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
@@ -374,7 +374,7 @@ class Client:
         })
         return validate_response
 
-    def get_pending_normal_withdrawal_amount_by_coin(self, coin_symbol, user_public_eth_address, signer, provider):
+    def get_pending_normal_withdrawal_amount_by_coin(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
         self.get_auth_status()
         w3 = provider
         coin_stats = self.get_coin_stats()['payload']
@@ -391,7 +391,7 @@ class Client:
             int(stark_asset_id, 16)
         ).call()
 
-        return format_withdrawal_amount(amount=balance, decimals=float(blockchain_decimal), symbol=coin_symbol)
+        return format_withdrawal_amount(amount=balance, decimals=int(blockchain_decimal), symbol=coin_symbol)
 
     def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
         self.get_auth_status()

@@ -144,12 +144,12 @@ def ethereum_deposit_and_withdrawal():
 
 
 
-        deposit_list = client.list_deposits({
-            'page': 1,
-            'limit': 1,
-            'network': 'ETHEREUM'
-        })
-        print(deposit_list)
+        # deposit_list = client.list_deposits({
+        #     'page': 1,
+        #     'limit': 1,
+        #     'network': 'ETHEREUM'
+        # })
+        # print(deposit_list)
 
     except Exception as e:
         print(e)
