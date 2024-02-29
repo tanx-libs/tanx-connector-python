@@ -23,6 +23,8 @@ from .typings import (
     TokenType,
     ListDepositParams,
     ListWithdrawalParams,
+    InitiateWithdrawalPayload,
+    ProcessFastWithdrawalPayload,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -545,3 +547,38 @@ class Client:
         provider.middleware_onion.inject(geth_poa_middleware, layer=0)
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_polygon_network_with_signer(signer=signer, provider=provider, currency=currency, amount=amount)
+
+    def start_fast_withdrawal(self, body: InitiateWithdrawalPayload):
+        r = self.session.post('/sapi/v1/payment/fast-withdrawals/v2/initiate/',
+                                json={'amount': body['amount'], 'token_id': body['symbol'], 'network': body['network']})
+        return r.json()
+
+    def process_fast_withdrawal(self, body: ProcessFastWithdrawalPayload):
+        r = self.session.post('/sapi/v1/payment/fast-withdrawals/v2/process/', json=body)
+        return r.json()
+
+    def fast_withdrawal(self, key_pair: dict, amount: float, coin_symbol: str, network: str):
+        if amount<=0:
+            raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
+        self.get_auth_status()
+        if network == 'POLYGON':
+            network_config = self.get_network_config()
+            polygon_config = network_config['POLYGON']
+            _ = filter_cross_chain_coin(polygon_config, coin_symbol, 'WITHDRAWAL')
+        else:
+            coin_stats = self.get_coin_stats()['payload']
+            _ = filter_ethereum_coin(coin_stats, coin_symbol)
+        
+        initiate_response = self.start_fast_withdrawal({
+            'amount': amount,
+            'symbol': coin_symbol,
+            'network': network
+        })
+        signature = sign_withdrawal_tx_msg_hash(key_pair, str(int(initiate_response['payload']['msg_hash'], 16)))
+
+        validate_response = self.process_fast_withdrawal({
+            'msg_hash': initiate_response['payload']['msg_hash'],
+            'signature': signature,     # type:ignore
+            'fastwithdrawal_withdrawal_id': initiate_response['payload']['fastwithdrawal_withdrawal_id'],
+        })
+        return validate_response

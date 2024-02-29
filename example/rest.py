@@ -14,8 +14,8 @@ from web3.middleware.geth_poa import geth_poa_middleware
 
 load_dotenv()
 
-PRIVATE_KEY = os.environ['PRIVATE_KEY_2']
-ETH_ADDRESS = os.environ['ETH_ADDRESS_2']
+PRIVATE_KEY = os.environ['PRIVATE_KEY']
+ETH_ADDRESS = os.environ['ETH_ADDRESS']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
 rpc_provider = os.environ['RPC_PROVIDER']
 polygon_rpc_provider = os.environ['POLYGON_RPC_PROVIDER']
@@ -145,6 +145,14 @@ def ethereum_deposit_and_withdrawal():
         # )
         # print(complete_normal_withdrawal_res)
 
+        # Fast Withdrawals
+        fast_withdrawal_res = client.fast_withdrawal(
+            key_pair,
+            10,
+            'usdc',
+            'ETHEREUM'
+        )
+        print(fast_withdrawal_res)
 
 
         # deposit_list = client.list_deposits({
@@ -157,7 +165,7 @@ def ethereum_deposit_and_withdrawal():
     except Exception as e:
         print(e)
 
-# ethereumDeposit()
+ethereum_deposit_and_withdrawal()
 
 # Deposits for polygon Network
 def polygonDeposit():
@@ -209,4 +217,4 @@ def polygonDeposit():
     except Exception as e:
         print(e)
 
-polygonDeposit()
+# polygonDeposit()

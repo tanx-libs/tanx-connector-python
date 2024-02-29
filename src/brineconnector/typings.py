@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Dict, Tuple, Union, List
+from typing import TypeVar, Generic, Dict, Tuple, Union, List, Optional
 from typing_extensions import TypedDict
 
 T = TypeVar("T")
@@ -189,3 +189,18 @@ class ListDepositParams(TypedDict):
 class ListWithdrawalParams(TypedDict):
     page: int
     network: str
+
+class InitiateWithdrawalPayload(TypedDict):
+    amount: float
+    symbol: str
+    network: Optional[str]
+
+class StarkSignature(TypedDict):
+    r: str
+    s: str
+    recoveryParam: Optional[int]
+
+class ProcessFastWithdrawalPayload(TypedDict):
+    msg_hash: str
+    signature: StarkSignature
+    fastwithdrawal_withdrawal_id: int
