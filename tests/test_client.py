@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
-from tests.mock_responses import list_deposits_response
+from tests.mock_responses import *
 BASE_URL = 'https://api.tanx.fi'
 
 # load_dotenv()  # load env variables from .env
@@ -422,3 +422,70 @@ def test_list_deposits():
     assert 'status' in data
     assert data['status'] == 'success'
     assert 'payload' in data
+
+@responses.activate
+def test_initiate_withdrawals_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/payment/withdrawals/v1/initiate/',
+                    json={'status': 'success',
+                        'message': 'successfully initiated withdrawal',
+                        'payload': {
+                            'nonce': 7819,
+                            'msg_hash': '686148137588728084357640508492604406021032862346002124816784805415214096923'
+                        }})
+    res = client.start_normal_withdrawl({
+        'amount': 0.00001,
+        'symbol': 'eth'
+    })
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+
+@responses.activate
+def test_validate_withdrawal_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/payment/withdrawals/v1/validate/',
+                    json=validate_withdrawal_response)
+    res = client.validate_normal_withdrawal({
+            'msg_hash':
+                '1845898ec19c65beac9eb12be93adc8fa4fe00a494aa005e2f2cc5bade3a21b',
+            'signature': {
+                'r': '0x4a0a8a...',
+                's': '0x7fc5d01...',
+                'recoveryParam': 1,
+            },
+            'nonce': '7819',
+        })
+    
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+
+@responses.activate
+def test_validate_withdrawal_failure():
+    responses.post(url=f'{BASE_URL}/sapi/v1/payment/withdrawals/v1/validate/',
+                    json={'status': 'error',
+                    'message': 'Withdrawal Validation Failed, please try again',
+                    'payload': ''})
+    res = client.validate_normal_withdrawal({
+            'msg_hash':
+                '1845898ec19c65beac9eb12be93adc8fa4fe00a494aa005e2f2cc5bade3a21b',
+            'signature': {
+                'r': '0x4a0a8a...',
+                's': '0x7fc5d01...',
+                'recoveryParam': 1,
+            },
+            'nonce': '7819',
+        })
+    
+    assert 'status' in res
+    assert res['status'] == 'error'
+    assert 'Withdrawal Validation Failed' in res['message']
+
+@responses.activate
+def test_list_withdrawals():
+    responses.get(url=f'{BASE_URL}/sapi/v1/payment/withdrawals/',
+                    json=list_withdrawals_response)
+    res = client.list_normal_withdrawals()
+
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res

@@ -185,3 +185,7 @@ class ListDepositParams(TypedDict):
     limit: int
     page: int
     network: str
+
+class ListWithdrawalParams(TypedDict):
+    page: int
+    network: str

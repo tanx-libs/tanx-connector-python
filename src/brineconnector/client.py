@@ -22,6 +22,7 @@ from .typings import (
     Order,
     TokenType,
     ListDepositParams,
+    ListWithdrawalParams,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -414,3 +415,8 @@ class Client:
         w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         res = signed_tx
         return res
+
+    def list_normal_withdrawals(self, params: Optional[ListWithdrawalParams]=None):
+        self.get_auth_status()
+        r = self.session.get('/sapi/v1/payment/withdrawals/', json=params)
+        return r.json()

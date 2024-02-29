@@ -89,3 +89,152 @@ list_deposits_response = {
         ]
     }
 }
+
+validate_withdrawal_response= {
+    "status": "success",
+    "message": "successfully initiated withdrawal",
+    "payload": {
+        "id": 7819,
+        "amount": "0.0000100000000000",
+        "token_id": "eth",
+        "created_at": "2023-08-07T05:12:50.012516Z",
+        "transaction_status": "INITIATED",
+        "extras": {
+            "errors": [],
+            "exp_timestamp": 3997985,
+            "quantised_amount": 100000
+        }
+    }
+}
+
+list_withdrawals_response= {
+    "status": "success",
+    "message": "",
+    "payload": {
+        "count": 315,
+        "next": "",
+        "previous": None,
+        "results": [
+            {
+                "id": 7817,
+                "amount": "20.0000000000000000",
+                "token_id": "usdc",
+                "created_at": "2023-08-04T12:34:14.863865Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 20000000
+                }
+            },
+            {
+                "id": 7816,
+                "amount": "20.0000000000000000",
+                "token_id": "usdc",
+                "created_at": "2023-08-04T11:11:06.828763Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 20000000
+                }
+            },
+            {
+                "id": 7815,
+                "amount": "20.0000000000000000",
+                "token_id": "usdc",
+                "created_at": "2023-08-04T11:10:35.030033Z",
+                "transaction_status": "FAILED",
+                "extras": {
+                    "errors": ["NOT_VALIDATED"],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 20000000
+                }
+            },
+            {
+                "id": 7814,
+                "amount": "20.0000000000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:42:12.537837Z",
+                "transaction_status": "FAILED",
+                "extras": {
+                    "errors": ["NOT_VALIDATED"],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 200000000000
+                }
+            },
+            {
+                "id": 7813,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:30:30.232291Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            },
+            {
+                "id": 7812,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:28:54.938646Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            },
+            {
+                "id": 7811,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:27:48.480858Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            },
+            {
+                "id": 7810,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:26:03.211778Z",
+                "transaction_status": "FAILED",
+                "extras": {
+                    "errors": ["HASH_MISMATCH"],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            },
+            {
+                "id": 7809,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T10:24:56.251147Z",
+                "transaction_status": "FAILED",
+                "extras": {
+                    "errors": ["HASH_MISMATCH"],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            },
+            {
+                "id": 7808,
+                "amount": "0.0000100000000000",
+                "token_id": "eth",
+                "created_at": "2023-08-04T09:42:35.114010Z",
+                "transaction_status": "CONFIRMING",
+                "extras": {
+                    "errors": [],
+                    "exp_timestamp": 3997985,
+                    "quantised_amount": 100000
+                }
+            }
+        ]
+    }
+}
