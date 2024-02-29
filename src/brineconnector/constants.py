@@ -10,6 +10,8 @@ with open('src/brineconnector/bin/starkex_abi_test.json') as f:
 with open('src/brineconnector/bin/erc20_abi.json') as f:
     erc20Abi = json.load(f)
 
+with open('src/brineconnector/bin/polygon_deposit.json') as f:
+    polygon_deposit_abi = json.load(f)
 
 
 class Config:
@@ -24,7 +26,7 @@ class Config:
         "mainnet": starkex_abi_main,
         "testnet": starkex_abi_test,
     }
-    # POLYGON_ABI = polygon_deposit_abi
+    POLYGON_ABI = polygon_deposit_abi
     ERC20_ABI = erc20Abi
 
 MAX_INT_ALLOWANCE = '115792089237316195423570985008687907853269984665640564039457584007913129639935'

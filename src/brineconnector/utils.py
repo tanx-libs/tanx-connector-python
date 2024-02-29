@@ -52,7 +52,7 @@ def filter_ethereum_coin(coin_stats_payload: CoinStatPayload, coin: str):
 
 def get_nonce(signer, provider: Web3):
     base_nonce = provider.eth.get_transaction_count(signer.address)
-    nonce_offset = 0
+    nonce_offset = 1
     return base_nonce + nonce_offset
 
 def get_0x0_to_0x(address: str):
@@ -109,3 +109,22 @@ def format_withdrawal_amount(amount: int, decimals: int, symbol: str):
         return str(Web3().fromWei(amount, 'ether')) if amount else '0'
     else:
         return str(dequantize(number=amount, decimals=decimals))
+def filter_cross_chain_coin(config, coin, type):
+    allowed_tokens = config['tokens']
+    allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']
+    allowed_tokens_for_fast_withdrawl = config['allowed_tokens_for_fast_wd']
+
+    if type == 'TOKENS':
+        allowed_token = allowed_tokens[coin]
+    elif type == 'DEPOSIT':
+        allowed_token = next((token for token in allowed_tokens_for_deposit if token == coin), None)
+    elif type == 'WITHDRAWL':
+        allowed_token = next((token for token in allowed_tokens_for_fast_withdrawl if token == coin), None)
+    else:
+        raise CoinNotFoundError('Type not found')
+    if not allowed_token:
+        raise CoinNotFoundError(f'Coin {coin} not found')
+
+    current_coin = allowed_tokens[coin]
+    return current_coin
+
