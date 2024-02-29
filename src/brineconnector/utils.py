@@ -50,30 +50,30 @@ def filter_ethereum_coin(coin_stats_payload: CoinStatPayload, coin: str):
             return coin_stat
     raise CoinNotFoundError(f"Coin '{coin}' not found")
 
-def get_nonce(signer, provider):
+def get_nonce(signer, provider: Web3):
     base_nonce = provider.eth.get_transaction_count(signer.address)
     nonce_offset = 1
     return base_nonce + nonce_offset
 
-def get_0x0_to_0x(address):
+def get_0x0_to_0x(address: str):
     if address and (address[:3] == '0x0' or address[:3] == '0X0'):
         return '0x' + address[4:]
     else:
         return address
 
-def dequantize(number, decimals):
+def dequantize(number: float, decimals: int):
     factor = 10**decimals
     return number/factor
 
-def get_allowance(user_address, stark_contract, token_contract, decimal, w3):
+def get_allowance(user_address: str, stark_contract: str, token_contract: str, decimal: str, w3: Web3):
     contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI) # type:ignore
     allowance = contract_instance.functions.allowance(user_address, stark_contract).call()
     allowance_decimal = dequantize(int(allowance), int(decimal))
     return allowance_decimal
 
-def approve_unlimited_allowance_util(contract_address, token_contract, signer, w3):
+def approve_unlimited_allowance_util(contract_address: str, token_contract: str, signer: Account, w3: Web3):
     gas_price = w3.eth.gas_price
-    contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI)
+    contract_instance = w3.eth.contract(address=token_contract, abi=Config.ERC20_ABI) # type:ignore
 
     gas_limit = contract_instance.functions.approve(
         contract_address,

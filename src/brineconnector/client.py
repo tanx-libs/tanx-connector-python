@@ -21,6 +21,7 @@ from .typings import (
     TradePayload,
     Order,
     TokenType,
+    ListDepositParams,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -200,12 +201,12 @@ class Client:
         r = self.session.post('/main/user/create_vault/', json=body)
         return r.json()
 
-    def list_deposits(self, params):
+    def list_deposits(self, params: ListDepositParams):
         self.get_auth_status()
         loc = locals()
         body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/deposits/', json=body)
-        return r.json()        
+        r = self.session.get('/sapi/v1/deposits/', json=body)
+        return r.json()
 
     def get_token_balance(self, provider: Web3, eth_address: str, currency: str):
         if currency == 'eth':
@@ -223,7 +224,7 @@ class Client:
         normal_balance = int(balance) / (10 ** int(decimal)) # type:ignore
         return normal_balance
 
-    def crypto_deposit_start(self, amount, stark_asset_id, stark_public_key, deposit_blockchain_hash, deposit_blockchain_nonce, vault_id):
+    def crypto_deposit_start(self, amount: float, stark_asset_id: str, stark_public_key: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str, vault_id: str):
         amount_to_string = str(amount)
         payload = {
             'amount': amount_to_string,
@@ -238,7 +239,7 @@ class Client:
         r = self.session.post('/sapi/v1/payment/stark/start/', json=payload)
         return r.json()
 
-    def approve_unlimited_allowance_ethereum_network(self, coin, signer, w3):
+    def approve_unlimited_allowance_ethereum_network(self, coin: str, signer, w3: Web3):
         coin_stats = self.get_coin_stats()
         current_coin = filter_ethereum_coin(coin_stats['payload'], coin)
         token_contract = current_coin['token_contract']
@@ -246,9 +247,11 @@ class Client:
         res = approve_unlimited_allowance_util(contract_address=stark_contract, token_contract=token_contract, signer=signer, w3=w3)
         return res
 
-    def deposit_from_ethereum_network_with_starkKey(self, signer, provider, stark_public_key, amount, currency: str):
+
+    def deposit_from_ethereum_network_with_starkKey(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
+        print(type(signer))
         w3 = provider
-        amount = Decimal(amount)
+        amount = float(amount)
         if amount <= 0:
             raise InvalidAmountError("Please enter a valid amount. It should be a numerical value greater than zero.")
 
@@ -277,12 +280,12 @@ class Client:
         # with smart contracts, and they provide a way to specify details such as 
         # the amount of gas to use, the gas price, the recipient address, and the value to send.
         overrides = {
-            'from': signer.address,
+            'from': signer.address, # type:ignore
             'nonce': get_nonce(signer, provider)
         }
 
 
-        balance = self.get_token_balance(provider, signer.address, currency)
+        balance = self.get_token_balance(provider, signer.address, currency) # type:ignore
 
         if balance < amount:
             raise BalanceTooLowError(f'Current Balance ({balance}) for "{currency}" is too low, please add balance before deposit')
@@ -304,7 +307,7 @@ class Client:
             )
 
         else:
-            allowance = get_allowance(user_address=signer.address, stark_contract=stark_contract, token_contract=token_contract, decimal=decimal, w3=provider)
+            allowance = get_allowance(user_address=signer.address, stark_contract=stark_contract, token_contract=token_contract, decimal=decimal, w3=provider) # type:ignore
             if allowance < amount:
                 raise AllowanceTooLowError(f"Current Allowance ({allowance}) is too low, please use Client.approve_unlimited_allowance_ethereum_network()")
             transaction_pre_build = contract_instance.functions.depositERC20(
@@ -333,14 +336,14 @@ class Client:
 
         return res
 
-    def deposit_from_ethereum_network(self, rpc_url, eth_private_key, network, currency, amount):
+    def deposit_from_ethereum_network(self, rpc_url: str, eth_private_key: str, network: Literal['mainnet', 'testnet'], currency: str, amount: float):
         self.get_auth_status()
         user_signature = create_user_signature(eth_private_key, network)
         key_pair = get_stark_key_pair_from_signature(user_signature)
         stark_public_key = key_pair['stark_public_key']
         provider = Web3(Web3.HTTPProvider(rpc_url))
         signer = Account.from_key(eth_private_key)
-        return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', str(amount), currency)
+        return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', amount, currency)
 
     def get_network_config(self):
         loc = locals()

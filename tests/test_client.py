@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
+from tests.mock_responses import list_deposits_response
 BASE_URL = 'https://api.tanx.fi'
 
 # load_dotenv()  # load env variables from .env
@@ -392,7 +393,7 @@ def test_eth_deposits_with_starkKey_success():
                     json={'status': 'success',
                         'message': 'Success! Awaiting Blockchain Confirmation',
                         'payload': ''})
-    res = client.crypto_deposit_start('100000','0x27..','0x27..','0x67..','930',65707,)
+    res = client.crypto_deposit_start(100000,'0x27..','0x27..','0x67..','930','65707',)
     assert 'status' in res
     assert 'success' == res['status']
     assert 'payload' in res
@@ -404,10 +405,20 @@ def test_eth_deposits_with_starkKey_fail():
                         'message':'Essential parameters are missing',
                         'payload': ''})
     with pytest.raises(requests.exceptions.RequestException):
-        res = client.crypto_deposit_start('100000','0x27..','0x27..','0x67..','930',65707,)
+        res = client.crypto_deposit_start(100000,'0x27..','0x27..','0x67..','930','65707',)
     # Handle exception
         
         data = res.response.json()
         assert 'status' in data
         assert data['status'] == 'error'
         assert 'Essential parameters' in data['message']
+
+@responses.activate
+def test_list_deposits():
+    responses.get(url=f'{BASE_URL}/sapi/v1/deposits/',
+                    json=list_deposits_response)
+    data = client.list_deposits({'network': 'ETHEREUM'}) # type:ignore
+
+    assert 'status' in data
+    assert data['status'] == 'success'
+    assert 'payload' in data

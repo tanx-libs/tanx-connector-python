@@ -124,6 +124,13 @@ def ethereumDeposit():
         # )
         # print(deposit_res_with_stark_keys)
 
+        deposit_list = client.list_deposits({
+            'page': 1,
+            'limit': 1,
+            'network': 'ETHEREUM'
+        })
+        print(deposit_list)
+
     except Exception as e:
         print(e)
 
