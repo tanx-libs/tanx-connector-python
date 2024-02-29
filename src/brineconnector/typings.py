@@ -180,3 +180,8 @@ class CoinStat(TypedDict):
     blockchain_decimal: str
 
 CoinStatPayload = Dict[str, CoinStat]
+
+class ListDepositParams(TypedDict):
+    limit: int
+    page: int
+    network: str
