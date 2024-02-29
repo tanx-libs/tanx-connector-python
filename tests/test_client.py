@@ -433,7 +433,7 @@ def test_start_polygon_deposits_success():
                         },
                     })
 
-    res = client.cross_chain_deposit_start('100000','0x27..','0x67..','930',)
+    res = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930',)
 
     assert 'status' in res
     assert res['status'] == 'success'
@@ -447,7 +447,7 @@ def test_start_polygon_deposits_failure():
                         'payload': '',
                     })
     
-    data = client.cross_chain_deposit_start('100000','0x27..','0x67..','930',)
+    data = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930',)
     assert 'status' in data
     assert data['status'] == 'error'
     assert 'Essential parameters' in data['message']
