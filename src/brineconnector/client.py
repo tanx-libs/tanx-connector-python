@@ -223,7 +223,7 @@ class Client:
         normal_balance = int(balance) / (10 ** int(decimal)) # type:ignore
         return normal_balance
 
-    def crypto_deposit_start(self, amount: float, stark_asset_id: str, stark_public_key: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str, vault_id: str):
+    def crypto_deposit_start(self, amount: int, stark_asset_id: str, stark_public_key: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str, vault_id: str):
         amount_to_string = str(amount)
         payload = {
             'amount': amount_to_string,
@@ -263,6 +263,7 @@ class Client:
         stark_asset_id = current_coin['stark_asset_id']
 
         quantized_amount = amount*(10**int(quanitization))
+        quantized_amount = int(quantized_amount)
 
         vault = self.get_vault_id(currency)
         stark_contract = Config.STARK_CONTRACT[self.option]
