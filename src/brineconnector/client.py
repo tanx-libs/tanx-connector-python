@@ -251,7 +251,7 @@ class Client:
         w3 = provider
         amount = float(amount)
         if amount <= 0:
-            raise ValueError("Please enter a valid amount. It should be a numerical value greater than zero.")
+            raise InvalidAmountError("Please enter a valid amount. It should be a numerical value greater than zero.")
 
         self.get_auth_status()
         coin_stats = self.get_coin_stats()['payload']
@@ -308,7 +308,7 @@ class Client:
         else:
             allowance = get_allowance(user_address=signer.address, stark_contract=stark_contract, token_contract=token_contract, decimal=decimal, w3=provider) # type:ignore
             if allowance < amount:
-                raise ValueError(f"Current Allowance ({allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()")
+                raise InvalidAmountError(f"Current Allowance ({allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()")
             transaction_pre_build = contract_instance.functions.depositERC20(
                 stark_public_key_uint,
                 stark_asset_id_uint,
