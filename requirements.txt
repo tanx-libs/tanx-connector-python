@@ -100,7 +100,7 @@ pycryptodome==3.20.0
     #   eth-keyfile
 pyrsistent==0.20.0
     # via jsonschema
-pywin32==306
+pywin32==306; sys_platform == 'win32'
     # via web3
 requests==2.31.0
     # via

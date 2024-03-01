@@ -167,9 +167,9 @@ pytest==8.0.2
     # via tanx-connector (pyproject.toml)
 python-dotenv==1.0.1
     # via tanx-connector (pyproject.toml)
-pywin32==306
+pywin32==306; sys_platform == 'win32'
     # via web3
-pywin32-ctypes==0.2.2
+pywin32-ctypes==0.2.2; sys_platform == 'win32'
     # via keyring
 pyyaml==6.0.1
     # via responses
