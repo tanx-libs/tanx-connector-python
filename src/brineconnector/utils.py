@@ -52,7 +52,7 @@ def filter_ethereum_coin(coin_stats_payload: CoinStatPayload, coin: str):
 
 def get_nonce(signer, provider: Web3):
     base_nonce = provider.eth.get_transaction_count(signer.address)
-    nonce_offset = 1
+    nonce_offset = 0
     return base_nonce + nonce_offset
 
 def get_0x0_to_0x(address: str):
