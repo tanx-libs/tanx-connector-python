@@ -402,12 +402,10 @@ class Client:
 
         w3 = provider
 
-        import json
         network_config = self.get_network_config()
         polygon_config = network_config['POLYGON']
         allowed_tokens = polygon_config['tokens']
         contract_address = polygon_config['deposit_contract']
-        print(polygon_config)
 
         current_coin = filter_cross_chain_coin(polygon_config, currency, 'DEPOSIT')
 
