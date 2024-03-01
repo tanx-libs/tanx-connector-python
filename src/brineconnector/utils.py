@@ -52,7 +52,7 @@ def filter_ethereum_coin(coin_stats_payload: CoinStatPayload, coin: str):
 
 def get_nonce(signer, provider: Web3):
     base_nonce = provider.eth.get_transaction_count(signer.address)
-    nonce_offset = 1
+    nonce_offset = 0
     return base_nonce + nonce_offset
 
 def get_0x0_to_0x(address: str):
@@ -88,7 +88,9 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     }
     amount = int(MAX_INT_ALLOWANCE)
     transaction_pre_build = contract_instance.functions.approve(contract_address, amount)
+    print(transaction_pre_build)
     transaction = transaction_pre_build.buildTransaction(overrides) # type: ignore
+    print(transaction)
     signed_tx = signer.sign_transaction(transaction)
     # send this signed transaction to blockchain
     w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
