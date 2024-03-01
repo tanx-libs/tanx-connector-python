@@ -251,7 +251,6 @@ class Client:
 
 
     def deposit_from_ethereum_network_with_starkKey(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
-        print(type(signer))
         w3 = provider
         amount = float(amount)
         if amount <= 0:
@@ -365,7 +364,6 @@ class Client:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
         initiate_response = self.start_normal_withdrawl({'amount': amount, 'symbol': coin_symbol})
-        print(initiate_response)
         signature = sign_withdrawal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
         msg_hex = initiate_response['payload']['msg_hash']
         msg_hex = hex(int(msg_hex))
@@ -463,7 +461,6 @@ class Client:
     def approve_unlimited_allowance_polygon_network(self, coin: str, signer: Account, w3: Web3):
         network_config = self.get_network_config()
         polygon_config = network_config['POLYGON']
-        print(polygon_config)
         allowed_tokens = polygon_config['tokens']
         contract_address = polygon_config['deposit_contract']
 
@@ -485,7 +482,6 @@ class Client:
         polygon_config = network_config['POLYGON']
         allowed_tokens = polygon_config['tokens']
         contract_address = polygon_config['deposit_contract']
-        print(polygon_config)
 
         current_coin = filter_cross_chain_coin(polygon_config, currency, 'DEPOSIT')
 
