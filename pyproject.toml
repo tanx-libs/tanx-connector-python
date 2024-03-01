@@ -15,7 +15,7 @@ license = { file = "LICENSE" }
 description = "The official Python connector for Tanx's API"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy", "typing-extensions"]
+dependencies = ["requests", "web3<=5.25.0,>5.0.0", "ecdsa", "websockets", "sympy", "typing-extensions"]
 keywords = ["brine", "connector", "finance", "api", "wrapper", "python" ]
 
 [project.urls]
