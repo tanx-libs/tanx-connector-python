@@ -77,7 +77,7 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
 
     gas_limit = contract_instance.functions.approve(
         contract_address,
-        Web3.toInt(int('100'))
+        Web3.toInt(int(MAX_INT_ALLOWANCE))
     ).estimateGas({"from": token_contract})
     # so basically, if token contract is not provided, it'll try to approve from 0 address account,
     # so providing a from account, other way is to initialize web3 using private key
