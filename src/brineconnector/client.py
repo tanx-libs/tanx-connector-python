@@ -248,7 +248,6 @@ class Client:
 
 
     def deposit_from_ethereum_network_with_starkKey(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
-        print(type(signer))
         w3 = provider
         amount = float(amount)
         if amount <= 0:
@@ -385,7 +384,6 @@ class Client:
     def approve_unlimited_allowance_polygon_network(self, coin: str, signer: Account, w3: Web3):
         network_config = self.get_network_config()
         polygon_config = network_config['POLYGON']
-        print(polygon_config)
         allowed_tokens = polygon_config['tokens']
         contract_address = polygon_config['deposit_contract']
 
