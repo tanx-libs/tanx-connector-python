@@ -368,7 +368,7 @@ class Client:
         normal_balance = balance / (10 ** int(decimal))
         return normal_balance
 
-    def cross_chain_deposit_start(self, amount: int, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
+    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
         loc = locals()
         body = {
@@ -450,7 +450,7 @@ class Client:
         w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
         res = self.cross_chain_deposit_start(
-            int(amount),
+            amount,
             currency,
             deposit_response['hash'].hex(),
             transaction['nonce']    # type:ignore
