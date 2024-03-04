@@ -191,9 +191,7 @@ class Client:
         return r.json()
 
     def get_coin_stats(self):
-        loc = locals()
-        body = params_to_dict(loc)
-        r = self.session.post('/main/stat/v2/coins/', json=body)
+        r = self.session.post('/main/stat/v2/coins/')
         return r.json()
 
     def get_vault_id(self, coin: str):
@@ -236,8 +234,6 @@ class Client:
             'deposit_blockchain_nonce': deposit_blockchain_nonce,
             'vault_id': vault_id
         }
-        loc = locals()
-        body = params_to_dict(loc)
         r = self.session.post('/sapi/v1/payment/stark/start/', json=payload)
         return r.json()
 
