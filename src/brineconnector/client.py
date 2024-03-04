@@ -347,7 +347,7 @@ class Client:
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', amount, currency)
 
-    def start_normal_withdrawl(self, body: dict):
+    def start_normal_withdrawal(self, body: dict):
         payload = {
             'amount': body['amount'],
             'token_id': body['symbol']
@@ -359,11 +359,11 @@ class Client:
         r = self.session.post('/sapi/v1/payment/withdrawals/v1/validate/', json=body)
         return r.json()
 
-    def initiate_normal_withdrawl(self, key_pair: dict, amount: float, coin_symbol: str):
+    def initiate_normal_withdrawal(self, key_pair: dict, amount: float, coin_symbol: str):
         if float(amount)<=0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
-        initiate_response = self.start_normal_withdrawl({'amount': amount, 'symbol': coin_symbol})
+        initiate_response = self.start_normal_withdrawal({'amount': amount, 'symbol': coin_symbol})
         signature = sign_withdrawal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
         msg_hex = initiate_response['payload']['msg_hash']
         msg_hex = hex(int(msg_hex))

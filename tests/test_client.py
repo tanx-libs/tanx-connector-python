@@ -432,7 +432,7 @@ def test_initiate_withdrawals_success():
                             'nonce': 7819,
                             'msg_hash': '686148137588728084357640508492604406021032862346002124816784805415214096923'
                         }})
-    res = client.start_normal_withdrawl({
+    res = client.start_normal_withdrawal({
         'amount': 0.00001,
         'symbol': 'eth'
     })
