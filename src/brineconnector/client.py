@@ -247,7 +247,6 @@ class Client:
 
 
     def deposit_from_ethereum_network_with_starkKey(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
-        print(type(signer))
         w3 = provider
         amount = float(amount)
         if amount <= 0:
