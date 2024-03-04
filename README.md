@@ -403,7 +403,7 @@ pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(
   provider, # The provider created above
 )
 # 4. In the final step, if you find the balance is more than 0, you can use the "completeNormalWithdrawal" function to withdraw the cumulative amount to your ETH wallet.
-const complete_normal_withdrawal_res = client.complete_normal_withdrawal(
+complete_normal_withdrawal_res = client.complete_normal_withdrawal(
   'eth', # Enter the coin symbol
   ethAddress, # User public eth address
   signer, # The signer created above
@@ -411,7 +411,7 @@ const complete_normal_withdrawal_res = client.complete_normal_withdrawal(
 )
 
 #Get a list of withdrawals
-const withdrawalsList = client.list_normal_withdrawals({
+withdrawals_list = client.list_normal_withdrawals({
   page: 2, # This is an optional field
 })
 ```
