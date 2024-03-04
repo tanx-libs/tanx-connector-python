@@ -73,10 +73,55 @@ def eth_withdrawals():
         # )
         # print(fast_withdrawal_res)
 
+        # List Fast Withdrawals
+        # list_fast_withdrawals_res = client.list_fast_withdrawals({
+        #     'page': 2
+        # }) # type:ignore
+        # print(list_fast_withdrawals_res)
+
     except requests.exceptions.HTTPError as e:
         print(e.response.json())
     
     except Exception as e:
         print(e)
 
-eth_withdrawals()
+# eth_withdrawals()
+
+def polygon_withdrawal():
+    try:
+        client = Client('testnet')
+        try:
+            # login to use private endpoints
+            login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
+            print('Login Successful')
+        # Error: AuthenticationError | requests.exceptions.HTTPError
+        except exception.AuthenticationError as exc:
+            print(exc)
+        except requests.exceptions.HTTPError as exc:
+            print(exc.response.json())
+
+        user_signature = create_user_signature(PRIVATE_KEY, 'testnet')
+        key_pair = get_stark_key_pair_from_signature(user_signature)
+
+        fast_withdrawal_res = client.fast_withdrawal(
+            key_pair,
+            0.0008,
+            'btc',
+            'POLYGON'
+        )
+        print(fast_withdrawal_res)
+
+        # List Fast Withdrawals
+        list_fast_withdrawals_res = client.list_fast_withdrawals({
+            'page': 1,
+            'network': 'POLYGON'
+        })
+        print(list_fast_withdrawals_res)
+
+    except requests.exceptions.HTTPError as e:
+        print(e.response.json())
+    
+    except Exception as e:
+        print(e)
+
+polygon_withdrawal()

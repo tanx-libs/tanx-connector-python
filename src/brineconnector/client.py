@@ -421,10 +421,9 @@ class Client:
         self.get_auth_status()
         r = self.session.get('/sapi/v1/payment/withdrawals/', json=params)
         return r.json()
+
     def get_network_config(self):
-        loc = locals()
-        body = params_to_dict(loc)
-        r = self.session.post('/main/stat/v2/app-and-markets/', json=body)
+        r = self.session.post('/main/stat/v2/app-and-markets/')
         return r.json()['payload']['network_config']
 
     def get_polygon_token_balance(self, provider: Web3, eth_address: str, currency: str):
@@ -447,7 +446,6 @@ class Client:
 
     def cross_chain_deposit_start(self, amount: int, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
-        loc = locals()
         body = {
             'amount': amount_to_string,
             'currency': currency,
@@ -477,7 +475,6 @@ class Client:
 
         w3 = provider
 
-        import json
         network_config = self.get_network_config()
         polygon_config = network_config['POLYGON']
         allowed_tokens = polygon_config['tokens']
@@ -578,3 +575,8 @@ class Client:
             'fastwithdrawal_withdrawal_id': initiate_response['payload']['fastwithdrawal_withdrawal_id'],
         })
         return validate_response
+
+    def list_fast_withdrawals(self, params: Optional[ListWithdrawalParams]=None):
+        self.get_auth_status()
+        r = self.session.get('/sapi/v1/payment/fast-withdrawals/', params=params)   # type:ignore
+        return r.json()

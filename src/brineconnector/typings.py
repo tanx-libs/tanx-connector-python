@@ -187,8 +187,8 @@ class ListDepositParams(TypedDict):
     network: str
 
 class ListWithdrawalParams(TypedDict):
-    page: int
-    network: str
+    page: Optional[int]
+    network: Optional[str]
 
 class InitiateWithdrawalPayload(TypedDict):
     amount: float
