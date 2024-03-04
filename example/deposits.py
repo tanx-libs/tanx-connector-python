@@ -111,13 +111,13 @@ def polygonDeposit():
         # print(allowance)
 
         # deposit with signer
-        deposit_res_with_stark_keys = client.deposit_from_polygon_network_with_signer(
+        deposit_res_with_signer = client.deposit_from_polygon_network_with_signer(
             signer,
             provider,
             'btc',
             0.0001,
         )
-        print(deposit_res_with_stark_keys)
+        print(deposit_res_with_signer)
 
     except Exception as e:
         print(e)

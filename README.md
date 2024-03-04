@@ -359,6 +359,46 @@ deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_starkKey
 )
 ```
 
+#### Polygon Deposit
+
+There are two ways to make a deposit on the Polygon network:
+
+#### 1. Using ETH Private Key and RPC URL:
+
+In this method, you will use an ETH private key and an RPC URL to execute a Polygon deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+
+```python
+deposit_res = client.deposit_from_polygon_network(
+  polygon_rpc_provider, # Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+  PRIVATE_KEY,  # ETH Private Key
+  'matic',  # Coin Symbol
+  0.00001 # Amount to be deposited
+)
+```
+
+#### 2. Using Custom Provider and Signer:
+
+This method involves using a custom provider and signer, which can be created using the web3.py library. Here's the code snippet for this method:
+
+```python
+# Note: Please use ethers version 5.25.0.
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+polygon_rpc_provider = os.environ['POLYGON_RPC_PROVIDER']
+provider = Web3(Web3.HTTPProvider(polygon_rpc_provider))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
+  signer, # Signer Created above
+  provider, # Provider created above
+  'btc',  # Enter the coin symbol
+  0.0001, # Amount to be deposited
+)
+```
+
 #### List Deposits
 
 To get the deposit history, you can use the following code:
