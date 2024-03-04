@@ -88,9 +88,7 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     }
     amount = int(MAX_INT_ALLOWANCE)
     transaction_pre_build = contract_instance.functions.approve(contract_address, amount)
-    print(transaction_pre_build)
     transaction = transaction_pre_build.buildTransaction(overrides) # type: ignore
-    print(transaction)
     signed_tx = signer.sign_transaction(transaction)
     # send this signed transaction to blockchain
     w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
