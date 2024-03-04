@@ -371,3 +371,48 @@ deposit_list = client.list_deposits({
 })
 ```
 
+### Withdrawal
+
+Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawal. For withdrawal methods that require a signer and provider, please refer to the deposit method mentioned above.
+
+#### Normal Withdrawal
+
+With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time.
+
+```python
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(rpc_provider))
+signer = Account.from_key(PRIVATE_KEY)
+
+# Withdrawals
+
+# Normal withdrawal:
+# 1. Initiate your withdrawal request by calling the "initiateNormalWithdrawal" function.
+withdrawal_res = client.initiate_normal_withdrawal(
+  key_pair, # The keyPair created for stark keys
+  0.0001, # Enter the amount you want to deposit
+  'usdc', # Enter the coin symbol
+)
+# 2. WAIT for up to 24 hours.
+# 3. Check whether the withdrawn balance is pending by calling the "getPendingNormalWithdrawalAmountByCoin" function with the required parameters.
+pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(
+  'eth', # Enter the coin symbol
+  eth_address, # User public eth address
+  signer, # The signer created above
+  provider, # The provider created above
+)
+# 4. In the final step, if you find the balance is more than 0, you can use the "completeNormalWithdrawal" function to withdraw the cumulative amount to your ETH wallet.
+const complete_normal_withdrawal_res = client.complete_normal_withdrawal(
+  'eth', # Enter the coin symbol
+  ethAddress, # User public eth address
+  signer, # The signer created above
+  provider, # The provider created above
+)
+
+#Get a list of withdrawals
+const withdrawalsList = client.list_normal_withdrawals({
+  page: 2, # This is an optional field
+})
+```
+
