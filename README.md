@@ -316,3 +316,58 @@ except requests.exceptions.HTTPError as exc:
     print(exc.response.json())
 ```
 
+### Deposit
+
+#### Ethereum Deposit
+
+There are two ways to make a deposit on the Ethereum network:
+
+<!-- 1. Using ETH Private Key and RPC URL: This approach utilizes your ETH private key and an rpcUrl (e.g., from Infura or Alchemy).
+2. Custom Provider and Signer: This method involves creating your provider and signer using web3.py. You'll also need the stark_public_key. -->
+
+#### 1. Using ETH Private Key and RPC URL:
+
+In this method, you will use an ETH private key and an RPC URL to execute a deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+
+```python
+  const res = client.deposit_from_ethereum_network(
+    rpc_provider, # Use 'sepolia' for the testnet and 'ethereum mainnet' for the mainnet.
+    PRIVATE_KEY,  # Your ETH private key
+    'testnet',  # Network allowed values are 'testnet' or 'mainnet'
+    'eth',  # Enter coin symbol
+    0.00001,  # Enter amount to be deposited
+  )
+```
+
+#### 2. Using Custom Provider and Signer:
+
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](#create-l2-key-pair) section. Here's the code snippet for this method:
+
+```python
+# Note: Please use web3 version 5.25.0
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(rpc_provider))
+signer = Account.from_key(PRIVATE_KEY)
+
+deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_starkKey(
+  signer,
+  provider,
+  f'0x{stark_public_key}',
+  0.0001,
+  'usdc'
+)
+```
+
+#### List Deposits
+
+To get the deposit history, you can use the following code:
+
+```python
+deposit_list = client.list_deposits({
+  'page': 1,  # This field is optional
+  'limit': 1, # This field is optional
+  'network': 'ETHEREUM' # Network for which you want to list the deposit history. Allowed networks are ETHEREUM & POLYGON
+})
+```
+
