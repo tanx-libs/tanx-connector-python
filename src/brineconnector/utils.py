@@ -120,7 +120,7 @@ def filter_cross_chain_coin(config, coin, type):
         allowed_token = allowed_tokens[coin]
     elif type == 'DEPOSIT':
         allowed_token = next((token for token in allowed_tokens_for_deposit if token == coin), None)
-    elif type == 'WITHDRAWL':
+    elif type == 'WITHDRAWAL':
         allowed_token = next((token for token in allowed_tokens_for_fast_withdrawl if token == coin), None)
     else:
         raise CoinNotFoundError('Type not found')

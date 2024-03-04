@@ -39,31 +39,43 @@ def eth_withdrawals():
         # Normal withdrawal
         # 1. Initiate your withdrawal request by calling "initiate_normal_withdrawal".
 
-        withdrawal_res = client.initiate_normal_withdrawal(key_pair=key_pair, amount=0.0001, coin_symbol='usdc')
-        print(withdrawal_res)
+        # withdrawal_res = client.initiate_normal_withdrawal(key_pair=key_pair, amount=0.0001, coin_symbol='usdc')
+        # print(withdrawal_res)
 
         # 2. WAIT for up to 24 hours.
         # 3. Call the function "get_pending_normal_withdrawal_amount_by_coin" by passing the required parameter
         #    to check whether the withdrawn balance is pending
 
-        pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(coin_symbol='eth', user_public_eth_address=ETH_ADDRESS,
-                                                                                signer=signer, provider=provider)
-        print(pending_balance)
+        # pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(coin_symbol='eth', user_public_eth_address=ETH_ADDRESS,
+        #                                                                         signer=signer, provider=provider)
+        # print(pending_balance)
 
         # 4. Final step - if you find the balance is more than 0, you can call "complete_normal_withdrawal"
         # to withdraw the cumulative amount to your ETH wallet.
 
-        complete_normal_withdrawal_res = client.complete_normal_withdrawal(
-            'eth',
-            ETH_ADDRESS,
-            signer,
-            provider
-        )
-        print(complete_normal_withdrawal_res)
+        # complete_normal_withdrawal_res = client.complete_normal_withdrawal(
+        #     'eth',
+        #     ETH_ADDRESS,
+        #     signer,
+        #     provider
+        # )
+        # print(complete_normal_withdrawal_res)
 
         # Get a list of withdrawals
-        withdrawals_list = client.list_normal_withdrawals()
+        # withdrawals_list = client.list_normal_withdrawals()
 
+        # Fast Withdrawals
+        # fast_withdrawal_res = client.fast_withdrawal(
+        #     key_pair,
+        #     10,
+        #     'usdc',
+        #     'ETHEREUM'
+        # )
+        # print(fast_withdrawal_res)
+
+    except requests.exceptions.HTTPError as e:
+        print(e.response.json())
+    
     except Exception as e:
         print(e)
 
