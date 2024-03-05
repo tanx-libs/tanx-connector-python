@@ -9,12 +9,18 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
-from tests.mock_responses import list_deposits_response
+from src.brineconnector.exception import InvalidAmountError, BalanceTooLowError
+from tests.mock_responses import *
+from web3 import EthereumTesterProvider, Account, Web3
+from dotenv import load_dotenv
 BASE_URL = 'https://api.tanx.fi'
 
-# load_dotenv()  # load env variables from .env
-PRIVATE_KEY = '7d6384d6877be027aa25bd458f2058e3f7ff68347dc583a9baf96f5f97b413a8'
-ETH_ADDRESS = '0x713Cf80b7c71440E7a09Dede1ee23dCBf862fB66'
+load_dotenv()
+
+PRIVATE_KEY = os.environ['PRIVATE_KEY']
+ETH_ADDRESS = os.environ['ETH_ADDRESS']
+stark_private_key = os.environ['STARK_PRIVATE_KEY']
+rpc_provider = os.environ['RPC_PROVIDER']
 
 client = Client()
 client2 = Client()
@@ -327,7 +333,6 @@ def test_create_complete_order():
     nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
                                            'price': 29580.51, 'side': 'buy', 'volume': 0.0001})
     # replace with your stark private key
-    stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
     msg_hash = sign_order_with_stark_private_key(
         stark_private_key, nonce_res['payload'])
     # msg_hash = sign_msg_hash(nonce_res['payload'], PRIVATE_KEY, 'testnet')
@@ -344,7 +349,6 @@ def test_create_order_nonce_raises_400_error():
         nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
                                                'price': 29580.51, 'side': 'buy', 'volume': 0.00001})
         # replace with your stark private key
-        stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
         msg_hash = sign_order_with_stark_private_key(
             stark_private_key, nonce_res['payload'])
         client.create_new_order(msg_hash)['message']
@@ -422,3 +426,24 @@ def test_list_deposits():
     assert 'status' in data
     assert data['status'] == 'success'
     assert 'payload' in data
+
+def test_deposit_from_ethereum_network_with_starkKey_invalid_amount():
+    test_signer = Account.from_key(PRIVATE_KEY)
+
+    test_provider = Web3(EthereumTesterProvider())
+
+    with pytest.raises(InvalidAmountError):
+        client.deposit_from_ethereum_network_with_starkKey(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0, currency='eth')
+
+@responses.activate
+def test_deposit_from_ethereum_network_with_starkKey_low_balance(mocker):
+    responses.post(f'{BASE_URL}/main/stat/v2/coins/', json=coin_stats_response)
+    responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
+
+    test_signer = Account.from_key(PRIVATE_KEY)
+
+    test_provider = Web3(EthereumTesterProvider())
+
+    with pytest.raises(BalanceTooLowError):
+        client.deposit_from_ethereum_network_with_starkKey(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
+    

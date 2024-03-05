@@ -23,7 +23,7 @@ keywords = ["brine", "connector", "finance", "api", "wrapper", "python" ]
 "Bug Tracker" = "https://github.com/tanx-libs/tanx-connector-python/issues"
 
 [project.optional-dependencies]
-dev = ["pytest", "responses", "pip-tools", "bumpver", "build", "twine", "python-dotenv"]
+dev = ["eth-tester", "pytest", "responses", "pip-tools", "bumpver", "build", "twine", "python-dotenv"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
