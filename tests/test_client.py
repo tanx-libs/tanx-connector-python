@@ -332,7 +332,6 @@ def test_create_complete_order():
     # replace with your stark private key
     msg_hash = sign_order_with_stark_private_key(
         stark_private_key, nonce_res['payload'])
-    # msg_hash = sign_msg_hash(nonce_res['payload'], PRIVATE_KEY, 'testnet')
     assert "Order" in client.create_new_order(msg_hash)['message']
 
 
