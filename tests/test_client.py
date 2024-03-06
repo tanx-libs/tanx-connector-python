@@ -439,8 +439,6 @@ def test_deposit_from_ethereum_network_with_starkKey_low_balance(mocker):
     responses.post(f'{BASE_URL}/main/stat/v2/coins/', json=coin_stats_response)
     responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
 
-    # test_signer = Account.from_key('abcd')
-
     test_provider = Web3(EthereumTesterProvider())
     w3 = Web3()
     test_signer = w3.eth.account.create()
@@ -448,6 +446,7 @@ def test_deposit_from_ethereum_network_with_starkKey_low_balance(mocker):
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_ethereum_network_with_starkKey(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
 
+<<<<<<< HEAD
 @responses.activate
 def test_initiat_internal_transfer_succcess():
     responses.post(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/initiate/',
@@ -621,3 +620,5 @@ def test_user_exists_failure():
         )
         assert 'status' in res
         assert res['status'] == 'error'
+=======
+>>>>>>> 305430c6ea3494f7d736442b5c679bd9069a59e5
