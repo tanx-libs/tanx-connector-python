@@ -371,7 +371,6 @@ This method involves using a custom provider and signer, which can be created us
 from web3 import Web3, Account
 from web3.middleware.geth_poa import geth_poa_middleware
 
-polygon_rpc_provider = os.environ['POLYGON_RPC_PROVIDER']
 provider = Web3(Web3.HTTPProvider(polygon_rpc_provider))
 provider.middleware_onion.inject(geth_poa_middleware, layer=0)
 
