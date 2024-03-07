@@ -74,9 +74,6 @@ def polygonDeposit():
         except requests.exceptions.HTTPError as exc:
             print(exc.response.json())
 
-        user_signature = create_user_signature(PRIVATE_KEY, 'testnet')
-        key_pair = get_stark_key_pair_from_signature(user_signature)
-        stark_public_key = key_pair['stark_public_key']
         provider = Web3(Web3.HTTPProvider(polygon_rpc_provider))
         provider.middleware_onion.inject(geth_poa_middleware, layer=0)
         signer = Account.from_key(PRIVATE_KEY)
