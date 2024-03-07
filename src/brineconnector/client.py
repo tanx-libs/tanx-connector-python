@@ -380,7 +380,7 @@ class Client:
         return res
 
     def deposit_from_polygon_network_with_signer(self, signer: Account, provider: Web3, currency:str, amount: float):
-        if float(amount)<0:
+        if float(amount)<=0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
 
         self.get_auth_status()

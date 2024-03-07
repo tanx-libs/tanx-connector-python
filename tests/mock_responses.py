@@ -262,3 +262,37 @@ list_polygon_deposits_response = {
         ]
     }
 }
+
+network_config_response = {
+    'payload': {
+        'network_config': {
+            'POLYGON': {
+                'deposit_contract': '0x09056dC8E09205eb04C78B9C33df4767B2325cF4',
+                'tokens': {
+                    'btc': {
+                        'blockchain_decimal': '18',
+                        'token_contract': '0x8DB9D35eDFdd2fcEe07A0fa60E864dDCBC4eF68e',
+                        'max_fast_withdrawal_for_platform_per_day': '10000',
+                        'max_fast_withdrawal_for_user_per_day': '4000'
+                    },
+                    'matic': {
+                        'blockchain_decimal': '18',
+                        'token_contract': '0x0000000000000000000000000000000000001010',
+                        'max_fast_withdrawal_for_platform_per_day': '10000',
+                        'max_fast_withdrawal_for_user_per_day': '4000'
+                    },
+                    'usdt': {
+                        'blockchain_decimal': '6',
+                        'token_contract': '0x4d2548DAbF3d662110d70239Bc3531043984644D',
+                        'max_fast_withdrawal_for_platform_per_day': '10000',
+                        'max_fast_withdrawal_for_user_per_day': '4000'
+                    }
+                },
+                'allowed_tokens_for_deposit': ['btc', 'matic', 'usdt'],
+                'allowed_tokens_for_deposit_frontend': ['btc', 'matic', 'usdt'],
+                'allowed_tokens_for_fast_wd': ['btc', 'matic', 'usdt'],
+                'allowed_tokens_for_fast_wd_frontend': ['btc', 'matic', 'usdt']
+            },
+        }
+    }
+}
