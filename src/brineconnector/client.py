@@ -188,9 +188,7 @@ class Client:
         return r.json()
 
     def get_coin_stats(self):
-        loc = locals()
-        body = params_to_dict(loc)
-        r = self.session.post('/main/stat/v2/coins/', json=body)
+        r = self.session.post('/main/stat/v2/coins/')
         return r.json()
 
     def get_vault_id(self, coin: str):
@@ -233,8 +231,6 @@ class Client:
             'deposit_blockchain_nonce': deposit_blockchain_nonce,
             'vault_id': vault_id
         }
-        loc = locals()
-        body = params_to_dict(loc)
         r = self.session.post('/sapi/v1/payment/stark/start/', json=payload)
         return r.json()
 
@@ -334,15 +330,6 @@ class Client:
         res['payload'] = {'transaction_hash': deposit_response['hash'].hex()}
 
         return res
-
-    def deposit_from_ethereum_network(self, rpc_url: str, eth_private_key: str, network: Literal['mainnet', 'testnet'], currency: str, amount: float):
-        self.get_auth_status()
-        user_signature = create_user_signature(eth_private_key, network)
-        key_pair = get_stark_key_pair_from_signature(user_signature)
-        stark_public_key = key_pair['stark_public_key']
-        provider = Web3(Web3.HTTPProvider(rpc_url))
-        signer = Account.from_key(eth_private_key)
-        return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', amount, currency)
 
     def get_network_config(self):
         loc = locals()
