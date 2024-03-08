@@ -5,7 +5,8 @@ from .utils import (
     get_nonce,
     get_0x0_to_0x,
     get_allowance,
-    approve_unlimited_allowance_util
+    approve_unlimited_allowance_util,
+    filter_cross_chain_coin
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
