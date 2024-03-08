@@ -240,6 +240,77 @@ list_withdrawals_response= {
 }
 
 
+coin_stats_response = {
+    "status": "success",
+    "message": "Retrieval Successful",
+    "payload": {
+        "ethereum": {
+            "name": "Ethereum",
+            "symbol": "eth",
+            "type": "crypto",
+            "fee": "0.0001",
+            "quanitization": "10",
+            "stark_asset_id": "0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e",
+            "token_contract": "",
+            "news_name": "ETH",
+            "trade_fee": "0.00",
+            "chart_name": "ethereum",
+            "minimum_order": "0.0002",
+            "minimum_withdraw": "0.04",
+            "maximum_order": "2",
+            "minimum_deposit": "0.01",
+            "frontend_visibility": True,
+            "starkex_deposits_enabled": True,
+            "starkex_deposits_enabled_frontend": True,
+            "fast_withdrawals_enabled": True,
+            "fast_withdrawal_fee": "0.0001",
+            "max_fast_withdrawal_for_platform_per_day": "5",
+            "max_fast_withdrawal_for_user_per_day": "2",
+            "min_fast_withdrawal": "0.001",
+            "decimal": "8",
+            "color": "#617EEA",
+            "trade_decimal": "4",
+            "blockchain_decimal": "18",
+            "chart": "BITFINEX:ETHUSD|12M",
+            "logo": "https://brine-mainnet-fe-assets.s3.ap-southeast-1.amazonaws.com/ETHEREUM.png",
+            "description": "Ethereum is an open platform that enables developers to build and deploy decentralized applications such as smart contracts and other complex legal and financial applications. "
+        },
+        "usdc": {
+            "name": "USDC",
+            "symbol": "usdc",
+            "decimal": "6",
+            "fee": "1",
+            "quanitization": "6",
+            "type": "crypto",
+            "stark_asset_id": "0x2893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d",
+            "token_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "trade_fee": "0.00",
+            "color": "#26A17B",
+            "minimum_withdraw": "0",
+            "news_name": "USDC",
+            "chart_name": "usdc",
+            "chart": "KRAKEN:USDCUSD|12M",
+            "minimum_order": "1",
+            "maximum_order": "250000",
+            "trade_decimal": "2",
+            "blockchain_decimal": "6",
+            "minimum_deposit": "1",
+            "frontend_visibility": True,
+            "starkex_deposits_enabled": True,
+            "starkex_deposits_enabled_frontend": True,
+            "fast_withdrawals_enabled": True,
+            "fast_withdrawal_fee": "1",
+            "max_fast_withdrawal_for_platform_per_day": "20000",
+            "max_fast_withdrawal_for_user_per_day": "10000",
+            "min_fast_withdrawal": "10",
+            "logo": "https://brine-mainnet-fe-assets.s3.ap-southeast-1.amazonaws.com/USDC.png",
+            "description": "USD Coin (known by its ticker USDC) is a stablecoin that is pegged to the U.S. dollar on a 1:1 basis. Every unit of this cryptocurrency in circulation is backed up by $1 that is held in reserve, in a mix of cash and short-term U.S. Treasury bonds. The Centre consortium, which is behind this asset, says USDC is issued by regulated financial institutions."
+        },
+    }
+}
+
+get_vault_id_response = {"status": "success", "message": "", "payload": {"id": 252, "coin": "eth"}}
+
 list_polygon_deposits_response = {
     "status": "success",
     "message": "",
