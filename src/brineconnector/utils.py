@@ -84,14 +84,14 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
 def filter_cross_chain_coin(config, coin, type):
     allowed_tokens = config['tokens']
     allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']
-    allowed_tokens_for_fast_withdrawl = config['allowed_tokens_for_fast_wd']
+    allowed_tokens_for_fast_withdrawal = config['allowed_tokens_for_fast_wd']
 
     if type == 'TOKENS':
         allowed_token = allowed_tokens[coin]
     elif type == 'DEPOSIT':
         allowed_token = next((token for token in allowed_tokens_for_deposit if token == coin), None)
-    elif type == 'WITHDRAWL':
-        allowed_token = next((token for token in allowed_tokens_for_fast_withdrawl if token == coin), None)
+    elif type == 'WITHDRAWAL':
+        allowed_token = next((token for token in allowed_tokens_for_fast_withdrawal if token == coin), None)
     else:
         raise CoinNotFoundError('Type not found')
     if not allowed_token:

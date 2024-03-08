@@ -332,9 +332,7 @@ class Client:
         return res
 
     def get_network_config(self):
-        loc = locals()
-        body = params_to_dict(loc)
-        r = self.session.post('/main/stat/v2/app-and-markets/', json=body)
+        r = self.session.post('/main/stat/v2/app-and-markets/')
         return r.json()['payload']['network_config']
 
     def get_polygon_token_balance(self, provider: Web3, eth_address: str, currency: str):
@@ -357,7 +355,6 @@ class Client:
 
     def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
-        loc = locals()
         body = {
             'amount': amount_to_string,
             'currency': currency,
