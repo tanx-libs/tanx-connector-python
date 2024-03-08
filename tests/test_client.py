@@ -389,7 +389,7 @@ def test_list_trades():
     assert "Trades" in client.list_trades()['message']
 
 @responses.activate
-def test_eth_deposits_with_starkKey_success():
+def test_eth_deposits_with_stark_key_success():
     responses.post(url=f'{BASE_URL}/sapi/v1/payment/stark/start/',
                     json={'status': 'success',
                         'message': 'Success! Awaiting Blockchain Confirmation',
@@ -400,7 +400,7 @@ def test_eth_deposits_with_starkKey_success():
     assert 'payload' in res
 
 @responses.activate
-def test_eth_deposits_with_starkKey_fail():
+def test_eth_deposits_with_stark_key_fail():
     responses.post(url=f'{BASE_URL}/main/payment/stark/start/',
                     json={'status':'error',
                         'message':'Essential parameters are missing',
@@ -490,17 +490,17 @@ def test_list_withdrawals():
     assert 'status' in res
     assert res['status'] == 'success'
     assert 'payload' in res
-def test_deposit_from_ethereum_network_with_starkKey_invalid_amount():
+def test_deposit_from_ethereum_network_with_stark_key_invalid_amount():
     w3 = Web3()
     test_signer = w3.eth.account.create()
 
     test_provider = Web3(EthereumTesterProvider())
 
     with pytest.raises(InvalidAmountError):
-        client.deposit_from_ethereum_network_with_starkKey(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0, currency='eth')
+        client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0, currency='eth')
 
 @responses.activate
-def test_deposit_from_ethereum_network_with_starkKey_low_balance(mocker):
+def test_deposit_from_ethereum_network_with_stark_key_low_balance(mocker):
     responses.post(f'{BASE_URL}/main/stat/v2/coins/', json=coin_stats_response)
     responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
 
@@ -509,5 +509,5 @@ def test_deposit_from_ethereum_network_with_starkKey_low_balance(mocker):
     test_signer = w3.eth.account.create()
 
     with pytest.raises(BalanceTooLowError):
-        client.deposit_from_ethereum_network_with_starkKey(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
+        client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
 
