@@ -341,6 +341,15 @@ class Client:
 
         return res
 
+    def deposit_from_ethereum_network(self, rpc_url: str, eth_private_key: str, network: Literal['mainnet', 'testnet'], currency: str, amount: float):
+        self.get_auth_status()
+        user_signature = create_user_signature(eth_private_key, network)
+        key_pair = get_stark_key_pair_from_signature(user_signature)
+        stark_public_key = key_pair['stark_public_key']
+        provider = Web3(Web3.HTTPProvider(rpc_url))
+        signer = Account.from_key(eth_private_key)
+        return self.deposit_from_ethereum_network_with_starkKey(signer, provider, f'0x{stark_public_key}', amount, currency)
+
 
     def initiate_internal_transfer(self, body: InternalTransferInitiateBody):
         r = self.session.post('/sapi/v1/internal_transfers/v2/initiate/', json=body)
