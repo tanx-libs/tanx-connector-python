@@ -8,6 +8,7 @@ from .utils import (
     approve_unlimited_allowance_util,
     format_withdrawal_amount,
     sign_withdrawal_tx_msg_hash,
+    filter_cross_chain_coin
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
