@@ -46,7 +46,7 @@ from tanxconnector import Client
 
 Create a new instance
 
-```ts
+```python
 client = Client()
 // or
 client = Client('testnet') 
@@ -59,7 +59,7 @@ client = Client('testnet')
 
 `GET /sapi/v1/health/`
 
-```ts
+```python
 client.test_connection()
 ```
 
@@ -67,7 +67,7 @@ client.test_connection()
 
 `GET /sapi/v1/market/tickers/`
 
-```ts
+```python
 client.get_24h_price('btcusdt')
 ```
 
@@ -75,7 +75,7 @@ client.get_24h_price('btcusdt')
 
 `GET /sapi/v1/market/kline/`
 
-```ts
+```python
 client.get_candlestick('btcusdt')
 ```
 
@@ -83,7 +83,7 @@ client.get_candlestick('btcusdt')
 
 `GET /sapi/v1/market/orderbook/`
 
-```ts
+```python
 client.get_orderbook('btcusdt')
 ```
 
@@ -91,7 +91,7 @@ client.get_orderbook('btcusdt')
 
 `GET /sapi/v1/market/trades/`
 
-```ts
+```python
 client.get_recent_trades('btcusdt')
 ```
 
@@ -126,7 +126,7 @@ client.set_refresh_token(token)
 
 If refresh token is set (manually or by using login functions), the refresh endpoint is called automatically when access token expires. Optionally, you can call `refresh_tokens` manually by passing in refresh_token (passing it is optional, it'll work if has been set before).
 
-```ts
+```python
 res = client.refresh_tokens(refresh_token)
 ```
 
@@ -134,7 +134,7 @@ res = client.refresh_tokens(refresh_token)
 
 Sets tokens to null
 
-```ts
+```python
 client.logout()
 ```
 
@@ -142,7 +142,7 @@ client.logout()
 
 `GET /sapi/v1/user/profile/`
 
-```ts
+```python
 client.get_profile_info()
 ```
 
@@ -150,7 +150,7 @@ client.get_profile_info()
 
 `GET /sapi/v1/user/balance/`
 
-```ts
+```python
 client.get_balance()
 ```
 
@@ -158,7 +158,7 @@ client.get_balance()
 
 `GET /sapi/v1/user/pnl/`
 
-```ts
+```python
 client.get_profit_and_loss()
 ```
 
@@ -177,9 +177,9 @@ Create Order
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
-Currently generating L2 Key Pairs (stark keys) are only supported with the [NodeJS SDK](https://github.com/Brine-Finance-Libs/brine-connector-nodejs#create-l2-key-pair)
+Currently generating L2 Key Pairs (stark keys) are only supported with the [NodeJS SDK](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair)
 
-```ts
+```python
 from brineconnector import sign_order_with_stark_private_key
 
 nonce_res = client.create_order_nonce(nonce)
@@ -191,7 +191,7 @@ order = client.create_new_order(msg_hash)
 
 `GET /sapi/v1/orders/{order_id}/`
 
-```ts
+```python
 client.get_order(order_id)
 ```
 
@@ -199,7 +199,7 @@ client.get_order(order_id)
 
 `GET /sapi/v1/orders/`
 
-```ts
+```python
 client.list_orders(
   limit=50,
   page=1,
@@ -217,7 +217,7 @@ client.list_orders(
 
 `POST /sapi/v1/orders/cancel/`
 
-```ts
+```python
 client.cancel_order(order_id)
 ```
 
@@ -225,7 +225,7 @@ client.cancel_order(order_id)
 
 `GET /sapi/v1/trades/`
 
-```ts
+```python
 client.list_trades()
 ```
 
@@ -240,7 +240,7 @@ import asyncio
 
 Create a new instance
 
-```ts
+```python
 ws_client = WsClient('public')
 // or
 ws_client = WsClient('public', 'mainnet')
@@ -376,23 +376,9 @@ There are two ways to make a deposit on the Ethereum network:
 <!-- 1. Using ETH Private Key and RPC URL: This approach utilizes your ETH private key and an rpcUrl (e.g., from Infura or Alchemy).
 2. Custom Provider and Signer: This method involves creating your provider and signer using web3.py. You'll also need the stark_public_key. -->
 
-#### 1. Using ETH Private Key and RPC URL:
+#### Using Custom Provider and Signer:
 
-In this method, you will use an ETH private key and an RPC URL to execute a deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
-
-```python
-  const res = client.deposit_from_ethereum_network(
-    rpc_provider, # Use 'sepolia' for the testnet and 'ethereum mainnet' for the mainnet.
-    PRIVATE_KEY,  # Your ETH private key
-    'testnet',  # Network allowed values are 'testnet' or 'mainnet'
-    'eth',  # Enter coin symbol
-    0.00001,  # Enter amount to be deposited
-  )
-```
-
-#### 2. Using Custom Provider and Signer:
-
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](#create-l2-key-pair) section. Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](#create-l2-key-pair) section of the nodejs connector(https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair). Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
@@ -401,7 +387,7 @@ from web3 import Web3, Account
 provider = Web3(Web3.HTTPProvider(rpc_provider))
 signer = Account.from_key(PRIVATE_KEY)
 
-deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_starkKey(
+deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_key(
   signer,
   provider,
   f'0x{stark_public_key}',
