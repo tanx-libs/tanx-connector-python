@@ -336,7 +336,7 @@ from web3 import Web3, Account
 provider = Web3(Web3.HTTPProvider(rpc_provider))
 signer = Account.from_key(PRIVATE_KEY)
 
-deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_starkKey(
+deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_key(
   signer,
   provider,
   f'0x{stark_public_key}',

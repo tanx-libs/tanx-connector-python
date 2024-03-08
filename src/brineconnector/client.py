@@ -1,5 +1,12 @@
 from .session import Session
-from .utils import *
+from .utils import (
+    params_to_dict,
+    filter_ethereum_coin,
+    get_nonce,
+    get_0x0_to_0x,
+    get_allowance,
+    approve_unlimited_allowance_util
+)
 from .bin.blockchain_utils import sign_msg
 from .exception import *
 from typing import Optional, Union, List, Literal
@@ -243,7 +250,7 @@ class Client:
         return res
 
 
-    def deposit_from_ethereum_network_with_starkKey(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
+    def deposit_from_ethereum_network_with_stark_key(self, signer: Account, provider: Web3, stark_public_key: str, amount: float, currency: str):
         w3 = provider
         amount = float(amount)
         if amount <= 0:
