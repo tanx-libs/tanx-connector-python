@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Dict, Tuple, Union, List
+from typing import TypeVar, Generic, Dict, Tuple, Union, List, Optional
 from typing_extensions import TypedDict
 
 T = TypeVar("T")
@@ -185,3 +185,27 @@ class ListDepositParams(TypedDict):
     limit: int
     page: int
     network: str
+
+class StarkSignature(TypedDict):
+    r: str
+    s: str
+    recoveryParam: Optional[int]
+
+class InternalTransferKey(TypedDict):
+    organization_key: str
+    api_key: str
+
+class InternalTransferInitiateBody(InternalTransferKey):
+    client_reference_id: Optional[int]
+    currency: str
+    amount: float
+    destination_address: str
+
+class InternalTransferProcessBody(InternalTransferKey):
+    signature: StarkSignature
+    nonce: int
+    msg_hash: str
+
+class ListInternalTransferParams(TypedDict):
+    limit: Optional[int]
+    offset: Optional[int]
