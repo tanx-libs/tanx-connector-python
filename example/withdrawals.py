@@ -97,8 +97,7 @@ def polygon_withdrawal():
         except requests.exceptions.HTTPError as exc:
             print(exc.response.json())
 
-        user_signature = create_user_signature(PRIVATE_KEY, 'testnet')
-        key_pair = get_stark_key_pair_from_signature(user_signature)
+        key_pair = {'stark_private_key': stark_private_key, 'stark_public_key': stark_public_key}
 
         fast_withdrawal_res = client.fast_withdrawal(
             key_pair,
