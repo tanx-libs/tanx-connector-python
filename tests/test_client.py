@@ -9,9 +9,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
 from src.brineconnector.typings import Balance  # noqa: E402
-BASE_URL = 'https://api.brine.fi'
+from src.brineconnector.exception import InvalidAmountError, BalanceTooLowError
+from tests.mock_responses import *
+from web3 import EthereumTesterProvider, Account, Web3
+BASE_URL = 'https://api.tanx.fi'
 
-# load_dotenv()  # load env variables from .env
+# load_dotenv()
 PRIVATE_KEY = '7d6384d6877be027aa25bd458f2058e3f7ff68347dc583a9baf96f5f97b413a8'
 ETH_ADDRESS = '0x713Cf80b7c71440E7a09Dede1ee23dCBf862fB66'
 
@@ -154,7 +157,7 @@ def test_get_orderbook():
 
 def test_get_orderbook_raises_type_error():
     with pytest.raises(TypeError):
-        client.get_orderbook()['payload']
+        client.get_orderbook()['payload'] # type:ignore
 
 
 @responses.activate
@@ -178,11 +181,11 @@ def test_get_recent_trades():
 
 @responses.activate
 def test_complete_login():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
                          'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
                    status=200)
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/login/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={'status': 'success', 'message': 'Login Successful', 'payload': {
                        'uid': ''}, 'token': {'refresh': 'test', 'access': 'test'}},
                    status=200)
@@ -192,7 +195,7 @@ def test_complete_login():
 
 @responses.activate
 def test_complete_login_raises_invalid_eth_address_400_error():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={
                        'status': 'error', 'message': 'Ensure eth_address has at least 30 characters.', 'payload': ''},
                    status=400)
@@ -202,11 +205,11 @@ def test_complete_login_raises_invalid_eth_address_400_error():
 
 @responses.activate
 def test_complete_login_raises_incorrect_eth_address_400_error():
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/nonce/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
                          'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
                    status=200)
-    responses.post(url=f"{BASE_URL}/sapi/v1/auth/login/",
+    responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={
                        'status': 'error', 'message': 'Invalid Credentials or Token Expired, Kindly login again.', 'payload': ''},
                    status=400)
@@ -325,11 +328,10 @@ def test_create_complete_order():
                    status=200)
     nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
                                            'price': 29580.51, 'side': 'buy', 'volume': 0.0001})
-    # replace with your stark private key
     stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
+    # replace with your stark private key
     msg_hash = sign_order_with_stark_private_key(
         stark_private_key, nonce_res['payload'])
-    # msg_hash = sign_msg_hash(nonce_res['payload'], PRIVATE_KEY, 'testnet')
     assert "Order" in client.create_new_order(msg_hash)['message']
 
 
@@ -342,8 +344,8 @@ def test_create_order_nonce_raises_400_error():
     with pytest.raises(requests.exceptions.HTTPError):
         nonce_res = client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'market',
                                                'price': 29580.51, 'side': 'buy', 'volume': 0.00001})
-        # replace with your stark private key
         stark_private_key = '0x64004f706c1eaa39348afb3191c74812d86e5b14b967e578addb4d89ce1234c'
+        # replace with your stark private key
         msg_hash = sign_order_with_stark_private_key(
             stark_private_key, nonce_res['payload'])
         client.create_new_order(msg_hash)['message']
@@ -385,3 +387,61 @@ def test_list_trades():
                         'message': 'Trades Retrieved Successfully', 'payload': [{}]},
                   status=200)
     assert "Trades" in client.list_trades()['message']
+
+@responses.activate
+def test_eth_deposits_with_stark_key_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/payment/stark/start/',
+                    json={'status': 'success',
+                        'message': 'Success! Awaiting Blockchain Confirmation',
+                        'payload': ''})
+    res = client.crypto_deposit_start(100000,'0x27..','0x27..','0x67..','930','65707',)
+    assert 'status' in res
+    assert 'success' == res['status']
+    assert 'payload' in res
+
+@responses.activate
+def test_eth_deposits_with_stark_key_fail():
+    responses.post(url=f'{BASE_URL}/main/payment/stark/start/',
+                    json={'status':'error',
+                        'message':'Essential parameters are missing',
+                        'payload': ''})
+    with pytest.raises(requests.exceptions.RequestException):
+        res = client.crypto_deposit_start(100000,'0x27..','0x27..','0x67..','930','65707',)
+    # Handle exception
+        
+        data = res.response.json()
+        assert 'status' in data
+        assert data['status'] == 'error'
+        assert 'Essential parameters' in data['message']
+
+@responses.activate
+def test_list_deposits():
+    responses.get(url=f'{BASE_URL}/sapi/v1/deposits/',
+                    json=list_deposits_response)
+    data = client.list_deposits({'network': 'ETHEREUM'}) # type:ignore
+
+    assert 'status' in data
+    assert data['status'] == 'success'
+    assert 'payload' in data
+
+def test_deposit_from_ethereum_network_with_stark_key_invalid_amount():
+    w3 = Web3()
+    test_signer = w3.eth.account.create()
+
+    test_provider = Web3(EthereumTesterProvider())
+
+    with pytest.raises(InvalidAmountError):
+        client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0, currency='eth')
+
+@responses.activate
+def test_deposit_from_ethereum_network_with_stark_key_low_balance(mocker):
+    responses.post(f'{BASE_URL}/main/stat/v2/coins/', json=coin_stats_response)
+    responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
+
+    test_provider = Web3(EthereumTesterProvider())
+    w3 = Web3()
+    test_signer = w3.eth.account.create()
+
+    with pytest.raises(BalanceTooLowError):
+        client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
+

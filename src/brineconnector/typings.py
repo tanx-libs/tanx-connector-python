@@ -170,3 +170,18 @@ class ProfitAndLoss(TypedDict):
 
 
 ProfitAndLossPayload = List[ProfitAndLoss]
+
+class CoinStat(TypedDict):
+    stark_asset_id: str
+    quanitization: str
+    token_contract: str
+    decimal: str
+    symbol: str
+    blockchain_decimal: str
+
+CoinStatPayload = Dict[str, CoinStat]
+
+class ListDepositParams(TypedDict):
+    limit: int
+    page: int
+    network: str

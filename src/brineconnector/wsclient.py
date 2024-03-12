@@ -10,7 +10,7 @@ import socket
 class WsClient:
     def __init__(self, type: str = 'public',
                  option: Literal['mainnet', 'testnet'] = 'mainnet', jwt: Optional[str] = None):
-        base_url = "wss://api.brine.fi" if option == 'mainnet' else 'wss://api-testnet.brine.fi'
+        base_url = "wss://api.tanx.fi" if option == 'mainnet' else 'wss://api-testnet.tanx.fi'
         self.websocket: Optional[websockets.client.WebSocketClientProtocol] = None
         self.connection: str
         if type == 'public':
