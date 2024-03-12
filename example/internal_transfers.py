@@ -14,7 +14,6 @@ ETH_ADDRESS = os.environ['ETH_ADDRESS']
 ETH_ADDRESS_2 = os.environ['ETH_ADDRESS_2']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
 stark_public_key = os.environ['STARK_PUBLIC_KEY']
-rpc_provider = os.environ['RPC_PROVIDER']
 BRINE_ORGANIZATION_KEY = os.environ['BRINE_ORGANIZATION_KEY']
 BRINE_API_KEY = os.environ['BRINE_API_KEY']
 
@@ -32,8 +31,6 @@ def internal_transfers():
             print(exc.response.json())
 
         key_pair = {'stark_private_key': stark_private_key, 'stark_public_key': stark_public_key}
-        provider = Web3(Web3.HTTPProvider(rpc_provider))
-        signer = Account.from_key(PRIVATE_KEY)
 
         # check if user exists by their destination address
         check_user_res = client.check_internal_transfer_user_exists(
