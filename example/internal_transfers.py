@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.brineconnector import Client  # noqa: E402
 from src.brineconnector import exception  # noqa: E402
-from src.brineconnector import create_user_signature
-from src.brineconnector.bin.signature import get_stark_key_pair_from_signature
 from web3 import Web3, Account
 
 load_dotenv()
@@ -15,6 +13,7 @@ PRIVATE_KEY = os.environ['PRIVATE_KEY']
 ETH_ADDRESS = os.environ['ETH_ADDRESS']
 ETH_ADDRESS_2 = os.environ['ETH_ADDRESS_2']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
+stark_public_key = os.environ['STARK_PUBLIC_KEY']
 rpc_provider = os.environ['RPC_PROVIDER']
 BRINE_ORGANIZATION_KEY = os.environ['BRINE_ORGANIZATION_KEY']
 BRINE_API_KEY = os.environ['BRINE_API_KEY']
@@ -32,9 +31,7 @@ def internal_transfers():
         except requests.exceptions.HTTPError as exc:
             print(exc.response.json())
 
-        user_signature = create_user_signature(PRIVATE_KEY, 'testnet')
-        key_pair = get_stark_key_pair_from_signature(user_signature)
-        stark_public_key = key_pair['stark_public_key']
+        key_pair = {'stark_private_key': stark_private_key, 'stark_public_key': stark_public_key}
         provider = Web3(Web3.HTTPProvider(rpc_provider))
         signer = Account.from_key(PRIVATE_KEY)
 
