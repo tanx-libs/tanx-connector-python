@@ -352,14 +352,9 @@ class Client:
     def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
                                             destination_address: str, client_reference_id: Optional[int]=None):
         self.get_auth_status()
-        initiate_response = self.initiate_internal_transfer({
-            'organization_key': organization_key,
-            'api_key': api_key,
-            'currency': currency,
-            'amount': amount,
-            'destination_address': destination_address,
-            'client_reference_id': client_reference_id
-        }) # type: ignore
+        loc = locals()
+        body = params_to_dict(loc)
+        initiate_response = self.initiate_internal_transfer(body) # type: ignore
         signature = sign_internal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
         execute_response = self.execute_internal_transfers({
             'organization_key': organization_key,

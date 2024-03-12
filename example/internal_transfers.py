@@ -35,27 +35,6 @@ def internal_transfers():
         provider = Web3(Web3.HTTPProvider(rpc_provider))
         signer = Account.from_key(PRIVATE_KEY)
 
-        # internal_transfer_response = client.intiate_and_process_internal_transfers(
-        #     key_pair=key_pair,
-        #     organization_key=BRINE_ORGANIZATION_KEY,
-        #     api_key=BRINE_API_KEY,
-        #     currency='usdc',
-        #     amount=1,
-        #     destination_address=ETH_ADDRESS_2,
-        #     client_reference_id=1
-        # )
-        # print(internal_transfer_response)
-
-        internal_trasnfers_list = client.list_internal_transfers({
-            'limit': 10
-        })  # type:ignore
-        print(internal_trasnfers_list)
-
-        if len(internal_trasnfers_list['payload']['internal_transfers']):
-            # get the internal transfer by client ID
-            internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id=internal_trasnfers_list['payload']['internal_transfers'][0]['client_reference_id'])
-            print(internal_transfer_by_id)
-        
         # check if user exists by their destination address
         check_user_res = client.check_internal_transfer_user_exists(
             organization_key=BRINE_ORGANIZATION_KEY,
@@ -64,6 +43,27 @@ def internal_transfers():
         )
         print(check_user_res)
 
+        internal_transfer_response = client.intiate_and_process_internal_transfers(
+            key_pair=key_pair,
+            organization_key=BRINE_ORGANIZATION_KEY,
+            api_key=BRINE_API_KEY,
+            currency='usdc',
+            amount=1,
+            destination_address=ETH_ADDRESS_2,
+            client_reference_id=123
+        )
+        print(internal_transfer_response)
+
+        internal_trasnfers_list = client.list_internal_transfers({
+            'limit': 10
+        })  # type:ignore
+        print(internal_trasnfers_list)
+
+        # if len(internal_trasnfers_list['payload']['internal_transfers']):
+        #     # get the internal transfer by client ID
+        #     internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id=internal_trasnfers_list['payload']['internal_transfers'][0]['client_reference_id'])
+        #     print(internal_transfer_by_id)
+        
 
     # except requests.exceptions.HTTPError as e:
     #     print(e.response.json())
