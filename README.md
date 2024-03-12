@@ -327,7 +327,7 @@ There are two ways to make a deposit on the Ethereum network:
 
 #### Using Custom Provider and Signer:
 
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](#create-l2-key-pair) section of the nodejs connector(https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair). Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) section of the nodejs connector. Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
