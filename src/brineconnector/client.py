@@ -7,7 +7,7 @@ from .utils import (
     get_allowance,
     approve_unlimited_allowance_util,
     format_withdrawal_amount,
-    sign_withdrawal_tx_msg_hash,,
+    sign_withdrawal_tx_msg_hash,
     sign_internal_tx_msg_hash,
 )
 from .bin.blockchain_utils import sign_msg
