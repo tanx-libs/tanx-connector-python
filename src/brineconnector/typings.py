@@ -204,3 +204,28 @@ class ProcessFastWithdrawalPayload(TypedDict):
     msg_hash: str
     signature: StarkSignature
     fastwithdrawal_withdrawal_id: int
+
+
+class StarkSignature(TypedDict):
+    r: str
+    s: str
+    recoveryParam: Optional[int]
+
+class InternalTransferKey(TypedDict):
+    organization_key: str
+    api_key: str
+
+class InternalTransferInitiateBody(InternalTransferKey):
+    client_reference_id: Optional[int]
+    currency: str
+    amount: float
+    destination_address: str
+
+class InternalTransferProcessBody(InternalTransferKey):
+    signature: StarkSignature
+    nonce: int
+    msg_hash: str
+
+class ListInternalTransferParams(TypedDict):
+    limit: Optional[int]
+    offset: Optional[int]

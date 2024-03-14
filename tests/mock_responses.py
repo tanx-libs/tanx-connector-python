@@ -311,6 +311,53 @@ coin_stats_response = {
 
 get_vault_id_response = {"status": "success", "message": "", "payload": {"id": 252, "coin": "eth"}}
 
+list_internal_transfer_response = {
+    'status': 'success',
+    'message': 'Fetched internal transfers successfully',
+    'payload': {
+        'internal_transfers': [
+            {
+                'client_reference_id': '3845010178310545',
+                'amount': '1.0000000000000000',
+                'currency': 'usdc',
+                'from_address': '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+                'destination_address': '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+                'status': 'success',
+                'created_at': '2023-07-26T05:11:47.285117Z',
+                'updated_at': '2023-07-26T05:11:47.698994Z',
+            },
+            {
+                'client_reference_id': '4645497856683096',
+                'amount': '1.0000000000000000',
+                'currency': 'usdc',
+                'from_address': '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+                'destination_address': '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+                'status': 'success',
+                'created_at': '2023-07-26T05:11:13.502647Z',
+                'updated_at': '2023-07-26T05:11:14.047787Z',
+            },
+        ],
+        'total_count': 26,
+        'limit': 2,
+        'offset': 0,
+    }
+}
+
+get_internal_transfer_by_client_id_response = {
+    'status': 'success',
+    'message': 'Fetched internal transfer successfully',
+    'payload': {
+        'client_reference_id': '1234',
+        'amount': '1.0000000000000000',
+        'currency': 'usdc',
+        'from_address': '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+        'destination_address': '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+        'status': 'success',
+        'created_at': '2023-07-26T05:16:31.557629Z',
+        'updated_at': '2023-07-26T05:16:32.047285Z',
+    }
+}
+
 list_polygon_deposits_response = {
     "status": "success",
     "message": "",

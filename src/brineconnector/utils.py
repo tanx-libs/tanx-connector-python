@@ -1,6 +1,6 @@
 from .bin.signature import sign, get_stark_key_pair_from_signature
 from .bin.blockchain_utils import sign_msg
-from .typings import CreateOrderNoncePayload, CreateNewOrderBody, CoinStatPayload
+from .typings import CreateOrderNoncePayload, CreateNewOrderBody, CoinStatPayload, StarkSignature
 from .exception import CoinNotFoundError
 from .constants import Config, MAX_INT_ALLOWANCE
 from typing import Literal
@@ -95,6 +95,13 @@ def format_withdrawal_amount(amount: int, decimals: int, symbol: str):
         return str(Web3().fromWei(amount, 'ether')) if amount else '0'
     else:
         return str(dequantize(number=amount, decimals=decimals))
+def sign_internal_tx_msg_hash(key_pair: dict, msg_hash: str):
+    r, s = sign(int(msg_hash, 16), key_pair['stark_private_key'])
+    signature: StarkSignature = {
+        'r': hex(r),
+        's': hex(s),
+    } # type:ignore
+    return signature
 def filter_cross_chain_coin(config, coin, type):
     allowed_tokens = config['tokens']
     allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']

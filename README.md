@@ -316,6 +316,57 @@ except requests.exceptions.HTTPError as exc:
     print(exc.response.json())
 ```
 
+### Internal Transfer
+
+Users will be able to seamlessly transfer assets from their CEXs or other chains with minimal fees.
+
+To get started with the feature, follow these two steps:
+
+1. Reach out to tanX (support@tanx.fi) to get the organization key and API key.
+
+2. Generate the L2 key pair with your private key
+
+### Available methods:
+
+#### To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
+
+```python
+internal_transfer_response = client.intiate_and_process_internal_transfers(
+  key_pair=key_pair,
+  organization_key=BRINE_ORGANIZATION_KEY,
+  api_key=BRINE_API_KEY,
+  currency='usdc',
+  amount=1,
+  destination_address=ETH_ADDRESS_2,
+  client_reference_id=1
+)
+```
+
+#### Retrieve a list of transfers initiated by the authenticated user:
+
+```python
+internal_trasnfers_list = client.list_internal_transfers({
+  'limit': 10,
+  'offset': 10
+})
+```
+
+#### Retrieve an internal transfer using its client reference id:
+
+```python
+internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id)
+```
+
+#### Check if a user exists by their destination address.
+
+```python
+check_user_res = client.check_internal_transfer_user_exists(
+  organization_key,
+  api_key,
+  destination_address,
+)
+```
+
 ### Deposit
 
 #### Ethereum Deposit
@@ -327,7 +378,7 @@ There are two ways to make a deposit on the Ethereum network:
 
 #### Using Custom Provider and Signer:
 
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](#create-l2-key-pair) section of the nodejs connector(https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair). Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) section of the nodejs connector. Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
