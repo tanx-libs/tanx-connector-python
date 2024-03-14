@@ -445,6 +445,179 @@ def test_deposit_from_ethereum_network_with_stark_key_low_balance(mocker):
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0.0001, currency='eth')
 
+@responses.activate
+def test_initiat_internal_transfer_succcess():
+    responses.post(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/initiate/',
+                    json={'status': 'success',
+                        'message': 'Please sign the message, to complete the transaction',
+                        'payload': {
+                            'nonce': 797982128,
+                            'msg_hash': '0x2af4af1aa1e47a8b4d71a111a0b5a0649d80d586090548f7bb5a7ba74c287d3',
+                        }
+                    })
+    res = client.initiate_internal_transfer({
+        'organization_key': 'abcd...',
+        'api_key': 'xyz...',
+        'currency': 'usdc',
+        'amount': 1,
+        'destination_address': '0xF5...',
+        'client_reference_id': 10
+    })
+
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+    assert 'nonce' in res['payload']
+
+@responses.activate
+def test_execute_internal_transfer_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/process/',
+                    json={
+                        'status': 'success',
+                        'message': 'Internal transfer processed successfully',
+                        'payload': {
+                            'client_reference_id': '6462569061361987',
+                            'amount': '1.0000000000000000',
+                            'currency': 'usdc',
+                            'from_address': '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+                            'destination_address': '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+                            'status': 'success',
+                            'created_at': '2023-07-26T06:28:52.350343Z',
+                            'updated_at': '2023-07-26T06:28:52.902831Z'
+                        }
+                    })
+    res = client.execute_internal_transfers({
+        'organization_key': 'abcd...',
+        'api_key': 'xyz...',
+        'signature': {
+            'r': '0x12...',
+            's': '0x4a...',
+        },
+        'nonce': 14214931,
+        'msg_hash': '0xda0...'
+    }) # type:ignore
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+    assert 'client_reference_id' in res['payload']    
+
+@responses.activate
+def test_initiate_internal_transfer_403_invalid_credential():
+    responses.post(f'{BASE_URL}/sapi/v1/internal_transfers/v2/initiate/',
+                    json={
+                        'status': 'error',
+                        'message': 'Invalid organization key',
+                        'payload': ''
+                    }, status=403)
+    with pytest.raises(requests.exceptions.HTTPError):
+        res = client.initiate_internal_transfer({
+            'organization_key': 'abcd...',
+            'api_key': 'xyz...',
+            'currency': 'usdc',
+            'amount': 1,
+            'destination_address': '0xF5...',
+            'client_reference_id': 10
+        })
+        assert 'status' in res
+        assert res['status'] == 'error'
+
+@responses.activate
+def test_execute_internal_transfer_403_invalid_credential():
+    responses.post(f'{BASE_URL}/sapi/v1/internal_transfers/v2/process/',
+                    json={
+                        'status': 'error',
+                        'message': 'Invalid organization key',
+                        'payload': ''
+                    }, status=403)
+    
+    with pytest.raises(requests.exceptions.HTTPError):
+        res = client.execute_internal_transfers({
+            'organization_key': 'abcd...',
+            'api_key': 'xyz...',
+            'signature': {
+                'r': '0x12...',
+                's': '0x4a...',
+            },
+            'nonce': 14214931,
+            'msg_hash': '0xda0...'
+        }) # type:ignore
+        assert 'status' in res
+        assert res['status'] == 'error'
+
+@responses.activate
+def test_list_internal_transfers_success():
+    responses.get(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/',
+                    json=list_internal_transfer_response, status=200)
+    res = client.list_internal_transfers()
+    assert 'status' in res
+    assert res['status']=='success'
+    assert 'client_reference_id' in res['payload']['internal_transfers'][0]
+
+@responses.activate
+def test_get_internal_transfer_by_client_id():
+    client_id = 1234
+    responses.get(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/{client_id}',
+                    json=get_internal_transfer_by_client_id_response, status=200)
+    res = client.get_internal_transfer_by_client_id(client_reference_id=client_id)
+    assert 'status' in res
+    assert res['status'] == 'success'
+
+@responses.activate
+def test_transfer_does_not_exist():
+    client_id = 1234
+    responses.get(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/{client_id}',
+                    json={
+                        'status': 'error',
+                        'message': 'Transfer does not exist',
+                        'payload': ''
+                    }, status=404)
+    
+    with pytest.raises(requests.exceptions.HTTPError):
+        res = client.get_internal_transfer_by_client_id(client_reference_id=client_id)
+        assert 'status' in res
+        assert res['status'] == 'error'
+
+@responses.activate
+def test_user_exists_success():
+    responses.post(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/check_user_exists/',
+                    json={
+                        'status': 'success',
+                        'message': 'User exists',
+                        'payload': {
+                            'destination_address': '0xF5...',
+                            'exists': True
+                        }
+                    })
+
+    res = client.check_internal_transfer_user_exists(
+        organization_key='abcd...',
+        api_key='xyz...',
+        destination_address='0xF5...'
+    )
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'payload' in res
+
+@responses.activate
+def test_user_exists_failure():
+    responses.post(url=f'{BASE_URL}/sapi/v1/internal_transfers/v2/check_user_exists/',
+                    json={
+                        'status': 'success',
+                        'message': 'User does not exists',
+                        'payload': {
+                            'destination_address': '0xF5...',
+                            'exists': False
+                        }
+                    }, status=404)
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        res = client.check_internal_transfer_user_exists(
+            organization_key='abcd...',
+            api_key='xyz...',
+            destination_address='0xF5...'
+        )
+        assert 'status' in res
+        assert res['status'] == 'error'
 
 @responses.activate
 def test_start_polygon_deposits_success():
