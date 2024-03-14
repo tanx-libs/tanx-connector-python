@@ -7,7 +7,8 @@ from .utils import (
     get_allowance,
     approve_unlimited_allowance_util,
     format_withdrawal_amount,
-    sign_withdrawal_tx_msg_hash,
+    sign_withdrawal_tx_msg_hash,,
+    sign_internal_tx_msg_hash,
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
@@ -32,6 +33,9 @@ from .typings import (
     TokenType,
     ListDepositParams,
     ListWithdrawalParams,
+    InternalTransferInitiateBody,
+    InternalTransferProcessBody,
+    ListInternalTransferParams,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -413,4 +417,45 @@ class Client:
     def list_normal_withdrawals(self, params: Optional[ListWithdrawalParams]=None):
         self.get_auth_status()
         r = self.session.get('/sapi/v1/payment/withdrawals/', json=params)
+        return r.json()
+
+    def initiate_internal_transfer(self, body: InternalTransferInitiateBody):
+        r = self.session.post('/sapi/v1/internal_transfers/v2/initiate/', json=body)
+        return r.json()
+
+    def execute_internal_transfers(self, body: InternalTransferProcessBody):
+        r = self.session.post('/sapi/v1/internal_transfers/v2/process/', json=body)
+        return r.json()
+
+    def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
+                                            destination_address: str, client_reference_id: Optional[int]=None):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        initiate_response = self.initiate_internal_transfer(body) # type: ignore
+        signature = sign_internal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
+        execute_response = self.execute_internal_transfers({
+            'organization_key': organization_key,
+            'api_key': api_key,
+            'signature': signature,
+            'nonce': int(initiate_response['payload']['nonce']),
+            'msg_hash': initiate_response['payload']['msg_hash']
+        })
+        return execute_response
+
+    def list_internal_transfers(self, params: Optional[ListInternalTransferParams]=None):
+        self.get_auth_status()
+        r = self.session.get('/sapi/v1/internal_transfers/v2/', params=params)  # type:ignore
+        return r.json()
+
+    def get_internal_transfer_by_client_id(self, client_reference_id: int):
+        self.get_auth_status()
+        r = self.session.get(f'/sapi/v1/internal_transfers/v2/{client_reference_id}')
+        return r.json()
+
+    def check_internal_transfer_user_exists(self, organization_key: str, api_key: str, destination_address: str):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.post('/sapi/v1/internal_transfers/v2/check_user_exists/', json=body)
         return r.json()
