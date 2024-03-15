@@ -58,6 +58,17 @@ def eth_withdrawals():
         # )
         # print(complete_normal_withdrawal_res)
 
+        gas_price = provider.eth.gas_price
+
+        complete_normal_withdrawal_res = client.complete_normal_withdrawal(
+            'eth',
+            ETH_ADDRESS,
+            signer,
+            provider,
+            gas_price # in wei
+        )
+        print(complete_normal_withdrawal_res)
+
         # Get a list of withdrawals
         # withdrawals_list = client.list_normal_withdrawals()
 

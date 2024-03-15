@@ -723,3 +723,25 @@ def test_list_polygon_deposits():
     assert 'status' in res
     assert res['status'] == 'success'
     assert 'payload' in res
+
+def test_deposit_from_polygon_network_with_signer_invalid_amount():
+    w3 = Web3()
+    test_signer = w3.eth.account.create()
+
+    test_provider = Web3(EthereumTesterProvider())
+
+    with pytest.raises(InvalidAmountError):
+        client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0, currency='matic')
+
+@responses.activate
+def test_deposit_from_polygon_network_with_signer_low_balance(mocker):
+    responses.post(f'{BASE_URL}/main/stat/v2/app-and-markets/', json=network_config_response)
+    responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
+
+    test_provider = Web3(EthereumTesterProvider())
+    w3 = Web3()
+    test_signer = w3.eth.account.create()
+
+    with pytest.raises(BalanceTooLowError):
+        client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic')
+
