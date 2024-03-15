@@ -6,6 +6,8 @@ from .utils import (
     get_0x0_to_0x,
     get_allowance,
     approve_unlimited_allowance_util,
+    format_withdrawal_amount,
+    sign_withdrawal_tx_msg_hash,
     filter_cross_chain_coin,
     sign_internal_tx_msg_hash,
 )
@@ -31,6 +33,7 @@ from .typings import (
     Order,
     TokenType,
     ListDepositParams,
+    ListWithdrawalParams,
     InternalTransferInitiateBody,
     InternalTransferProcessBody,
     ListInternalTransferParams,
@@ -342,6 +345,86 @@ class Client:
         res['payload'] = {'transaction_hash': deposit_response['hash'].hex()}
 
         return res
+
+    def start_normal_withdrawal(self, body: dict):
+        payload = {
+            'amount': body['amount'],
+            'token_id': body['symbol']
+        }
+        r = self.session.post('/sapi/v1/payment/withdrawals/v1/initiate/', json=payload)
+        return r.json()
+
+    def validate_normal_withdrawal(self, body: dict):
+        r = self.session.post('/sapi/v1/payment/withdrawals/v1/validate/', json=body)
+        return r.json()
+
+    def initiate_normal_withdrawal(self, key_pair: dict, amount: float, coin_symbol: str):
+        if float(amount)<=0:
+            raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
+        self.get_auth_status()
+        initiate_response = self.start_normal_withdrawal({'amount': amount, 'symbol': coin_symbol})
+        signature = sign_withdrawal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
+        msg_hex = initiate_response['payload']['msg_hash']
+        msg_hex = hex(int(msg_hex))
+
+        validate_response = self.validate_normal_withdrawal({
+            'msg_hash': str(msg_hex[2:]),
+            'signature': signature,
+            'nonce': initiate_response['payload']['nonce']
+        })
+        return validate_response
+
+    def get_pending_normal_withdrawal_amount_by_coin(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
+        self.get_auth_status()
+        w3 = provider
+        coin_stats = self.get_coin_stats()['payload']
+        current_coin = filter_ethereum_coin(coin_stats_payload=coin_stats, coin=coin_symbol)
+        stark_asset_id = current_coin['stark_asset_id']
+        blockchain_decimal = current_coin['blockchain_decimal']
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        stark_abi = Config.STARK_ABI[self.option]
+
+        contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
+        
+        balance = contract_instance.functions.getWithdrawalBalance(
+            int(user_public_eth_address, 16),
+            int(stark_asset_id, 16)
+        ).call()
+
+        return format_withdrawal_amount(amount=balance, decimals=int(blockchain_decimal), symbol=coin_symbol)
+
+    def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3, gas_price: int):
+        self.get_auth_status()
+        w3 = provider
+        coin_stats = self.get_coin_stats()['payload']
+        current_coin = filter_ethereum_coin(coin_stats_payload=coin_stats, coin=coin_symbol)
+        stark_asset_id = current_coin['stark_asset_id']
+        stark_contract = Config.STARK_CONTRACT[self.option]
+        stark_abi = Config.STARK_ABI[self.option]
+
+        contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
+
+        transaction_pre_build = contract_instance.functions.withdraw(int(user_public_eth_address, 16), int(stark_asset_id, 16))
+
+        gas_price_current = w3.eth.gas_price
+        if gas_price_current > gas_price:
+            raise InvalidAmountError('Current gas price is higher than provided')
+
+        overrides = {
+            'nonce': get_nonce(signer, provider),
+            'gasPrice': gas_price,
+        }
+        transaction = transaction_pre_build.buildTransaction(overrides)
+        signed_tx = signer.sign_transaction(transaction)
+        # send this signed transaction to blockchain
+        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        res = signed_tx
+        return res
+
+    def list_normal_withdrawals(self, params: Optional[ListWithdrawalParams]=None):
+        self.get_auth_status()
+        r = self.session.get('/sapi/v1/payment/withdrawals/', json=params)
+        return r.json()
 
     def get_network_config(self):
         r = self.session.post('/main/stat/v2/app-and-markets/')

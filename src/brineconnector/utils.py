@@ -81,6 +81,21 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     approval = signed_tx
     return approval
 
+def sign_withdrawal_tx_msg_hash(key_pair: dict, msg_hash: str):
+    r, s = sign(msg_hash=int(msg_hash), stark_private_key=key_pair['stark_private_key'])
+    signature = {
+        'r': f"{hex(r)}",
+        's': f"{hex(s)}",
+        'recoveryParam': 0
+    }
+    return signature
+
+def format_withdrawal_amount(amount: int, decimals: int, symbol: str):
+    if symbol == 'eth':
+        return str(Web3().fromWei(amount, 'ether')) if amount else '0'
+    else:
+        return str(dequantize(number=amount, decimals=decimals))
+
 def filter_cross_chain_coin(config, coin, type):
     allowed_tokens = config['tokens']
     allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']

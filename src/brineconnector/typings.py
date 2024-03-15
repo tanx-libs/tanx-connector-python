@@ -186,6 +186,11 @@ class ListDepositParams(TypedDict):
     page: int
     network: str
 
+class ListWithdrawalParams(TypedDict):
+    page: int
+    network: str
+
+
 class StarkSignature(TypedDict):
     r: str
     s: str
