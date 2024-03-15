@@ -421,6 +421,7 @@ from web3 import Web3, Account
 
 provider = Web3(Web3.HTTPProvider(rpc_provider))
 signer = Account.from_key(PRIVATE_KEY)
+gas_price = provider.eth.gas_price # or any custom value
 
 # Withdrawals
 
@@ -438,6 +439,7 @@ pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(
   eth_address, # User public eth address
   signer, # The signer created above
   provider, # The provider created above
+  gas_price, # max gas price for the transaction
 )
 # 4. In the final step, if you find the balance is more than 0, you can use the "completeNormalWithdrawal" function to withdraw the cumulative amount to your ETH wallet.
 complete_normal_withdrawal_res = client.complete_normal_withdrawal(
