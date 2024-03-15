@@ -187,8 +187,23 @@ class ListDepositParams(TypedDict):
     network: str
 
 class ListWithdrawalParams(TypedDict):
-    page: int
-    network: str
+    page: Optional[int]
+    network: Optional[str]
+
+class InitiateWithdrawalPayload(TypedDict):
+    amount: float
+    symbol: str
+    network: Optional[str]
+
+class StarkSignature(TypedDict):
+    r: str
+    s: str
+    recoveryParam: Optional[int]
+
+class ProcessFastWithdrawalPayload(TypedDict):
+    msg_hash: str
+    signature: StarkSignature
+    fastwithdrawal_withdrawal_id: int
 
 
 class StarkSignature(TypedDict):

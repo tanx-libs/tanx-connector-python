@@ -724,6 +724,7 @@ def test_list_polygon_deposits():
     assert res['status'] == 'success'
     assert 'payload' in res
 
+@responses.activate
 def test_deposit_from_polygon_network_with_signer_invalid_amount():
     w3 = Web3()
     test_signer = w3.eth.account.create()

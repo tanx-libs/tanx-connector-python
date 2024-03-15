@@ -10,6 +10,7 @@ from .utils import (
     sign_withdrawal_tx_msg_hash,
     filter_cross_chain_coin,
     sign_internal_tx_msg_hash,
+    filter_cross_chain_coin
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
@@ -37,6 +38,8 @@ from .typings import (
     InternalTransferInitiateBody,
     InternalTransferProcessBody,
     ListInternalTransferParams,
+    InitiateWithdrawalPayload,
+    ProcessFastWithdrawalPayload,
 )
 from web3 import Web3, Account
 from .constants import Config
@@ -426,6 +429,47 @@ class Client:
         r = self.session.get('/sapi/v1/payment/withdrawals/', json=params)
         return r.json()
 
+    def initiate_internal_transfer(self, body: InternalTransferInitiateBody):
+        r = self.session.post('/sapi/v1/internal_transfers/v2/initiate/', json=body)
+        return r.json()
+
+    def execute_internal_transfers(self, body: InternalTransferProcessBody):
+        r = self.session.post('/sapi/v1/internal_transfers/v2/process/', json=body)
+        return r.json()
+
+    def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
+                                            destination_address: str, client_reference_id: Optional[int]=None):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        initiate_response = self.initiate_internal_transfer(body) # type: ignore
+        signature = sign_internal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
+        execute_response = self.execute_internal_transfers({
+            'organization_key': organization_key,
+            'api_key': api_key,
+            'signature': signature,
+            'nonce': int(initiate_response['payload']['nonce']),
+            'msg_hash': initiate_response['payload']['msg_hash']
+        })
+        return execute_response
+
+    def list_internal_transfers(self, params: Optional[ListInternalTransferParams]=None):
+        self.get_auth_status()
+        r = self.session.get('/sapi/v1/internal_transfers/v2/', params=params)  # type:ignore
+        return r.json()
+
+    def get_internal_transfer_by_client_id(self, client_reference_id: int):
+        self.get_auth_status()
+        r = self.session.get(f'/sapi/v1/internal_transfers/v2/{client_reference_id}')
+        return r.json()
+
+    def check_internal_transfer_user_exists(self, organization_key: str, api_key: str, destination_address: str):
+        self.get_auth_status()
+        loc = locals()
+        body = params_to_dict(loc)
+        r = self.session.post('/sapi/v1/internal_transfers/v2/check_user_exists/', json=body)
+        return r.json()
+
     def get_network_config(self):
         r = self.session.post('/main/stat/v2/app-and-markets/')
         return r.json()['payload']['network_config']
@@ -448,7 +492,7 @@ class Client:
         normal_balance = balance / (10 ** int(decimal))
         return normal_balance
 
-    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
+    def cross_chain_deposit_start(self, amount: int, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
         body = {
             'amount': amount_to_string,
@@ -529,7 +573,7 @@ class Client:
         w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
         res = self.cross_chain_deposit_start(
-            amount,
+            int(amount),
             currency,
             deposit_response['hash'].hex(),
             transaction['nonce']    # type:ignore
@@ -545,43 +589,42 @@ class Client:
         signer = Account.from_key(eth_private_key)
         return self.deposit_from_polygon_network_with_signer(signer=signer, provider=provider, currency=currency, amount=amount)
 
-    def initiate_internal_transfer(self, body: InternalTransferInitiateBody):
-        r = self.session.post('/sapi/v1/internal_transfers/v2/initiate/', json=body)
+    def start_fast_withdrawal(self, body: InitiateWithdrawalPayload):
+        r = self.session.post('/sapi/v1/payment/fast-withdrawals/v2/initiate/',
+                                json={'amount': body['amount'], 'token_id': body['symbol'], 'network': body['network']})
         return r.json()
 
-    def execute_internal_transfers(self, body: InternalTransferProcessBody):
-        r = self.session.post('/sapi/v1/internal_transfers/v2/process/', json=body)
+    def process_fast_withdrawal(self, body: ProcessFastWithdrawalPayload):
+        r = self.session.post('/sapi/v1/payment/fast-withdrawals/v2/process/', json=body)
         return r.json()
 
-    def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
-                                            destination_address: str, client_reference_id: Optional[int]=None):
+    def fast_withdrawal(self, key_pair: dict, amount: float, coin_symbol: str, network: str):
+        if amount<=0:
+            raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
-        loc = locals()
-        body = params_to_dict(loc)
-        initiate_response = self.initiate_internal_transfer(body) # type: ignore
-        signature = sign_internal_tx_msg_hash(key_pair, initiate_response['payload']['msg_hash'])
-        execute_response = self.execute_internal_transfers({
-            'organization_key': organization_key,
-            'api_key': api_key,
-            'signature': signature,
-            'nonce': int(initiate_response['payload']['nonce']),
-            'msg_hash': initiate_response['payload']['msg_hash']
+        if network == 'POLYGON':
+            network_config = self.get_network_config()
+            polygon_config = network_config['POLYGON']
+            _ = filter_cross_chain_coin(polygon_config, coin_symbol, 'WITHDRAWAL')
+        else:
+            coin_stats = self.get_coin_stats()['payload']
+            _ = filter_ethereum_coin(coin_stats, coin_symbol)
+        
+        initiate_response = self.start_fast_withdrawal({
+            'amount': amount,
+            'symbol': coin_symbol,
+            'network': network
         })
-        return execute_response
+        signature = sign_withdrawal_tx_msg_hash(key_pair, str(int(initiate_response['payload']['msg_hash'], 16)))
 
-    def list_internal_transfers(self, params: Optional[ListInternalTransferParams]=None):
-        self.get_auth_status()
-        r = self.session.get('/sapi/v1/internal_transfers/v2/', params=params)  # type:ignore
-        return r.json()
+        validate_response = self.process_fast_withdrawal({
+            'msg_hash': initiate_response['payload']['msg_hash'],
+            'signature': signature,     # type:ignore
+            'fastwithdrawal_withdrawal_id': initiate_response['payload']['fastwithdrawal_withdrawal_id'],
+        })
+        return validate_response
 
-    def get_internal_transfer_by_client_id(self, client_reference_id: int):
+    def list_fast_withdrawals(self, params: Optional[ListWithdrawalParams]=None):
         self.get_auth_status()
-        r = self.session.get(f'/sapi/v1/internal_transfers/v2/{client_reference_id}')
-        return r.json()
-
-    def check_internal_transfer_user_exists(self, organization_key: str, api_key: str, destination_address: str):
-        self.get_auth_status()
-        loc = locals()
-        body = params_to_dict(loc)
-        r = self.session.post('/sapi/v1/internal_transfers/v2/check_user_exists/', json=body)
+        r = self.session.get('/sapi/v1/payment/fast-withdrawals/', params=params)   # type:ignore
         return r.json()

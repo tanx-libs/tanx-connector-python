@@ -96,6 +96,14 @@ def format_withdrawal_amount(amount: int, decimals: int, symbol: str):
     else:
         return str(dequantize(number=amount, decimals=decimals))
 
+def sign_internal_tx_msg_hash(key_pair: dict, msg_hash: str):
+    r, s = sign(int(msg_hash, 16), key_pair['stark_private_key'])
+    signature: StarkSignature = {
+        'r': hex(r),
+        's': hex(s),
+    } # type:ignore
+    return signature
+
 def filter_cross_chain_coin(config, coin, type):
     allowed_tokens = config['tokens']
     allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']
@@ -115,10 +123,3 @@ def filter_cross_chain_coin(config, coin, type):
     current_coin = allowed_tokens[coin]
     return current_coin
 
-def sign_internal_tx_msg_hash(key_pair: dict, msg_hash: str):
-    r, s = sign(int(msg_hash, 16), key_pair['stark_private_key'])
-    signature: StarkSignature = {
-        'r': hex(r),
-        's': hex(s),
-    } # type:ignore
-    return signature

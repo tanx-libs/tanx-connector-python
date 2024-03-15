@@ -494,3 +494,40 @@ withdrawals_list = client.list_normal_withdrawals({
 })
 ```
 
+#### Fast Withdrawal
+
+With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee.
+
+```python
+fast_withdrawal_res = client.fast_withdrawal(
+  key_pair, # The keyPair created above
+  0.0001, # Enter the amount you want to deposit
+  'usdc', # Enter the coin symbol
+  'ETHEREUM', # Allowed networks are POLYGON & ETHEREUM
+)
+
+# Get a list of fast withdrawals
+fast_withdrawals_list = client.list_fast_withdrawals({
+  'page': 2, # This is an optional field
+})
+```
+
+#### Polygon withdrawal
+
+On the Polygon network, we only support fast withdrawals.
+
+```python
+const fastWithdrawalRes = await client.fastWithdrawal(
+  key_pair, # The keyPair created above
+  0.001, # Enter the amount you want to deposit
+  'btc', # Enter the coin symbol
+  'POLYGON', # Allowed networks are POLYGON & ETHEREUM
+)
+```
+
+# Get a list of fast withdrawals
+fast_withdrawals_list = client.list_fast_withdrawals({
+  'page': 2, # This is an optional field
+  'network': 'POLYGON'  # This is an optional field
+})
+```
