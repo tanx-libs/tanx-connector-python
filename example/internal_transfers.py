@@ -3,8 +3,8 @@ import sys
 import os
 from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brineconnector import Client  # noqa: E402
-from src.brineconnector import exception  # noqa: E402
+from src.tanxconnector import Client  # noqa: E402
+from src.tanxconnector import exception  # noqa: E402
 from web3 import Web3, Account
 
 load_dotenv()
@@ -14,8 +14,8 @@ ETH_ADDRESS = os.environ['ETH_ADDRESS']
 ETH_ADDRESS_2 = os.environ['ETH_ADDRESS_2']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
 stark_public_key = os.environ['STARK_PUBLIC_KEY']
-BRINE_ORGANIZATION_KEY = os.environ['BRINE_ORGANIZATION_KEY']
-BRINE_API_KEY = os.environ['BRINE_API_KEY']
+TANX_ORGANIZATION_KEY = os.environ['TANX_ORGANIZATION_KEY']
+TANX_API_KEY = os.environ['TANX_API_KEY']
 
 def internal_transfers():
     try:
@@ -34,16 +34,16 @@ def internal_transfers():
 
         # check if user exists by their destination address
         check_user_res = client.check_internal_transfer_user_exists(
-            organization_key=BRINE_ORGANIZATION_KEY,
-            api_key=BRINE_API_KEY,
+            organization_key=TANX_ORGANIZATION_KEY,
+            api_key=TANX_API_KEY,
             destination_address=ETH_ADDRESS_2,
         )
         print(check_user_res)
 
         internal_transfer_response = client.intiate_and_process_internal_transfers(
             key_pair=key_pair,
-            organization_key=BRINE_ORGANIZATION_KEY,
-            api_key=BRINE_API_KEY,
+            organization_key=TANX_ORGANIZATION_KEY,
+            api_key=TANX_API_KEY,
             currency='usdc',
             amount=1,
             destination_address=ETH_ADDRESS_2,

@@ -3,10 +3,10 @@ import sys
 import os
 from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brineconnector import Client  # noqa: E402
-from src.brineconnector import exception  # noqa: E402
-from src.brineconnector.typings import CreateOrderNonceBody  # noqa: E402
-from src.brineconnector import sign_order_with_stark_private_key
+from src.tanxconnector import Client  # noqa: E402
+from src.tanxconnector import exception  # noqa: E402
+from src.tanxconnector.typings import CreateOrderNonceBody  # noqa: E402
+from src.tanxconnector import sign_order_with_stark_private_key
 
 load_dotenv()
 

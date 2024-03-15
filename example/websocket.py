@@ -3,8 +3,8 @@ import os
 import asyncio
 from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brineconnector.client import Client  # noqa: E402
-from src.brineconnector import WsClient  # noqa: E402
+from src.tanxconnector.client import Client  # noqa: E402
+from src.tanxconnector import WsClient  # noqa: E402
 
 load_dotenv()
 private_key = os.environ['PRIVATE_KEY']

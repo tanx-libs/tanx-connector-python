@@ -1,16 +1,16 @@
 import json
 
 
-with open('src/brineconnector/bin/starkex_abi_main.json') as f:
+with open('src/tanxconnector/bin/starkex_abi_main.json') as f:
     starkex_abi_main = json.load(f)
 
-with open('src/brineconnector/bin/starkex_abi_test.json') as f:
+with open('src/tanxconnector/bin/starkex_abi_test.json') as f:
     starkex_abi_test = json.load(f)
 
-with open('src/brineconnector/bin/erc20_abi.json') as f:
+with open('src/tanxconnector/bin/erc20_abi.json') as f:
     erc20Abi = json.load(f)
 
-with open('src/brineconnector/bin/polygon_deposit.json') as f:
+with open('src/tanxconnector/bin/polygon_deposit.json') as f:
     polygon_deposit_abi = json.load(f)
 
 

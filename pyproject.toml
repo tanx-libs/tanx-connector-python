@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tanx-connector"
-version = "0.8.0"
+version = "0.1.0"
 authors = [
   { name="tanX" },
 ]
@@ -15,8 +15,8 @@ license = { file = "LICENSE" }
 description = "The official Python connector for Tanx's API"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["requests", "web3<=5.25.0,>5.0.0", "ecdsa", "websockets", "sympy", "typing-extensions"]
-keywords = ["brine", "connector", "finance", "api", "wrapper", "python" ]
+dependencies = ["requests", "web3", "ecdsa", "websockets", "sympy", "typing-extensions"]
+keywords = ["tanx", "connector", "finance", "api", "wrapper", "python" ]
 
 [project.urls]
 "Homepage" = "https://github.com/tanx-libs/tanx-connector-python"
@@ -29,10 +29,10 @@ dev = ["eth-tester", "pytest", "pytest-mock", "responses", "pip-tools", "bumpver
 where = ["src"]
 
 [tool.setuptools.package-data]
-"brineconnector.bin" = ["*.json"]
+"tanxconnector.bin" = ["*.json"]
 
 [tool.bumpver]
-current_version = "0.8.0"
+current_version = "0.1.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "version: v{old_version} -> v{new_version}"
 commit = true
