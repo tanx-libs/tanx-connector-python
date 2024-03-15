@@ -50,11 +50,14 @@ def eth_withdrawals():
         # 4. Final step - if you find the balance is more than 0, you can call "complete_normal_withdrawal"
         # to withdraw the cumulative amount to your ETH wallet.
 
+        gas_price = provider.eth.gas_price
+
         complete_normal_withdrawal_res = client.complete_normal_withdrawal(
             'eth',
             ETH_ADDRESS,
             signer,
-            provider
+            provider,
+            gas_price # in wei
         )
         print(complete_normal_withdrawal_res)
 

@@ -391,7 +391,7 @@ class Client:
 
         return format_withdrawal_amount(amount=balance, decimals=int(blockchain_decimal), symbol=coin_symbol)
 
-    def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3):
+    def complete_normal_withdrawal(self, coin_symbol: str, user_public_eth_address: str, signer: Account, provider: Web3, gas_price: int):
         self.get_auth_status()
         w3 = provider
         coin_stats = self.get_coin_stats()['payload']
@@ -404,9 +404,13 @@ class Client:
 
         transaction_pre_build = contract_instance.functions.withdraw(int(user_public_eth_address, 16), int(stark_asset_id, 16))
 
+        gas_price_current = w3.eth.gas_price
+        if gas_price_current > gas_price:
+            raise InvalidAmountError('Current gas price is higher than provided')
+
         overrides = {
             'nonce': get_nonce(signer, provider),
-            'gasPrice': w3.eth.gas_price,
+            'gasPrice': gas_price,
         }
         transaction = transaction_pre_build.buildTransaction(overrides)
         signed_tx = signer.sign_transaction(transaction)
