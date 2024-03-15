@@ -405,7 +405,8 @@ class Client:
         transaction_pre_build = contract_instance.functions.withdraw(int(user_public_eth_address, 16), int(stark_asset_id, 16))
 
         overrides = {
-            'nonce': get_nonce(signer, provider)
+            'nonce': get_nonce(signer, provider),
+            'gasPrice': w3.eth.gas_price,
         }
         transaction = transaction_pre_build.buildTransaction(overrides)
         signed_tx = signer.sign_transaction(transaction)
