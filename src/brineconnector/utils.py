@@ -63,8 +63,8 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
 
     gas_limit = contract_instance.functions.approve(
         contract_address,
-        Web3.toInt(int('100'))
-    ).estimateGas({"from": token_contract})
+        Web3.to_int(int('100'))
+    ).estimate_gas({"from": token_contract})
     # so basically, if token contract is not provided, it'll try to approve from 0 address account,
     # so providing a from account, other way is to initialize web3 using private key
     overrides = {
@@ -74,10 +74,10 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     }
     amount = int(MAX_INT_ALLOWANCE)
     transaction_pre_build = contract_instance.functions.approve(contract_address, amount)
-    transaction = transaction_pre_build.buildTransaction(overrides) # type: ignore
+    transaction = transaction_pre_build.build_transaction(overrides) # type: ignore
     signed_tx = signer.sign_transaction(transaction)
     # send this signed transaction to blockchain
-    w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+    w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
     approval = signed_tx
     return approval
 
