@@ -96,25 +96,6 @@ def format_withdrawal_amount(amount: int, decimals: int, symbol: str):
     else:
         return str(dequantize(number=amount, decimals=decimals))
 
-def filter_cross_chain_coin(config, coin, type):
-    allowed_tokens = config['tokens']
-    allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']
-    allowed_tokens_for_fast_withdrawal = config['allowed_tokens_for_fast_wd']
-
-    if type == 'TOKENS':
-        allowed_token = allowed_tokens[coin]
-    elif type == 'DEPOSIT':
-        allowed_token = next((token for token in allowed_tokens_for_deposit if token == coin), None)
-    elif type == 'WITHDRAWAL':
-        allowed_token = next((token for token in allowed_tokens_for_fast_withdrawal if token == coin), None)
-    else:
-        raise CoinNotFoundError('Type not found')
-    if not allowed_token:
-        raise CoinNotFoundError(f'Coin {coin} not found')
-
-    current_coin = allowed_tokens[coin]
-    return current_coin
-
 def sign_internal_tx_msg_hash(key_pair: dict, msg_hash: str):
     r, s = sign(int(msg_hash, 16), key_pair['stark_private_key'])
     signature: StarkSignature = {
@@ -122,6 +103,7 @@ def sign_internal_tx_msg_hash(key_pair: dict, msg_hash: str):
         's': hex(s),
     } # type:ignore
     return signature
+
 def filter_cross_chain_coin(config, coin, type):
     allowed_tokens = config['tokens']
     allowed_tokens_for_deposit = config['allowed_tokens_for_deposit']
