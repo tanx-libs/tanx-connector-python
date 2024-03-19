@@ -500,7 +500,7 @@ def test_deposit_from_ethereum_network_with_stark_key_invalid_amount():
         client.deposit_from_ethereum_network_with_stark_key(signer=test_signer, provider=test_provider, stark_public_key='0x27..', amount=0, currency='eth')
 
 @responses.activate
-def test_deposit_from_ethereum_network_with_stark_key_low_balance(mocker):
+def test_deposit_from_ethereum_network_with_stark_key_low_balance():
     responses.post(f'{BASE_URL}/main/stat/v2/coins/', json=coin_stats_response)
     responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
 
@@ -735,7 +735,7 @@ def test_deposit_from_polygon_network_with_signer_invalid_amount():
         client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0, currency='matic')
 
 @responses.activate
-def test_deposit_from_polygon_network_with_signer_low_balance(mocker):
+def test_deposit_from_polygon_network_with_signer_low_balance():
     responses.post(f'{BASE_URL}/main/stat/v2/app-and-markets/', json=network_config_response)
     responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
 
