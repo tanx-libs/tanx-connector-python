@@ -1,0 +1,15 @@
+requests
+web3
+ecdsa
+websockets
+sympy
+typing-extensions
+eth-tester
+pytest
+pytest-mock
+responses
+pip-tools
+bumpver
+build
+twine
+python-dotenv
