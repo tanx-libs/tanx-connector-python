@@ -1,6 +1,6 @@
-requests
-web3
-ecdsa
+requests>=2.22.0,<3.0.0
+web3>=6.0.0,<7.0.0
+ecdsa>=0.16.0
 websockets
 sympy
-typing-extensions
+typing-extensions>=4.3.0
