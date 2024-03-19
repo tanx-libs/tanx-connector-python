@@ -6,10 +6,10 @@ import requests
 from typing import List, cast
 from responses import matchers
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.brineconnector import Client  # noqa: E402
-from src.brineconnector import sign_order_with_stark_private_key  # noqa: E402
-from src.brineconnector.typings import Balance  # noqa: E402
-from src.brineconnector.exception import InvalidAmountError, BalanceTooLowError
+from src.tanxconnector import Client  # noqa: E402
+from src.tanxconnector import sign_order_with_stark_private_key  # noqa: E402
+from src.tanxconnector.typings import Balance  # noqa: E402
+from src.tanxconnector.exception import InvalidAmountError, BalanceTooLowError
 from tests.mock_responses import *
 from web3 import EthereumTesterProvider, Account, Web3
 BASE_URL = 'https://api.tanx.fi'
@@ -183,7 +183,7 @@ def test_get_recent_trades():
 def test_complete_login():
     responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
-                         'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
+                         'payload': 'You’re now signing into Tanx Testnet, make sure the origin is https://testnet.tanx.fi (Login-code:abc)'},
                    status=200)
     responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={'status': 'success', 'message': 'Login Successful', 'payload': {
@@ -207,7 +207,7 @@ def test_complete_login_raises_invalid_eth_address_400_error():
 def test_complete_login_raises_incorrect_eth_address_400_error():
     responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/nonce/",
                    json={'status': 'success', 'message': 'Cached Nonce Acquired',
-                         'payload': 'You’re now signing into Brine Testnet, make sure the origin is https://testnet.brine.fi (Login-code:abc)'},
+                         'payload': 'You’re now signing into Tanx Testnet, make sure the origin is https://testnet.tanx.fi (Login-code:abc)'},
                    status=200)
     responses.post(url=f"{BASE_URL}/sapi/v1/auth/v2/login/",
                    json={
@@ -222,7 +222,7 @@ def test_complete_login_raises_incorrect_eth_address_400_error():
 def test_get_profile_info():
     responses.get(url=f"{BASE_URL}/sapi/v1/user/profile/",
                   json={'status': 'success', 'message': 'Successful', 'payload': {
-                      'name': 'test', 'img': None, 'username': '0x7brine', 'stark_key': '0x'}},
+                      'name': 'test', 'img': None, 'username': '0x7tanx', 'stark_key': '0x'}},
                   status=200)
     assert "name" in client.get_profile_info()['payload']
 

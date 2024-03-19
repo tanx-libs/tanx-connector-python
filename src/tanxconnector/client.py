@@ -226,7 +226,7 @@ class Client:
     def get_token_balance(self, provider: Web3, eth_address: str, currency: str):
         if currency == 'eth':
             balance_wei = provider.eth.get_balance(eth_address) # type: ignore
-            balance_eth = provider.fromWei(balance_wei, 'ether')
+            balance_eth = provider.from_wei(balance_wei, 'ether')
             return balance_eth
 
         coin_stats =  self.get_coin_stats()
@@ -284,8 +284,8 @@ class Client:
         stark_abi = Config.STARK_ABI[self.option]
 
         contract_instance = w3.eth.contract(address=stark_contract, abi=stark_abi) # type:ignore
-        parsed_amount = w3.toWei(amount, 'ether')
-        gwei = w3.toWei(amount, 'gwei')
+        parsed_amount = w3.to_wei(amount, 'ether')
+        gwei = w3.to_wei(amount, 'gwei')
 
         # In the context of building transactions on the Ethereum network, 
         # "overrides" typically refer to parameters that allow you to customize 
@@ -312,7 +312,7 @@ class Client:
             # - For transactions involving other tokens on the Ethereum network, 
             #     you typically interact with smart contracts, and you need to explicitly specify 
             #     the value and other parameters required by the contract.
-            overrides['value'] = w3.toWei(amount, 'ether')
+            overrides['value'] = w3.to_wei(amount, 'ether')
             transaction_pre_build = contract_instance.functions.depositEth(
                 stark_public_key_uint,
                 stark_asset_id_uint,
@@ -330,10 +330,10 @@ class Client:
                 int(quantized_amount)
             )
 
-        transaction = transaction_pre_build.buildTransaction(overrides)
+        transaction = transaction_pre_build.build_transaction(overrides)
         signed_tx = signer.sign_transaction(transaction)
         # send this signed transaction to blockchain
-        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
 
         res = self.crypto_deposit_start(
@@ -417,10 +417,10 @@ class Client:
             'nonce': get_nonce(signer, provider),
             'gasPrice': gas_price,
         }
-        transaction = transaction_pre_build.buildTransaction(overrides)
+        transaction = transaction_pre_build.build_transaction(overrides)
         signed_tx = signer.sign_transaction(transaction)
         # send this signed transaction to blockchain
-        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         res = signed_tx
         return res
 
@@ -476,8 +476,8 @@ class Client:
 
     def get_polygon_token_balance(self, provider: Web3, eth_address: str, currency: str):
         if currency == 'matic':
-            balance = provider.eth.get_balance(eth_address)
-            return Web3.fromWei(balance, 'ether')
+            balance = provider.eth.get_balance(eth_address)     # type:ignore
+            return Web3.from_wei(balance, 'ether')
         network_config = self.get_network_config()
         polygon_config = network_config['POLYGON']
         allowed_tokens = polygon_config['tokens']
@@ -492,7 +492,7 @@ class Client:
         normal_balance = balance / (10 ** int(decimal))
         return normal_balance
 
-    def cross_chain_deposit_start(self, amount: int, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
+    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
         amount_to_string = str(amount)
         body = {
             'amount': amount_to_string,
@@ -538,8 +538,8 @@ class Client:
 
         polygon_contract = w3.eth.contract(address=contract_address, abi=Config.POLYGON_ABI['abi'])
 
-        parsed_amount = w3.toWei(amount, 'ether')
-        gwei = w3.fromWei(parsed_amount, 'gwei')
+        parsed_amount = w3.to_wei(amount, 'ether')
+        gwei = w3.from_wei(parsed_amount, 'gwei')
         nonce = get_nonce(signer=signer, provider=provider)
 
         params = {
@@ -567,13 +567,13 @@ class Client:
                 int(quantized_amount)
             )
 
-        transaction = transaction_pre_build.buildTransaction(params)    # type:ignore
+        transaction = transaction_pre_build.build_transaction(params)    # type:ignore
         signed_tx = signer.sign_transaction(transaction)
         # send this signed transaction to blockchain
-        w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+        w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
         res = self.cross_chain_deposit_start(
-            int(amount),
+            amount,
             currency,
             deposit_response['hash'].hex(),
             transaction['nonce']    # type:ignore

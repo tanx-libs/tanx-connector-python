@@ -22,7 +22,7 @@
 - Automatically sets JWT token internally
 - Auto refresh tokens when access token expires
 
-Tanx-connector-python includes utility/connector functions which can be used to interact with the Brine API. It uses requests internally to handle all requests.
+Tanx-connector-python includes utility/connector functions which can be used to interact with the Tanx API. It uses requests internally to handle all requests.
 
 ## Installation
 
@@ -103,7 +103,7 @@ getNonce: `POST /sapi/v1/auth/nonce/`
 login: `POST /sapi/v1/auth/login/`
 
 ```js
-from brineconnector import sign_msg
+from tanxconnector import sign_msg
 
 nonce = client.get_nonce(ETH_ADDRESS)
 user_signature = sign_msg(nonce['payload'], PRIVATE_KEY)
@@ -167,7 +167,7 @@ client.get_profit_and_loss()
 Create Nonce Body
 
 ```py
-from brineconnector.typings import CreateOrderNonceBody
+from tanxconnector.typings import CreateOrderNonceBody
 nonce: CreateOrderNonceBody = {'market': 'btcusdt', 'ord_type': 'market',
                                'price': 29580.51, 'side': 'buy', 'volume': 0.0001}
 ```
@@ -180,7 +180,7 @@ create_new_order: `POST /sapi/v1/orders/create/`
 Currently generating L2 Key Pairs (stark keys) are only supported with the [NodeJS SDK](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair)
 
 ```python
-from brineconnector import sign_order_with_stark_private_key
+from tanxconnector import sign_order_with_stark_private_key
 
 nonce_res = client.create_order_nonce(nonce)
 msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res['payload'])
@@ -234,7 +234,7 @@ client.list_trades()
 Import the WebSocket Client. All WsClient methods are asynchronous (use async/await method).
 
 ```py
-from brineconnector import WsClient
+from tanxconnector import WsClient
 import asyncio
 ```
 
@@ -333,8 +333,8 @@ To get started with the feature, follow these two steps:
 ```python
 internal_transfer_response = client.intiate_and_process_internal_transfers(
   key_pair=key_pair,
-  organization_key=BRINE_ORGANIZATION_KEY,
-  api_key=BRINE_API_KEY,
+  organization_key=TANX_ORGANIZATION_KEY,
+  api_key=TANX_API_KEY,
   currency='usdc',
   amount=1,
   destination_address=ETH_ADDRESS_2,
