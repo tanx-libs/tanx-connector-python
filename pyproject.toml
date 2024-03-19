@@ -57,7 +57,7 @@ commit = true
 push = false
 
 [tool.setuptools.dynamic]
-version = {attr = "test_package.__version__"}
+version = {attr = "tanxconnector.__version__"}
 
 [tool.bumpver.file_patterns]
 "src/test_package/__init__.py" = [
