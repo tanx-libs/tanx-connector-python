@@ -205,12 +205,6 @@ class ProcessFastWithdrawalPayload(TypedDict):
     signature: StarkSignature
     fastwithdrawal_withdrawal_id: int
 
-
-class StarkSignature(TypedDict):
-    r: str
-    s: str
-    recoveryParam: Optional[int]
-
 class InternalTransferKey(TypedDict):
     organization_key: str
     api_key: str

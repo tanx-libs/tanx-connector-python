@@ -36,6 +36,17 @@ The default base url for mainnet is https://api.tanx.fi and testnet is https://a
 
 Check out the [example files](./example) to see an example workflow.
 
+### L2 Key Pair
+
+L2 Key Pair generation isn't currently available in the TanX Python SDK. 
+
+To get the L2 Key Pair, follow any of the two steps:
+
+1. Get the Key Pair from the [TanX official website](https://trade.tanx.fi/)'s Account Settings Tab once wallet is connected. Refer to the image below for more reference. Click on `Settings -> tanX key -> Show Keys` and Sign the request to get the keys. Copy these keys and store it securely.
+![image](https://github.com/tanx-libs/tanx-connector-python/assets/160207723/306e6351-77be-48c0-ab39-4aff18c30fa6)
+
+2. Generate the L2 key pair using the [TanX Nodejs SDK](https://github.com/tanx-libs/tanx-connector-nodejs). For generation using the Node SDK, refer to [this section](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) in the documentation of the Nodejs SDK.
+
 ### Rest Client
 
 Import the REST Client
@@ -177,7 +188,7 @@ Create Order
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
-Currently generating L2 Key Pairs (stark keys) are only supported with the [NodeJS SDK](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair)
+For getting the L2 Key Pairs (Stark Keys) refer to the above [section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) in the documentation.
 
 ```python
 from tanxconnector import sign_order_with_stark_private_key
@@ -378,7 +389,7 @@ There are two ways to make a deposit on the Ethereum network:
 
 #### Using Custom Provider and Signer:
 
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [Create L2 Key Pair](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) section of the nodejs connector. Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) section of the documentation. Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
@@ -453,7 +464,7 @@ Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawa
 
 #### Normal Withdrawal
 
-With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time.
+With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) of the documentation.
 
 ```python
 from web3 import Web3, Account
@@ -461,6 +472,11 @@ from web3 import Web3, Account
 provider = Web3(Web3.HTTPProvider(rpc_provider))
 signer = Account.from_key(PRIVATE_KEY)
 gas_price = provider.eth.gas_price # or any custom value
+
+key_pair = {
+  'stark_public_key': stark_public_key,
+  'stark_private_key': stark_private_key
+}
 
 # Withdrawals
 
@@ -496,9 +512,14 @@ withdrawals_list = client.list_normal_withdrawals({
 
 #### Fast Withdrawal
 
-With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee.
+With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) of the documentation.
 
 ```python
+key_pair = {
+  'stark_public_key': stark_public_key,
+  'stark_private_key': stark_private_key
+}
+
 fast_withdrawal_res = client.fast_withdrawal(
   key_pair, # The keyPair created above
   0.0001, # Enter the amount you want to deposit
@@ -526,6 +547,7 @@ const fastWithdrawalRes = await client.fastWithdrawal(
 ```
 
 # Get a list of fast withdrawals
+```python
 fast_withdrawals_list = client.list_fast_withdrawals({
   'page': 2, # This is an optional field
   'network': 'POLYGON'  # This is an optional field
