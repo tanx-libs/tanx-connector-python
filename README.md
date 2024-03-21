@@ -26,46 +26,46 @@ Tanx-connector-python includes utility/connector functions which can be used to 
 
 ## Table of Contents
 
-- [Features](https://github.com/tanx-libs/tanx-connector-python#features)
-- [Table of Contents](https://github.com/tanx-libs/tanx-connector-python/tree/patch/connector-update#table-of-contents)
-- [Installation](https://github.com/tanx-libs/tanx-connector-python#installation)
-- [Quickstart](https://github.com/tanx-libs/tanx-connector-python#quickstart)
-- [Getting Started](https://github.com/tanx-libs/tanx-connector-python#getting-started)
-  - [Workflow](https://github.com/tanx-libs/tanx-connector-python#workflow)
-  - [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair)
-  - [Rest Client](https://github.com/tanx-libs/tanx-connector-python#rest-client)
-  - [General Endpoints](https://github.com/tanx-libs/tanx-connector-python#general-endpoints)
-    - [Test Connectivity](https://github.com/tanx-libs/tanx-connector-python#test-connectivity)
-    - [24hr Price](https://github.com/tanx-libs/tanx-connector-python#24hr-price)
-    - [Kline/Candlestick Data](https://github.com/tanx-libs/tanx-connector-python#klinecandlestick-data)
-    - [Order Book](https://github.com/tanx-libs/tanx-connector-python#order-book)
-    - [Recent trades](https://github.com/tanx-libs/tanx-connector-python#recent-trades)
-    - [Login](https://github.com/tanx-libs/tanx-connector-python#login)
-    - [Refresh Token](https://github.com/tanx-libs/tanx-connector-python#refersh-token)
-    - [Logout](https://github.com/tanx-libs/tanx-connector-python#logout)
-    - [Profile Information (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#profile-information-private-)
-    - [Balance details (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#balance-details-private-)
-    - [Profit and Loss Details (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#profit-and-loss-details-private-)
-    - [Create order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#create-order-private-)
-    - [Get Order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#get-order-private-)
-    - [List Orders (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#list-orders-)
-    - [Cancel Order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#cancel-order-private-)
-    - [List Trades (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#list-trades-private-)
-  - [WebSocket Client](https://github.com/tanx-libs/tanx-connector-python#websocket-client)
-    - [Connect](https://github.com/tanx-libs/tanx-connector-python#connect)
-    - [Subscribe](https://github.com/tanx-libs/tanx-connector-python#subscribe)
-    - [Unsubscribe](https://github.com/tanx-libs/tanx-connector-python#unsubscribe)
-    - [Disconnect](https://github.com/tanx-libs/tanx-connector-python#disconnect)
-    - [Usage](https://github.com/tanx-libs/tanx-connector-python#usage)
-  - [Error Handling](https://github.com/tanx-libs/tanx-connector-python#error-handling)
-  - [Internal Transfer](https://github.com/tanx-libs/tanx-connector-python#internal-transfer)
-  - [Deposit](https://github.com/tanx-libs/tanx-connector-python#deposit)
-    - [Ethereum Network Deposit](https://github.com/tanx-libs/tanx-connector-python#ehtereum-network-deposit)
-    - [Polygon Network Deposit](https://github.com/tanx-libs/tanx-connector-python#polygon-network-deposit)
-    - [List Deposits](https://github.com/tanx-libs/tanx-connector-python#list-deposits)
-  - [Withdrawal](https://github.com/tanx-libs/tanx-connector-python#withdrawal)
-    - [Normal Withdrawal](https://github.com/tanx-libs/tanx-connector-python#normal-withdrawal)
-    - [Fast Withdrawal](https://github.com/tanx-libs/tanx-connector-python#fast-withdrawal)
+- [Features](#features)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Quickstart](#quickstart)
+- [Getting Started](#getting-started)
+  - [Workflow](#workflow)
+  - [L2 Key Pair](#l2-key-pair)
+  - [Rest Client](#rest-client)
+  - [General Endpoints](#general-endpoints)
+    - [Test Connectivity](#test-connectivity)
+    - [24hr Price](#24hr-price)
+    - [Kline/Candlestick Data](#klinecandlestick-data)
+    - [Order Book](#order-book)
+    - [Recent trades](#recent-trades)
+    - [Login](#login)
+    - [Refresh Token](#refersh-token)
+    - [Logout](#logout)
+    - [Profile Information (Private 🔒)](#profile-information-private-)
+    - [Balance details (Private 🔒)](#balance-details-private-)
+    - [Profit and Loss Details (Private 🔒)](#profit-and-loss-details-private-)
+    - [Create order (Private 🔒)](#create-order-private-)
+    - [Get Order (Private 🔒)](#get-order-private-)
+    - [List Orders (Private 🔒)](#list-orders-)
+    - [Cancel Order (Private 🔒)](#cancel-order-private-)
+    - [List Trades (Private 🔒)](#list-trades-private-)
+  - [WebSocket Client](#websocket-client)
+    - [Connect](#connect)
+    - [Subscribe](#subscribe)
+    - [Unsubscribe](#unsubscribe)
+    - [Disconnect](#disconnect)
+    - [Usage](#usage)
+  - [Error Handling](#error-handling)
+  - [Internal Transfer](#internal-transfer)
+  - [Deposit](#deposit)
+    - [Ethereum Network Deposit](#ehtereum-network-deposit)
+    - [Polygon Network Deposit](#polygon-network-deposit)
+    - [List Deposits](#list-deposits)
+  - [Withdrawal](#withdrawal)
+    - [Normal Withdrawal](#normal-withdrawal)
+    - [Fast Withdrawal](#fast-withdrawal)
 
 ## Installation
 
@@ -116,7 +116,7 @@ L2 Key Pair generation isn't currently available in the TanX Python SDK.
 To get the L2 Key Pair, follow any of the two steps:
 
 1. Get the Key Pair from the [TanX official website](https://trade.tanx.fi/)'s Account Settings Tab once wallet is connected. Refer to the image below for more reference. Click on `Settings -> tanX key -> Show Keys` and Sign the request to get the keys. Copy these keys and store it securely.
-![image](https://github.com/tanx-libs/tanx-connector-python/assets/160207723/306e6351-77be-48c0-ab39-4aff18c30fa6)
+![image](/assets/160207723/306e6351-77be-48c0-ab39-4aff18c30fa6)
 
 2. Generate the L2 key pair using the [TanX Nodejs SDK](https://github.com/tanx-libs/tanx-connector-nodejs). For generation using the Node SDK, refer to [this section](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) in the documentation of the Nodejs SDK.
 
@@ -269,7 +269,7 @@ Create Order
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
-For getting the L2 Key Pairs (Stark Keys) refer to the above [section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) in the documentation.
+For getting the L2 Key Pairs (Stark Keys) refer to the above [section](#l2-key-pair) in the documentation.
 
 ```python
 stark_private_key = '(Your Stark Private Key Here)'
@@ -477,7 +477,7 @@ check_user_res = client.check_internal_transfer_user_exists(
 
 #### Ethereum Network Deposit
 
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) section of the documentation. Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](#l2-key-pair) section of the documentation. Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
@@ -549,7 +549,7 @@ Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawa
 
 #### Normal Withdrawal (Only for ETHEREUM Network)
 
-With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
+With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](#l2-key-pair) of the documentation.
 
 ```python
 from web3 import Web3, Account
@@ -597,7 +597,7 @@ withdrawals_list = client.list_normal_withdrawals({
 
 #### Fast Withdrawal
 
-With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
+With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](#l2-key-pair) of the documentation.
 
 1. Ethereum Network
 
