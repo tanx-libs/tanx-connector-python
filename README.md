@@ -24,6 +24,49 @@
 
 Tanx-connector-python includes utility/connector functions which can be used to interact with the Tanx API. It uses requests internally to handle all requests.
 
+## Table of Contents
+
+- [Features](https://github.com/tanx-libs/tanx-connector-python#features)
+- [Table of Contents](https://github.com/tanx-libs/tanx-connector-python/tree/patch/connector-update#table-of-contents)
+- [Installation](https://github.com/tanx-libs/tanx-connector-python#installation)
+- [Quickstart](https://github.com/tanx-libs/tanx-connector-python#quickstart)
+- [Getting Started](https://github.com/tanx-libs/tanx-connector-python#getting-started)
+  - [Workflow](https://github.com/tanx-libs/tanx-connector-python#workflow)
+  - [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair)
+  - [Rest Client](https://github.com/tanx-libs/tanx-connector-python#rest-client)
+  - [General Endpoints](https://github.com/tanx-libs/tanx-connector-python#general-endpoints)
+    - [Test Connectivity](https://github.com/tanx-libs/tanx-connector-python#test-connectivity)
+    - [24hr Price](https://github.com/tanx-libs/tanx-connector-python#24hr-price)
+    - [Kline/Candlestick Data](https://github.com/tanx-libs/tanx-connector-python#klinecandlestick-data)
+    - [Order Book](https://github.com/tanx-libs/tanx-connector-python#order-book)
+    - [Recent trades](https://github.com/tanx-libs/tanx-connector-python#recent-trades)
+    - [Login](https://github.com/tanx-libs/tanx-connector-python#login)
+    - [Refresh Token](https://github.com/tanx-libs/tanx-connector-python#refersh-token)
+    - [Logout](https://github.com/tanx-libs/tanx-connector-python#logout)
+    - [Profile Information (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#profile-information-private-)
+    - [Balance details (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#balance-details-private-)
+    - [Profit and Loss Details (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#profit-and-loss-details-private-)
+    - [Create order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#create-order-private-)
+    - [Get Order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#get-order-private-)
+    - [List Orders (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#list-orders-)
+    - [Cancel Order (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#cancel-order-private-)
+    - [List Trades (Private 🔒)](https://github.com/tanx-libs/tanx-connector-python#list-trades-private-)
+  - [WebSocket Client](https://github.com/tanx-libs/tanx-connector-python#websocket-client)
+    - [Connect](https://github.com/tanx-libs/tanx-connector-python#connect)
+    - [Subscribe](https://github.com/tanx-libs/tanx-connector-python#subscribe)
+    - [Unsubscribe](https://github.com/tanx-libs/tanx-connector-python#unsubscribe)
+    - [Disconnect](https://github.com/tanx-libs/tanx-connector-python#disconnect)
+    - [Usage](https://github.com/tanx-libs/tanx-connector-python#usage)
+  - [Error Handling](https://github.com/tanx-libs/tanx-connector-python#error-handling)
+  - [Internal Transfer](https://github.com/tanx-libs/tanx-connector-python#internal-transfer)
+  - [Deposit](https://github.com/tanx-libs/tanx-connector-python#deposit)
+    - [Ethereum Network Deposit](https://github.com/tanx-libs/tanx-connector-python#ehtereum-network-deposit)
+    - [Polygon Network Deposit](https://github.com/tanx-libs/tanx-connector-python#polygon-network-deposit)
+    - [List Deposits](https://github.com/tanx-libs/tanx-connector-python#list-deposits)
+  - [Withdrawal](https://github.com/tanx-libs/tanx-connector-python#withdrawal)
+    - [Normal Withdrawal](https://github.com/tanx-libs/tanx-connector-python#normal-withdrawal)
+    - [Fast Withdrawal](https://github.com/tanx-libs/tanx-connector-python#fast-withdrawal)
+
 ## Installation
 
 First go to the [tanX Website](https://www.tanx.fi/) and create an account with your wallet.
@@ -381,7 +424,7 @@ To get started with the feature, follow these two steps:
 
 2. Generate the L2 key pair with your private key
 
-### Available methods:
+#### Available methods:
 
 #### To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
 
@@ -424,14 +467,7 @@ check_user_res = client.check_internal_transfer_user_exists(
 
 ### Deposit
 
-#### Ethereum Deposit
-
-There are two ways to make a deposit on the Ethereum network:
-
-<!-- 1. Using ETH Private Key and RPC URL: This approach utilizes your ETH private key and an rpcUrl (e.g., from Infura or Alchemy).
-2. Custom Provider and Signer: This method involves creating your provider and signer using web3.py. You'll also need the stark_public_key. -->
-
-#### Using Custom Provider and Signer:
+#### Ethereum Network Deposit
 
 This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) section of the documentation. Here's the code snippet for this method:
 
@@ -451,12 +487,11 @@ deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_ke
 )
 ```
 
-#### Polygon Deposit
+#### Polygon Network Deposit
 
 There are two ways to make a deposit on the Polygon network:
 
-#### 1. Using ETH Private Key and RPC URL:
-
+1. Using ETH Private Key and RPC URL:<br>
 In this method, you will use an ETH private key and an RPC URL to execute a Polygon deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
 
 ```python
@@ -468,10 +503,8 @@ deposit_res = client.deposit_from_polygon_network(
 )
 ```
 
-#### 2. Using Custom Provider and Signer:
-
-This method involves using a custom provider and signer, which can be created using the web3.py library. Here's the code snippet for this method:
-
+2. Using Custom Provider and Signer:
+<br>This method involves using a custom provider and signer, which can be created using the web3.py library. Here's the code snippet for this method:
 ```python
 # Note: Please use ethers version 5.25.0.
 from web3 import Web3, Account
@@ -506,7 +539,7 @@ deposit_list = client.list_deposits({
 
 Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawal. For withdrawal methods that require a signer and provider, please refer to the deposit method mentioned above.
 
-#### Normal Withdrawal
+#### Normal Withdrawal (Only for ETHEREUM Network)
 
 With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
 
@@ -558,6 +591,8 @@ withdrawals_list = client.list_normal_withdrawals({
 
 With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
 
+1. Ethereum Network
+
 ```python
 key_pair = {
   'stark_public_key': stark_public_key,
@@ -570,16 +605,9 @@ fast_withdrawal_res = client.fast_withdrawal(
   'usdc', # Enter the coin symbol
   'ETHEREUM', # Allowed networks are POLYGON & ETHEREUM
 )
-
-# Get a list of fast withdrawals
-fast_withdrawals_list = client.list_fast_withdrawals({
-  'page': 2, # This is an optional field
-})
 ```
 
-#### Polygon withdrawal
-
-On the Polygon network, we only support fast withdrawals.
+2. Polygon network
 
 ```python
 const fastWithdrawalRes = await client.fastWithdrawal(
@@ -590,7 +618,7 @@ const fastWithdrawalRes = await client.fastWithdrawal(
 )
 ```
 
-# Get a list of fast withdrawals
+3. Get a list of fast withdrawals
 ```python
 fast_withdrawals_list = client.list_fast_withdrawals({
   'page': 2, # This is an optional field
