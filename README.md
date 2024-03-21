@@ -132,9 +132,9 @@ Create a new instance
 
 ```python
 client = Client()
-// or
+# or
 client = Client('testnet') 
-// default is mainnet
+# default is mainnet
 ```
 
 ### General Endpoints
@@ -191,7 +191,8 @@ from tanxconnector import sign_msg, Client
 
 client = Client('testnet')
 
-client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  # calls below functions internally, use this for ease
+client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  
+# calls below functions internally, use this for ease
 
 # or
 
@@ -426,9 +427,16 @@ To get started with the feature, follow these two steps:
 
 #### Available methods:
 
-#### To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
+1. To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
 
 ```python
+key_pair = {
+  'stark_public_key': '(your stark public key here)'
+  'stark_private_key': '(your stark private key here)'
+}
+
+ETH_ADDRESS_2 = '(destination Eth wallet address here)'
+
 internal_transfer_response = client.intiate_and_process_internal_transfers(
   key_pair=key_pair,
   organization_key=TANX_ORGANIZATION_KEY,
@@ -440,7 +448,7 @@ internal_transfer_response = client.intiate_and_process_internal_transfers(
 )
 ```
 
-#### Retrieve a list of transfers initiated by the authenticated user:
+2. Retrieve a list of transfers initiated by the authenticated user:
 
 ```python
 internal_trasnfers_list = client.list_internal_transfers({
@@ -449,18 +457,18 @@ internal_trasnfers_list = client.list_internal_transfers({
 })
 ```
 
-#### Retrieve an internal transfer using its client reference id:
+3. Retrieve an internal transfer using its client reference id:
 
 ```python
 internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id)
 ```
 
-#### Check if a user exists by their destination address.
+4. Check if a user exists by their destination address.
 
 ```python
 check_user_res = client.check_internal_transfer_user_exists(
-  organization_key,
-  api_key,
+  TANX_ORGANIZATION_KEY,
+  TANX_API_KEY,
   destination_address,
 )
 ```
@@ -475,7 +483,7 @@ This method involves using a custom provider and signer, which can be created us
 # Note: Please use web3 version 5.25.0
 from web3 import Web3, Account
 
-provider = Web3(Web3.HTTPProvider(rpc_provider))
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
 signer = Account.from_key(PRIVATE_KEY)
 
 deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_key(
@@ -496,7 +504,7 @@ In this method, you will use an ETH private key and an RPC URL to execute a Poly
 
 ```python
 deposit_res = client.deposit_from_polygon_network(
-  polygon_rpc_provider, # Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+  RPC_PROVIDER_FOR_POLYGON, # Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
   PRIVATE_KEY,  # ETH Private Key
   'matic',  # Coin Symbol
   0.00001 # Amount to be deposited
@@ -504,13 +512,13 @@ deposit_res = client.deposit_from_polygon_network(
 ```
 
 2. Using Custom Provider and Signer:
-<br>This method involves using a custom provider and signer, which can be created using the web3.py library. Here's the code snippet for this method:
+<br>This method involves using a custom provider and signer, which can be created using the web3.py library. Also, its important to inject a middleware at the 0th layer of the middleware onion for the provider ([See Reference](https://web3py.readthedocs.io/en/stable/middleware.html#proof-of-authority)). Here's the code snippet for this method:
 ```python
 # Note: Please use ethers version 5.25.0.
 from web3 import Web3, Account
 from web3.middleware.geth_poa import geth_poa_middleware
 
-provider = Web3(Web3.HTTPProvider(polygon_rpc_provider))
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_POLYGON))
 provider.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 signer = Account.from_key(PRIVATE_KEY)
@@ -546,7 +554,7 @@ With Normal Withdrawal, your requested funds will be processed within a standard
 ```python
 from web3 import Web3, Account
 
-provider = Web3(Web3.HTTPProvider(rpc_provider))
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
 signer = Account.from_key(PRIVATE_KEY)
 gas_price = provider.eth.gas_price # or any custom value
 
