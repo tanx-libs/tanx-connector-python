@@ -28,6 +28,36 @@ Tanx-connector-python includes utility/connector functions which can be used to 
 
 First go to the [tanX Website](https://www.tanx.fi/) and create an account with your wallet.
 
+## Quickstart
+
+Make sure that tanxconnector is installed and up-to-date.
+
+To get quickly started, try running the simple example for creating and fetching the order once logged in.
+
+```python
+from tanxconnector import Client
+
+ETH_ADDRESS = "(your eth wallet address)"
+PRIVATE_KEY = "(your wallet's private key)"
+
+client = Client('testnet')
+
+# login to the network
+login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
+
+# create an order nonce
+nonce: CreateOrderNonceBody = {'market': 'ethusdc', 'ord_type':'market', 'price': 29580.51, 'side': 'sell', 'volume': 0.0005}
+
+# create the order
+order = client.create_complete_order(nonce, stark_private_key)
+print(order)
+
+# fetch the details of the order just created
+order_id = order['payload']['id']
+fetch_order = client.get_order(order_id)
+print(fetch_order)
+```
+
 ## Getting Started
 
 The default base url for mainnet is https://api.tanx.fi and testnet is https://api-testnet.tanx.fi. You can choose between mainnet and testnet by providing it through the constructor. The default is mainnet. All REST apis, WebSockets are handled by Client, WsClient classes respectively.
@@ -113,22 +143,24 @@ Both login() and complete_Login() sets tokens internally. Optionally, set_access
 getNonce: `POST /sapi/v1/auth/nonce/`  
 login: `POST /sapi/v1/auth/login/`
 
-```js
-from tanxconnector import sign_msg
+```python
+from tanxconnector import sign_msg, Client
+
+client = Client('testnet')
+
+client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  # calls below functions internally, use this for ease
+
+# or
 
 nonce = client.get_nonce(ETH_ADDRESS)
 user_signature = sign_msg(nonce['payload'], PRIVATE_KEY)
 login = client.login(ETH_ADDRESS, user_signature)
 
-// or
+# or
 
-client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  // calls above functions internally
-
-// or
-
-client.set_access_token(token)
-client.set_refresh_token(token)
-// these functions are called internally when you use login or complete_login
+client.set_access_token(access_token)
+client.set_refresh_token(refresh_token)
+# these functions are called internally when you use login or complete_login
 ```
 
 #### Refresh Token
@@ -175,6 +207,11 @@ client.get_profit_and_loss()
 
 #### Create order (Private 🔒)
 
+Order is created in 2 steps:
+
+1. Create the order nonce body
+2. Process the order nonce body with the stark private key to create the order
+
 Create Nonce Body
 
 ```py
@@ -188,7 +225,7 @@ Create Order
 create_order_nonce: `POST /sapi/v1/orders/nonce/`  
 create_new_order: `POST /sapi/v1/orders/create/`
 
-For getting the L2 Key Pairs (Stark Keys) refer to the above [section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) in the documentation.
+For getting the L2 Key Pairs (Stark Keys) refer to the above [section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) in the documentation.
 
 ```python
 stark_private_key = '(Your Stark Private Key Here)'
@@ -396,7 +433,7 @@ There are two ways to make a deposit on the Ethereum network:
 
 #### Using Custom Provider and Signer:
 
-This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) section of the documentation. Here's the code snippet for this method:
+This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) section of the documentation. Here's the code snippet for this method:
 
 ```python
 # Note: Please use web3 version 5.25.0
@@ -471,7 +508,7 @@ Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawa
 
 #### Normal Withdrawal
 
-With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) of the documentation.
+With Normal Withdrawal, your requested funds will be processed within a standard time frame (24 hours). This mode is suitable for users who are not in a rush to access their funds and are comfortable with the regular processing time. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
 
 ```python
 from web3 import Web3, Account
@@ -519,7 +556,7 @@ withdrawals_list = client.list_normal_withdrawals({
 
 #### Fast Withdrawal
 
-With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) of the documentation.
+With Fast Withdrawal, your funds will be processed in an expedited timeframe, often within a few minutes. This mode is ideal for users who require immediate access to their funds and are comfortable with paying a fee. The `stark keys (L2 Key Pair)` can be generated with the help of [this section](https://github.com/tanx-libs/tanx-connector-python#l2-key-pair) of the documentation.
 
 ```python
 key_pair = {
