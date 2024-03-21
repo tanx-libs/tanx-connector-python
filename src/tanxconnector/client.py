@@ -10,7 +10,8 @@ from .utils import (
     sign_withdrawal_tx_msg_hash,
     filter_cross_chain_coin,
     sign_internal_tx_msg_hash,
-    filter_cross_chain_coin
+    filter_cross_chain_coin,
+    sign_order_with_stark_private_key
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
@@ -178,6 +179,12 @@ class Client:
         r = self.session.post('/sapi/v1/orders/create/',
                               json=body)
         return r.json()
+
+    def create_complete_order(self, nonce: CreateOrderNonceBody, stark_private_key: str):
+        nonce_res = self.create_order_nonce(nonce)
+        msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res['payload'])
+        order = self.create_new_order(msg_hash)
+        return order
 
     def get_order(self, order_id: int) -> Response[OrderPayload]:
         self.get_auth_status()
