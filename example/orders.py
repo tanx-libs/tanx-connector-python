@@ -14,7 +14,7 @@ PRIVATE_KEY = os.environ['PRIVATE_KEY']
 ETH_ADDRESS = os.environ['ETH_ADDRESS']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
 
-client = Client('testnet')
+client = Client()
 try:
     # login to use private endpoints
     login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)

@@ -14,7 +14,7 @@ ETH_ADDRESS = os.environ['ETH_ADDRESS']
 stark_public_key = os.environ['STARK_PUBLIC_KEY']
 rpc_provider = os.environ['RPC_PROVIDER']
 
-client = Client('testnet')
+client = Client()
 
 try:
     # login to use private endpoints

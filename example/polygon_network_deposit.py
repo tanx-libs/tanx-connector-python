@@ -14,7 +14,7 @@ PRIVATE_KEY = os.environ['PRIVATE_KEY']
 ETH_ADDRESS = os.environ['ETH_ADDRESS']
 polygon_rpc_provider = os.environ['POLYGON_RPC_PROVIDER']
 
-client = Client('testnet')
+client = Client()
 
 try:
     # login to use private endpoints

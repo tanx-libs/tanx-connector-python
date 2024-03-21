@@ -11,7 +11,7 @@ load_dotenv()
 PRIVATE_KEY = os.environ['PRIVATE_KEY']
 ETH_ADDRESS = os.environ['ETH_ADDRESS']
 
-client = Client('testnet')
+client = Client()
 # create a rest client instance (default is mainnet)
 
 try:

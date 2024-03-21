@@ -17,7 +17,7 @@ stark_public_key = os.environ['STARK_PUBLIC_KEY']
 TANX_ORGANIZATION_KEY = os.environ['TANX_ORGANIZATION_KEY']
 TANX_API_KEY = os.environ['TANX_API_KEY']
 
-client = Client('testnet')
+client = Client()
 try:
     # login to use private endpoints
     login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
