@@ -191,6 +191,13 @@ create_new_order: `POST /sapi/v1/orders/create/`
 For getting the L2 Key Pairs (Stark Keys) refer to the above [section](https://github.com/tanx-libs/tanx-connector-python#L2-Key-Pair) in the documentation.
 
 ```python
+stark_private_key = '(Your Stark Private Key Here)'
+
+order = client.create_complete_order(nonce, stark_private_key)
+# calls below functions internally, we recommend using createCompleteOrder for ease of use
+
+# or
+
 from tanxconnector import sign_order_with_stark_private_key
 
 nonce_res = client.create_order_nonce(nonce)
