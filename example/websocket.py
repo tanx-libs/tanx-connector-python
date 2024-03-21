@@ -13,7 +13,7 @@ eth_address = os.environ['ETH_ADDRESS']
 
 async def main():
     # create a public websocket instance
-    ws_client = WsClient('public', 'testnet')
+    ws_client = WsClient('public', 'mainnet')
 
     # check to see if connected
     await ws_client.connect()
