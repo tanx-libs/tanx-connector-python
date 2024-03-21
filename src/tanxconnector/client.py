@@ -180,6 +180,12 @@ class Client:
                               json=body)
         return r.json()
 
+    def create_complete_order(self, nonce: CreateOrderNonceBody, stark_private_key: str):
+        nonce_res = self.create_order_nonce(nonce)
+        msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res['payload'])
+        order = self.create_new_order(msg_hash)
+        return order
+
     def get_order(self, order_id: int) -> Response[OrderPayload]:
         self.get_auth_status()
         r = self.session.get(f'/sapi/v1/orders/{order_id}')
@@ -198,12 +204,6 @@ class Client:
         body = params_to_dict(loc)
         r = self.session.post('/sapi/v1/orders/cancel/', json=body)
         return r.json()
-
-    def create_complete_order(self, nonce: CreateOrderNonceBody, stark_private_key: str):
-        nonce_res = self.create_order_nonce(nonce)
-        msg_hash = sign_order_with_stark_private_key(stark_private_key, nonce_res['payload'])
-        order = self.create_new_order(msg_hash)
-        return order
 
     def list_trades(self, limit: Optional[int] = None, page: Optional[int] = None, market: Optional[str] = None, start_time: Optional[int] = None, end_time: Optional[int] = None, order_by: Optional[str] = None) -> Response[List[TradePayload]]:
         self.get_auth_status()
