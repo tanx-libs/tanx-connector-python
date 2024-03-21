@@ -83,7 +83,7 @@ from tanxconnector import Client
 ETH_ADDRESS = "(your eth wallet address)"
 PRIVATE_KEY = "(your wallet's private key)"
 
-client = Client('testnet')
+client = Client()
 
 # login to the network
 login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
@@ -133,7 +133,7 @@ Create a new instance
 ```python
 client = Client()
 # or
-client = Client('testnet') 
+client = Client() 
 # default is mainnet
 ```
 
@@ -189,7 +189,7 @@ login: `POST /sapi/v1/auth/login/`
 ```python
 from tanxconnector import sign_msg, Client
 
-client = Client('testnet')
+client = Client()
 
 client.complete_login(ETH_ADDRESS, PRIVATE_KEY)  
 # calls below functions internally, use this for ease
