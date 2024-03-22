@@ -63,3 +63,6 @@ version = {attr = "tanxconnector.__version__"}
 "src/tanxconnector/__init__.py" = [
     '^__version__ = "{version}"$',
 ]
+
+[tool.setuptools.package-data]
+"tanxconnector.bin" = ["*.json"]
