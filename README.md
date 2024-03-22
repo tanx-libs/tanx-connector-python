@@ -71,9 +71,16 @@ Tanx-connector-python includes utility/connector functions which can be used to 
 
 First go to the [tanX Website](https://www.tanx.fi/) and create an account with your wallet.
 
+Install the package using pip.
+
+```python
+pip install tanx-connector
+```
+
 ## Quickstart
 
-Make sure that tanxconnector is installed and up-to-date.
+Make sure that tanxconnector is [installed](#installation) and up-to-date.
+Also make sure you have an account on the [mainnet](https://www.tanx.fi/) or [testnet](https://api-testnet.tanx.fi) website.
 
 To get quickly started, try running the simple example for creating and fetching the order once logged in.
 
