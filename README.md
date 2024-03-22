@@ -116,7 +116,7 @@ L2 Key Pair generation isn't currently available in the TanX Python SDK.
 To get the L2 Key Pair, follow any of the two steps:
 
 1. Get the Key Pair from the [TanX official website](https://trade.tanx.fi/)'s Account Settings Tab once wallet is connected. Refer to the image below for more reference. Click on `Settings -> tanX key -> Show Keys` and Sign the request to get the keys. Copy these keys and store it securely.
-![image](/assets/160207723/306e6351-77be-48c0-ab39-4aff18c30fa6)
+<img src="images/tanx-key.png">
 
 2. Generate the L2 key pair using the [TanX Nodejs SDK](https://github.com/tanx-libs/tanx-connector-nodejs). For generation using the Node SDK, refer to [this section](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) in the documentation of the Nodejs SDK.
 
