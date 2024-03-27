@@ -60,7 +60,7 @@ Tanx-connector-python includes utility/connector functions which can be used to 
   - [Error Handling](#error-handling)
   - [Internal Transfer](#internal-transfer)
   - [Deposit](#deposit)
-    - [Ethereum Network Deposit](#ehtereum-network-deposit)
+    - [Ethereum Network Deposit](#ethereum-network-deposit)
     - [Polygon Network Deposit](#polygon-network-deposit)
     - [List Deposits](#list-deposits)
   - [Withdrawal](#withdrawal)
@@ -487,7 +487,39 @@ check_user_res = client.check_internal_transfer_user_exists(
 This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](#l2-key-pair) section of the documentation. Here's the code snippet for this method:
 
 ```python
-# Note: Please use web3 version 5.25.0
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
+signer = Account.from_key(PRIVATE_KEY)
+
+deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_key(
+  signer,
+  provider,
+  f'0x{stark_public_key}',
+  0.0001,
+  'eth'
+)
+```
+
+For any `ERC20` token (which is not native for the network, like usdc), first allow unlimited allowance for that token using the `approve_unlimited_allowance_ethereum_network` method.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
+signer = Account.from_key(PRIVATE_KEY)
+
+# approval for unlimited allowance for ERC20 contracts
+allowance = client.approve_unlimited_allowance_ethereum_network('usdc', signer, provider)
+print(allowance) # prints the hash for the allowance transaction, check this on the etherscan/sepoliascan for success.
+```
+
+Once the allowance is success, transactions can be made for `ERC20` token on ETH network.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
 from web3 import Web3, Account
 
 provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
@@ -520,8 +552,9 @@ deposit_res = client.deposit_from_polygon_network(
 
 2. Using Custom Provider and Signer:
 <br>This method involves using a custom provider and signer, which can be created using the web3.py library. Also, its important to inject a middleware at the 0th layer of the middleware onion for the provider ([See Reference](https://web3py.readthedocs.io/en/stable/middleware.html#proof-of-authority)). Here's the code snippet for this method:
+
 ```python
-# Note: Please use ethers version 5.25.0.
+# Note: Please use web3>=6.0.0, <7.0.0
 from web3 import Web3, Account
 from web3.middleware.geth_poa import geth_poa_middleware
 
