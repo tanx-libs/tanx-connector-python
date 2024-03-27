@@ -64,7 +64,7 @@ Tanx-connector-python includes utility/connector functions which can be used to 
     - [Polygon Network Deposit](#polygon-network-deposit)
     - [List Deposits](#list-deposits)
   - [Withdrawal](#withdrawal)
-    - [Normal Withdrawal](#normal-withdrawal)
+    - [Normal Withdrawal](#normal-withdrawal-only-for-ethereum-network)
     - [Fast Withdrawal](#fast-withdrawal)
 
 ## Installation
@@ -80,7 +80,7 @@ pip install tanx-connector
 ## Quickstart
 
 Make sure that tanxconnector is [installed](#installation) and up-to-date.
-Also make sure you have an account on the [mainnet](https://www.tanx.fi/) or [testnet](https://api-testnet.tanx.fi) website.
+Also make sure you have an account on the [mainnet](https://trade.tanx.fi/) or [testnet](https://testnet.tanx.fi/) website.
 
 To get quickly started, try running the simple example for creating and fetching the order once logged in.
 
