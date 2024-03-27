@@ -566,6 +566,43 @@ signer = Account.from_key(PRIVATE_KEY)
 polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
   signer, # Signer Created above
   provider, # Provider created above
+  'matic',  # Enter the coin symbol
+  0.0001, # Amount to be deposited
+)
+```
+
+For any `ERC20` token (which is not native for the network, like btc), first allow unlimited allowance for that token using the `approve_unlimited_allowance_polygon_network` method.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_POLYGON))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+# approval for unlimited allowance for ERC20 contracts
+allowance = client.approve_unlimited_allowance_polygon_network(coin='btc', signer=signer, w3=provider)
+print(allowance)  # prints the hash for the allowance, check on polygon scan for success
+```
+
+Once the allowance is success, transactions can be made for `ERC20` token on POLYGON network.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_POLYGON))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
+  signer, # Signer Created above
+  provider, # Provider created above
   'btc',  # Enter the coin symbol
   0.0001, # Amount to be deposited
 )
