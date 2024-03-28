@@ -44,14 +44,7 @@ print(pending_balance)
 
 # 4. Final step - if you find the balance is more than 0, you can call "complete_normal_withdrawal"
 # to withdraw the cumulative amount to your ETH wallet.
-complete_normal_withdrawal_res = client.complete_normal_withdrawal(
-    'eth',
-    ETH_ADDRESS,
-    signer,
-    provider
-)
-print(complete_normal_withdrawal_res)
-
+# Make sure to pass the gas price for the transaction which is the maximum gas fee for the transaction.
 gas_price = provider.eth.gas_price
 
 complete_normal_withdrawal_res = client.complete_normal_withdrawal(

@@ -60,11 +60,11 @@ Tanx-connector-python includes utility/connector functions which can be used to 
   - [Error Handling](#error-handling)
   - [Internal Transfer](#internal-transfer)
   - [Deposit](#deposit)
-    - [Ethereum Network Deposit](#ehtereum-network-deposit)
+    - [Ethereum Network Deposit](#ethereum-network-deposit)
     - [Polygon Network Deposit](#polygon-network-deposit)
     - [List Deposits](#list-deposits)
   - [Withdrawal](#withdrawal)
-    - [Normal Withdrawal](#normal-withdrawal)
+    - [Normal Withdrawal](#normal-withdrawal-only-for-ethereum-network)
     - [Fast Withdrawal](#fast-withdrawal)
 
 ## Installation
@@ -80,7 +80,7 @@ pip install tanx-connector
 ## Quickstart
 
 Make sure that tanxconnector is [installed](#installation) and up-to-date.
-Also make sure you have an account on the [mainnet](https://www.tanx.fi/) or [testnet](https://api-testnet.tanx.fi) website.
+Also make sure you have an account on the [mainnet](https://trade.tanx.fi/) or [testnet](https://testnet.tanx.fi/) website.
 
 To get quickly started, try running the simple example for creating and fetching the order once logged in.
 
@@ -123,7 +123,7 @@ L2 Key Pair generation isn't currently available in the TanX Python SDK.
 To get the L2 Key Pair, follow any of the two steps:
 
 1. Get the Key Pair from the [TanX official website](https://trade.tanx.fi/)'s Account Settings Tab once wallet is connected. Refer to the image below for more reference. Click on `Settings -> tanX key -> Show Keys` and Sign the request to get the keys. Copy these keys and store it securely.
-<img src="images/tanx-key.png">
+<img src="https://raw.githubusercontent.com/tanx-libs/tanx-connector-python/main/images/tanx-key.png">
 
 2. Generate the L2 key pair using the [TanX Nodejs SDK](https://github.com/tanx-libs/tanx-connector-nodejs). For generation using the Node SDK, refer to [this section](https://github.com/tanx-libs/tanx-connector-nodejs#create-l2-key-pair) in the documentation of the Nodejs SDK.
 
@@ -140,8 +140,8 @@ Create a new instance
 ```python
 client = Client()
 # or
-client = Client() 
-# default is mainnet
+client = Client('testnet')
+# default is mainnet, can pass explicitly as well
 ```
 
 ### General Endpoints
@@ -487,7 +487,39 @@ check_user_res = client.check_internal_transfer_user_exists(
 This method involves using a custom provider and signer, which can be created using the web3.py library. The `stark_public_key` mentioned in the code should be obtained using the steps described in the [L2 Key Pair](#l2-key-pair) section of the documentation. Here's the code snippet for this method:
 
 ```python
-# Note: Please use web3 version 5.25.0
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
+signer = Account.from_key(PRIVATE_KEY)
+
+deposit_res_with_stark_keys = client.deposit_from_ethereum_network_with_stark_key(
+  signer,
+  provider,
+  f'0x{stark_public_key}',
+  0.0001,
+  'eth'
+)
+```
+
+For any `ERC20` token (which is not native for the network, like usdc), first allow unlimited allowance for that token using the `approve_unlimited_allowance_ethereum_network` method.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
+signer = Account.from_key(PRIVATE_KEY)
+
+# approval for unlimited allowance for ERC20 contracts
+allowance = client.approve_unlimited_allowance_ethereum_network('usdc', signer, provider)
+print(allowance) # prints the hash for the allowance transaction, check this on the etherscan/sepoliascan for success.
+```
+
+Once the allowance is success, transactions can be made for `ERC20` token on ETH network.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
 from web3 import Web3, Account
 
 provider = Web3(Web3.HTTPProvider(RPC_PROVIDER))
@@ -520,8 +552,46 @@ deposit_res = client.deposit_from_polygon_network(
 
 2. Using Custom Provider and Signer:
 <br>This method involves using a custom provider and signer, which can be created using the web3.py library. Also, its important to inject a middleware at the 0th layer of the middleware onion for the provider ([See Reference](https://web3py.readthedocs.io/en/stable/middleware.html#proof-of-authority)). Here's the code snippet for this method:
+
 ```python
-# Note: Please use ethers version 5.25.0.
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_POLYGON))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
+  signer, # Signer Created above
+  provider, # Provider created above
+  'matic',  # Enter the coin symbol
+  0.0001, # Amount to be deposited
+)
+```
+
+For any `ERC20` token (which is not native for the network, like btc), first allow unlimited allowance for that token using the `approve_unlimited_allowance_polygon_network` method.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_POLYGON))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+# approval for unlimited allowance for ERC20 contracts
+allowance = client.approve_unlimited_allowance_polygon_network(coin='btc', signer=signer, w3=provider)
+print(allowance)  # prints the hash for the allowance, check on polygon scan for success
+```
+
+Once the allowance is success, transactions can be made for `ERC20` token on POLYGON network.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
 from web3 import Web3, Account
 from web3.middleware.geth_poa import geth_poa_middleware
 
@@ -586,7 +656,6 @@ pending_balance = client.get_pending_normal_withdrawal_amount_by_coin(
   eth_address, # User public eth address
   signer, # The signer created above
   provider, # The provider created above
-  gas_price, # max gas price for the transaction
 )
 # 4. In the final step, if you find the balance is more than 0, you can use the "completeNormalWithdrawal" function to withdraw the cumulative amount to your ETH wallet.
 complete_normal_withdrawal_res = client.complete_normal_withdrawal(
@@ -594,6 +663,7 @@ complete_normal_withdrawal_res = client.complete_normal_withdrawal(
   ethAddress, # User public eth address
   signer, # The signer created above
   provider, # The provider created above
+  gas_price, # max gas price for the transaction
 )
 
 #Get a list of withdrawals
