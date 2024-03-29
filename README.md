@@ -58,7 +58,6 @@ Tanx-connector-python includes utility/connector functions which can be used to 
     - [Disconnect](#disconnect)
     - [Usage](#usage)
   - [Error Handling](#error-handling)
-  - [Internal Transfer](#internal-transfer)
   - [Deposit](#deposit)
     - [Ethereum Network Deposit](#ethereum-network-deposit)
     - [Polygon Network Deposit](#polygon-network-deposit)
@@ -66,6 +65,8 @@ Tanx-connector-python includes utility/connector functions which can be used to 
   - [Withdrawal](#withdrawal)
     - [Normal Withdrawal](#normal-withdrawal-only-for-ethereum-network)
     - [Fast Withdrawal](#fast-withdrawal)
+  - [Internal Transfer](#internal-transfer)
+    - [Available Methods](#available-methods)
 
 ## Installation
 
@@ -422,64 +423,6 @@ except requests.exceptions.HTTPError as exc:
     print(exc.response.json())
 ```
 
-### Internal Transfer
-
-Users will be able to seamlessly transfer assets from their CEXs or other chains with minimal fees.
-
-To get started with the feature, follow these two steps:
-
-1. Reach out to tanX (support@tanx.fi) to get the organization key and API key.
-
-2. Generate the L2 key pair with your private key
-
-#### Available methods:
-
-1. To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
-
-```python
-key_pair = {
-  'stark_public_key': '(your stark public key here)'
-  'stark_private_key': '(your stark private key here)'
-}
-
-ETH_ADDRESS_2 = '(destination Eth wallet address here)'
-
-internal_transfer_response = client.intiate_and_process_internal_transfers(
-  key_pair=key_pair,
-  organization_key=TANX_ORGANIZATION_KEY,
-  api_key=TANX_API_KEY,
-  currency='usdc',
-  amount=1,
-  destination_address=ETH_ADDRESS_2,
-  client_reference_id=1
-)
-```
-
-2. Retrieve a list of transfers initiated by the authenticated user:
-
-```python
-internal_trasnfers_list = client.list_internal_transfers({
-  'limit': 10,
-  'offset': 10
-})
-```
-
-3. Retrieve an internal transfer using its client reference id:
-
-```python
-internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id)
-```
-
-4. Check if a user exists by their destination address.
-
-```python
-check_user_res = client.check_internal_transfer_user_exists(
-  TANX_ORGANIZATION_KEY,
-  TANX_API_KEY,
-  destination_address,
-)
-```
-
 ### Deposit
 
 #### Ethereum Network Deposit
@@ -709,4 +652,62 @@ fast_withdrawals_list = client.list_fast_withdrawals({
   'page': 2, # This is an optional field
   'network': 'POLYGON'  # This is an optional field
 })
+```
+
+### Internal Transfer
+
+Users will be able to seamlessly transfer assets from their CEXs or other chains with minimal fees.
+
+To get started with the feature, follow these two steps:
+
+1. Reach out to tanX (support@tanx.fi) to get the organization key and API key.
+
+2. Generate the L2 key pair with your private key
+
+#### Available methods:
+
+1. To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
+
+```python
+key_pair = {
+  'stark_public_key': '(your stark public key here)'
+  'stark_private_key': '(your stark private key here)'
+}
+
+ETH_ADDRESS_2 = '(destination Eth wallet address here)'
+
+internal_transfer_response = client.intiate_and_process_internal_transfers(
+  key_pair=key_pair,
+  organization_key=TANX_ORGANIZATION_KEY,
+  api_key=TANX_API_KEY,
+  currency='usdc',
+  amount=1,
+  destination_address=ETH_ADDRESS_2,
+  client_reference_id=1
+)
+```
+
+2. Retrieve a list of transfers initiated by the authenticated user:
+
+```python
+internal_trasnfers_list = client.list_internal_transfers({
+  'limit': 10,
+  'offset': 10
+})
+```
+
+3. Retrieve an internal transfer using its client reference id:
+
+```python
+internal_transfer_by_id = client.get_internal_transfer_by_client_id(client_reference_id)
+```
+
+4. Check if a user exists by their destination address.
+
+```python
+check_user_res = client.check_internal_transfer_user_exists(
+  TANX_ORGANIZATION_KEY,
+  TANX_API_KEY,
+  destination_address,
+)
 ```
