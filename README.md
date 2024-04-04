@@ -84,6 +84,7 @@ Make sure that tanxconnector is [installed](#installation) and up-to-date.
 Also make sure you have an account on the [mainnet](https://trade.tanx.fi/) or [testnet](https://testnet.tanx.fi/) website.
 
 To get quickly started, try running the simple example for creating and fetching the order once logged in.
+For the `stark_private_key`, kindly see the [L2 Key Pair](#l2-key-pair) section of the documentation.
 
 ```python
 from tanxconnector import Client
