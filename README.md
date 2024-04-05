@@ -90,7 +90,8 @@ For the `stark_private_key`, kindly see the [L2 Key Pair](#l2-key-pair) section 
 from tanxconnector import Client
 
 ETH_ADDRESS = "(your eth wallet address)"
-PRIVATE_KEY = "(your wallet's private key)"
+ETH_WALLET_PRIVATE_KEY = "(your wallet's private key)"
+STARK_PRIVATE_KEY = "(stark private key from the L2 Key Pair)"
 
 client = Client()
 
@@ -101,7 +102,7 @@ login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
 nonce: CreateOrderNonceBody = {'market': 'ethusdc', 'ord_type':'market', 'price': 29580.51, 'side': 'sell', 'volume': 0.0005}
 
 # create the order
-order = client.create_complete_order(nonce, stark_private_key)
+order = client.create_complete_order(nonce, STARK_PRIVATE_KEY)
 print(order)
 
 # fetch the details of the order just created

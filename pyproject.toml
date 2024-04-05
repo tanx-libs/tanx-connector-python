@@ -50,7 +50,7 @@ dev = [
 ]
 
 [tool.bumpver]
-current_version = "2.0.2"
+current_version = "2.0.3"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "update version: v{old_version} -> v{new_version}"
 commit = false
