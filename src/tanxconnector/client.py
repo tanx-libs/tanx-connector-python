@@ -43,7 +43,7 @@ from .typings import (
     InitiateWithdrawalPayload,
     ProcessFastWithdrawalPayload,
 )
-from .starknet import StarkNetHelper
+# from .starknet import StarkNetHelper
 from web3 import Web3, Account
 from .constants import Config
 from web3.middleware.geth_poa import geth_poa_middleware
