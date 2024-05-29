@@ -42,8 +42,11 @@ from .typings import (
     ListInternalTransferParams,
     InitiateWithdrawalPayload,
     ProcessFastWithdrawalPayload,
+    LayerSwapDepositFeeParams,
+    LayerSwapDepositFeePayload,
+    InitiateLayerSwapDepositPayload,
 )
-# from .starknet import StarkNetHelper
+from .starknet import StarkNetHelper
 from web3 import Web3, Account
 from .constants import Config
 from web3.middleware.geth_poa import geth_poa_middleware
@@ -693,8 +696,180 @@ class Client:
 
 
 
+#     async saveLayerSwapTx(ref_id: string, transaction_hash: string) {
+#     const res = await this.axiosInstance.post(
+#       `/sapi/v1/payment/layer-swap/deposit/save/`,
+#       {
+#         ref_id,
+#         transaction_hash,
+#       },
+#     )
+
+#     return res.data
+#   }
+
+#       formatLayerSwapInitateData(
+#     data: Response<InitaiteLayerSwapDepositPayload>,
+#     tokenAddress: string,
+#   ): {
+#     to: string
+#     amount: string
+#     ref_id: string
+#     data: any
+#     tokenAddress: string
+#   } {
+#     return {
+#       to: data?.payload?.ls_data?.to_address,
+#       amount: data?.payload?.ls_data?.base_units,
+#       ref_id: data?.payload?.ref_id,
+#       data: data?.payload?.ls_data?.data,
+#       tokenAddress: tokenAddress,
+#     }
+#   }
+
+    # def format_layer_swap_initiate_data(data, token_address: str):
+    #     return {
+    #         'to': data.get().to_address),
+    #         'amount': data.payload.ls_data.base_units,
+    #         'ref_id': data.payload.ref_id,
+    #         'data': data.payload.ls_data.data,
+    #         'tokenAddress': token_address,
+    #     }
+
+#     async initaiteLayerSwapDeposit(
+#     amount: string | number,
+#     token_id: string,
+#     cc_address: string,
+#     fee_meta: LayerSwapDepositFeePayload,
+#   ): Promise<Response<InitaiteLayerSwapDepositPayload>> {
+#     this.getAuthStatus()
+#     const source_network = 'STARKNET'
+#     const res = await this.axiosInstance.post(
+#       `/sapi/v1/payment/layer-swap/deposit/`,
+#       {
+#         amount,
+#         token_id,
+#         cc_address,
+#         fee_meta,
+#         source_network,
+#       },
+#     )
+
+#     return res.data
+#   }
+    
+#       async fetchLayerSwapDepositFee(
+#     params?: LayerSwapDepositFeeParams,
+#   ): Promise<Response<LayerSwapDepositFeePayload>> {
+#     this.getAuthStatus()
+#     const network_config = await this.getNetworkConfig()
+#     const selectedNetworkConfig =
+#       network_config[params?.source_network as string]
+
+#     const _ = filterCrossChainCoin(
+#       selectedNetworkConfig,
+#       params?.token_id?.toLowerCase() as string,
+#       'DEPOSIT',
+#       params?.source_network?.toUpperCase() as string,
+#     )
+
+#     const res = await this.axiosInstance.get<
+#       Response<LayerSwapDepositFeePayload>
+#     >(`/sapi/v1/payment/layer-swap/deposit/fee/`, { params: params })
+#     return res.data
+#   }
 
 
+    async def starknet_deposit(self, rpc_url, public_address, private_address, amount, currency,):
+        network = 'STARKNET'
+        network_config = self.get_network_config()
+        starknet_config = network_config[network]
+
+        currency=currency.lower()
+        current_coin = filter_cross_chain_coin(starknet_config, currency, 'DEPOSIT')
+        decimal = current_coin.get('blockchain_decimal')
+        token_contract = current_coin.get('token_contract')
+
+        balance = await StarkNetHelper.get_starknet_user_balance(token_contract,rpc_url,public_address, private_address)
+
+
+        layer_swap_fee_detail = self.fetch_layer_swap_deposit_fee(starknet_config,currency)
+        
+        max_amount = float(layer_swap_fee_detail.get('max_amount', 0))
+        min_amount = float(layer_swap_fee_detail.get('min_amount', 0))
+
+        if float(balance) - float(layer_swap_fee_detail.get('fee_amount', 0)) < float(amount) or float(balance) == 0:
+            raise Exception('Your blockchain wallet has insufficient balance')
+        
+        if max_amount < float(amount):
+            raise Exception(f"Amount cannot exceed {max_amount} {currency.upper()}")
+        if float(amount) < min_amount:
+            raise Exception(f"Amount should be at least {min_amount} {currency.upper()}")
+        
+        print(layer_swap_fee_detail)
+        initiate_res = self.initiate_layer_swap_deposit(amount, currency, public_address, layer_swap_fee_detail)
+
+        # Convert amount to blockchain-specific format
+        quantized_amount = amount * (10 ** int(decimal))
+        quantized_amount = int(quantized_amount)
+
+        # formatted_data = self.format_layer_swap_initiate_data(initiate_res, token_contract)
+        print(initiate_res,"initiating layer swap deposit")
+        execute_response = await StarkNetHelper.execute_starknet_transaction( public_address, private_address,rpc_url,quantized_amount, initiate_res)
+        print(execute_response, "initiating layer swap deposit")
+        save_res = self.save_layer_swap_tx(initiate_res.get('ref_id'), execute_response['transaction_hash'])
+        print(save_res, "save_res")
+        save_res = {'transaction_hash': execute_response['transaction_hash']}
+        return save_res
+
+
+    def fetch_layer_swap_deposit_fee(self,starknet_config, currency):
+        self.get_auth_status()
+        _ = filter_cross_chain_coin(starknet_config, currency, 'DEPOSIT')
+        params = {'token_id': currency,'source_network': 'STARKNET',}
+        r = self.session.get('/sapi/v1/payment/layer-swap/deposit/fee/', params=params)
+        return r.json()['payload']
+
+
+
+    def initiate_layer_swap_deposit(self, amount: str, token_id: str, cc_address: str, fee_meta:str):
+        self.get_auth_status()
+        source_network = 'STARKNET'
+        body= {'amount': amount,"token_id":token_id, 'cc_address':cc_address, 'fee_meta':fee_meta,'source_network':source_network}
+        r = self.session.post('/sapi/v1/payment/layer-swap/deposit/', json=body)
+        print(r.json(), "😍")
+        return r.json()['payload']
+    
+
+
+
+    def save_layer_swap_tx(self,ref_id: str,transaction_hash: str):
+        body = {'ref':ref_id, 'transaction_hash': transaction_hash}
+        res = self.session.post('/sapi/v1/payment/layer-swap/deposit/save/', json=body)
+        print("swap_tx",res.json())
+        return res.json()['payload']
+
+
+
+    # async def starknet_deposit1(self, starknet_rpc,public_address,private_address,amount, currency,  network="STARKNET"):
+    #     network = network.upper()
+    #     network_config = self.get_network_config()
+    #     starknet_config = network_config[network]
+
+    #     currency=currency.lower()
+    #     current_coin = filter_cross_chain_coin(starknet_config, currency, 'DEPOSIT')
+    #     decimal = current_coin.get('blockchain_decimal')
+    #     token_contract = current_coin.get('token_contract')
+
+    #     balance = await StarkNetHelper.get_starknet_user_balance(token_address=token_contract,starknet_rpc=starknet_rpc,public_address=public_address, private_address=private_address)
+
+    #     res = {}
+    #     res['status'] = 'success'
+    #     res['decimal'] = decimal
+    #     res['token_contract'] = token_contract
+    #     res['balance'] = balance
+        
+    #     return res
 
 
 

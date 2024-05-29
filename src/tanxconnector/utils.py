@@ -119,7 +119,7 @@ def filter_cross_chain_coin(config, coin, type):
     else:
         raise CoinNotFoundError('Type not found')
     if not allowed_token:
-        raise CoinNotFoundError(f'Coin {coin} not found, allowed tokens: {list(allowed_tokens.keys())}')
+        raise CoinNotFoundError(f'Coin {coin} not found, allowed tokens: {allowed_tokens_for_deposit}')
 
     current_coin = allowed_tokens[coin]
     return current_coin
