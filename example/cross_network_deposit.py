@@ -46,7 +46,7 @@ print(deposit_res_with_private_key)
 
 
 # approval for unlimited allowance for ERC20 contracts
-allowance = client.approve_unlimited_allowance_cross_network(coin='eth', signer=signer, w3=provider, network="LINEA")
+allowance = client.set_allowance(coin='eth', signer=signer, w3=provider, network="LINEA")
 print(allowance)
 
 # deposit with signer

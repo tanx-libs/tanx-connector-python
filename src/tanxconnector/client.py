@@ -446,7 +446,7 @@ class Client:
         r = self.session.post('/sapi/v1/internal_transfers/v2/process/', json=body)
         return r.json()
 
-    def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
+    def initiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
                                             destination_address: str, client_reference_id: Optional[int]=None):
         self.get_auth_status()
         loc = locals()
@@ -513,9 +513,9 @@ class Client:
         return r.json()
 
     def approve_unlimited_allowance_polygon_network(self, coin: str, signer: Account, w3: Web3):
-        self.approve_unlimited_allowance_cross_network(coin, signer, w3, network = "POLYGON")
+        self.set_allowance(coin, signer, w3, network = "POLYGON")
     
-    def approve_unlimited_allowance_cross_network(self, coin: str, signer: Account, w3: Web3, network: str):
+    def set_allowance(self, coin: str, signer: Account, w3: Web3, network: str):
         """
         Approve unlimited allowance for a specified token on a cross-chain network.
 
@@ -545,6 +545,7 @@ class Client:
         
         # Prepare and return response
         res = {"status": "success", "payload": res}
+    
         return res
 
     
@@ -631,7 +632,7 @@ class Client:
             # Check allowance for token transfer
             allowance = get_allowance(user_address=signer.address, stark_contract=contract_address, token_contract=token_contract, decimal=decimal, w3=provider)
             if allowance < amount:
-                raise AllowanceTooLowError(f"Current Allowance ({allowance}) is too low, please use Client.approve_unlimited_allowance_cross_network")
+                raise AllowanceTooLowError(f"Current Allowance ({allowance}) is too low, please use Client.set_allowance()")
             transaction_pre_build = cross_network_contract.functions.deposit(
                 token_contract,
                 int(quantized_amount),
