@@ -558,7 +558,7 @@ polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
 There are two ways to make a deposit on the Cross network:
 
 1. Using ETH Private Key and RPC URL:<br>
-In this method, you will use an ETH private key and an RPC URL to execute a Cross deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+In this method, you will use an ETH private key and an RPC URL to execute a Cross chain/network deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
 
 ```python
 deposit_res = client.deposit_from_cross_network(
@@ -583,7 +583,7 @@ provider.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 signer = Account.from_key(PRIVATE_KEY)
 
-polygon_deposit_res = client.deposit_from_cross_network_with_signer(
+deposit_res = client.deposit_from_cross_network_with_signer(
   signer, # Signer Created above
   provider, # Provider created above
   'matic',  # Enter the coin symbol
@@ -621,7 +621,7 @@ provider.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 signer = Account.from_key(PRIVATE_KEY)
 
-polygon_deposit_res = client.deposit_from_cross_network_with_signer(
+deposit_res = client.deposit_from_cross_network_with_signer(
   signer, # Signer Created above
   provider, # Provider created above
   'btc',  # Enter the coin symbol
