@@ -17,6 +17,7 @@ from .bin.blockchain_utils import sign_msg
 from .exception import *
 from typing import Optional, Union, List, Literal
 from .typings import (
+    BulkOrderCancel,
     Response,
     LoginResponse,
     FullDayPricePayload,
@@ -638,11 +639,7 @@ class Client:
 
 
 
-    def bulk_cancel(self,market,limit):
+    def bulk_cancel(self,data: BulkOrderCancel):
         self.get_auth_status()
-        data = {
-            'market': market.lower(),
-            'limit': str(limit),  # Optional field; default limit is 100
-        }
         r = self.session.post('/sapi/v1/user/bulkcancel/', json=data)
         return(r.json())

@@ -24,5 +24,9 @@ except requests.exceptions.HTTPError as exc:
 
 
 # Run the function
-res = client.bulk_cancel(market='btcusdt', limit=100)
+res = client.bulk_cancel({
+    'market': 'btcusdt',
+    'limit': 100, # optional
+    'side': 'buy' # optional
+})
 print(res)
