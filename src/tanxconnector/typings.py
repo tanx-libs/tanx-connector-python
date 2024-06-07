@@ -241,5 +241,5 @@ class InitiateLayerSwapDepositPayload(TypedDict):
 
 class BulkOrderCancel(TypedDict):
     market: str
-    limit: int | None
-    side: str | None
+    limit: Optional[int]
+    side: Optional[str]
