@@ -553,6 +553,84 @@ polygon_deposit_res = client.deposit_from_polygon_network_with_signer(
 )
 ```
 
+#### Cross Network Deposit
+
+There are two ways to make a deposit on the Cross network:
+
+1. Using ETH Private Key and RPC URL:<br>
+In this method, you will use an ETH private key and an RPC URL to execute a Cross chain/network deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+
+```python
+deposit_res = client.deposit_from_cross_network(
+  RPC_PROVIDER_FOR_NETWORK, # use different RPC for TEST_NET and MAIN_NET 
+  PRIVATE_KEY,  # ETH Private Key
+  'matic',  # Coin Symbol
+  0.00001 # Amount to be deposited
+  'optimism' # Network name
+)
+```
+
+2. Using Custom Provider and Signer:
+<br>This method involves using a custom provider and signer, which can be created using the web3.py library. Also, its important to inject a middleware at the 0th layer of the middleware onion for the provider ([See Reference](https://web3py.readthedocs.io/en/stable/middleware.html#proof-of-authority)). Here's the code snippet for this method:
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_NETWORK))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+deposit_res = client.deposit_from_cross_network_with_signer(
+  signer, # Signer Created above
+  provider, # Provider created above
+  'matic',  # Enter the coin symbol
+  0.0001, # Amount to be deposited
+  'optimism' # Network name
+)
+```
+
+For any `ERC20` token (which is not native for the network, like btc), first allow unlimited allowance for that token using the `set_allowance()` method.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_NETWORK))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+# approval for unlimited allowance for ERC20 contracts
+allowance = client.set_allowance(coin='btc', signer=signer, w3=provider)
+print(allowance)  # prints the hash for the allowance, check on network scan for success
+```
+
+Once the allowance is success, transactions can be made for `ERC20` token on the network.
+
+```python
+# Note: Please use web3>=6.0.0, <7.0.0
+from web3 import Web3, Account
+from web3.middleware.geth_poa import geth_poa_middleware
+
+provider = Web3(Web3.HTTPProvider(RPC_PROVIDER_FOR_NETWORK))
+provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+signer = Account.from_key(PRIVATE_KEY)
+
+deposit_res = client.deposit_from_cross_network_with_signer(
+  signer, # Signer Created above
+  provider, # Provider created above
+  'btc',  # Enter the coin symbol
+  0.0001, # Amount to be deposited
+  'optimism' # Network name
+)
+```
+
+
 #### List Deposits
 
 To get the deposit history, you can use the following code:
@@ -561,7 +639,7 @@ To get the deposit history, you can use the following code:
 deposit_list = client.list_deposits({
   'page': 1,  # This field is optional
   'limit': 1, # This field is optional
-  'network': 'ETHEREUM' # Network for which you want to list the deposit history. Allowed networks are ETHEREUM & POLYGON
+  'network': 'ETHEREUM' # Network for which you want to list the deposit history.
 })
 ```
 
@@ -633,18 +711,7 @@ fast_withdrawal_res = client.fast_withdrawal(
   key_pair, # The keyPair created above
   0.0001, # Enter the amount you want to deposit
   'usdc', # Enter the coin symbol
-  'ETHEREUM', # Allowed networks are POLYGON & ETHEREUM
-)
-```
-
-2. Polygon network
-
-```python
-const fastWithdrawalRes = await client.fastWithdrawal(
-  key_pair, # The keyPair created above
-  0.001, # Enter the amount you want to deposit
-  'btc', # Enter the coin symbol
-  'POLYGON', # Allowed networks are POLYGON & ETHEREUM
+  'ETHEREUM', # Enter Network name
 )
 ```
 

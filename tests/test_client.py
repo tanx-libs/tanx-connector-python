@@ -686,7 +686,7 @@ def test_user_exists_failure():
         assert res['status'] == 'error'
 
 @responses.activate
-def test_start_polygon_deposits_success():
+def test_start_cross_chain_deposits_success():
     responses.post(url=f'{BASE_URL}/sapi/v1/deposits/crosschain/create/',
                     json={'status': 'success',
                         'message': 'Success! Awaiting Blockchain Confirmation',
@@ -695,21 +695,21 @@ def test_start_polygon_deposits_success():
                         },
                     })
 
-    res = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930',)
+    res = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930', "polygon")
 
     assert 'status' in res
     assert res['status'] == 'success'
     assert 'payload' in res
 
 @responses.activate
-def test_start_polygon_deposits_failure():
+def test_start_cross_chain_deposits_failure():
     responses.post(url=f'{BASE_URL}/sapi/v1/deposits/crosschain/create/',
                     json={'status': 'error',
                         'message': 'Essential parameters are missing',
                         'payload': '',
                     })
     
-    data = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930',)
+    data = client.cross_chain_deposit_start(100000,'0x27..','0x67..','930',"polygon")
     assert 'status' in data
     assert data['status'] == 'error'
     assert 'Essential parameters' in data['message']
@@ -746,3 +746,24 @@ def test_deposit_from_polygon_network_with_signer_low_balance():
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic')
 
+@responses.activate
+def test_deposit_from_cross_chain_network_with_signer_invalid_amount():
+    w3 = Web3()
+    # test_signer = "0xb500b7238e2aFbBca678B2A3B462e35ab001A4a0"
+    test_signer = w3.eth.account.create()
+
+    test_provider = Web3(EthereumTesterProvider())
+
+    with pytest.raises(InvalidAmountError):
+        client.deposit_from_cross_network_with_signer(signer=test_signer, provider=test_provider, amount=0, currency='matic', network="POLYGON") 
+
+@responses.activate
+def test_deposit_from_cross_network_with_signer_low_balance():
+    responses.post(f'{BASE_URL}/main/stat/v2/app-and-markets/', json=network_config_response)
+    responses.post(f'{BASE_URL}/main/user/create_vault/', json=get_vault_id_response)
+
+    test_provider = Web3(EthereumTesterProvider())
+    w3 = Web3()
+    test_signer = w3.eth.account.create()
+    with pytest.raises(BalanceTooLowError):
+        client.deposit_from_cross_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic', network='POLYGON')

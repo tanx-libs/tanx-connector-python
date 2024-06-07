@@ -13,7 +13,9 @@ ETH_ADDRESS = os.environ['ETH_ADDRESS']
 stark_private_key = os.environ['STARK_PRIVATE_KEY']
 stark_public_key = os.environ['STARK_PUBLIC_KEY']
 
-client = Client()
+
+client = Client("testnet")
+
 try:
     # login to use private endpoints
     login = client.complete_login(ETH_ADDRESS, PRIVATE_KEY)
@@ -30,8 +32,8 @@ key_pair = {'stark_private_key': stark_private_key, 'stark_public_key': stark_pu
 fast_withdrawal_res = client.fast_withdrawal(
     key_pair,
     10,
-    'usdc',     # coin
-    'ETHEREUM'  # network
+    'usdt',     # coin
+    'OPTIMISM'  # network
 )
 print(fast_withdrawal_res)
 
@@ -45,8 +47,8 @@ print(list_fast_withdrawals_res)
 # Fast Withdrawals on polygon network
 fast_withdrawal_res = client.fast_withdrawal(
     key_pair,
-    0.0008,
-    'btc',
+    10,
+    'matic',
     'POLYGON'
 )
 print(fast_withdrawal_res)

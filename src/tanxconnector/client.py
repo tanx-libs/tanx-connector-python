@@ -11,7 +11,8 @@ from .utils import (
     filter_cross_chain_coin,
     sign_internal_tx_msg_hash,
     filter_cross_chain_coin,
-    sign_order_with_stark_private_key
+    sign_order_with_stark_private_key,
+    get_native_currency_by_network
 )
 from .bin.blockchain_utils import sign_msg
 from .exception import *
@@ -42,6 +43,7 @@ from .typings import (
     InitiateWithdrawalPayload,
     ProcessFastWithdrawalPayload,
 )
+# from .starknet import StarkNetHelper
 from web3 import Web3, Account
 from .constants import Config
 from web3.middleware.geth_poa import geth_poa_middleware
@@ -444,7 +446,7 @@ class Client:
         r = self.session.post('/sapi/v1/internal_transfers/v2/process/', json=body)
         return r.json()
 
-    def intiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
+    def initiate_and_process_internal_transfers(self, key_pair: dict, organization_key: str, api_key: str, currency: str, amount: float,
                                             destination_address: str, client_reference_id: Optional[int]=None):
         self.get_auth_status()
         loc = locals()
@@ -481,30 +483,29 @@ class Client:
         r = self.session.post('/main/stat/v2/app-and-markets/')
         return r.json()['payload']['network_config']
 
-    def get_polygon_token_balance(self, provider: Web3, eth_address: str, currency: str):
+    def get_network_token_balance(self, provider: Web3, eth_address: str, currency: str, network: str):
         if currency == 'matic':
             balance = provider.eth.get_balance(eth_address)     # type:ignore
             return Web3.from_wei(balance, 'ether')
         network_config = self.get_network_config()
-        polygon_config = network_config['POLYGON']
-        allowed_tokens = polygon_config['tokens']
+        cross_network_config = network_config[network.upper()]
 
-        current_coin = filter_cross_chain_coin(polygon_config, currency, 'TOKENS')
+        current_coin = filter_cross_chain_coin(cross_network_config, currency, 'TOKENS')
 
         decimal = current_coin['blockchain_decimal']
         token_contract = current_coin['token_contract']
         contract = provider.eth.contract(address=token_contract, abi=Config.ERC20_ABI)
-        
+
         balance = contract.functions.balanceOf(eth_address).call()
         normal_balance = balance / (10 ** int(decimal))
         return normal_balance
 
-    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str):
+    def cross_chain_deposit_start(self, amount: float, currency: str, deposit_blockchain_hash: str, deposit_blockchain_nonce: str, network: str):
         amount_to_string = str(amount)
         body = {
             'amount': amount_to_string,
             'currency': currency,
-            'network': 'POLYGON',
+            'network': network.upper(),
             'deposit_blockchain_hash': deposit_blockchain_hash,
             'deposit_blockchain_nonce': deposit_blockchain_nonce,
         }
@@ -512,89 +513,192 @@ class Client:
         return r.json()
 
     def approve_unlimited_allowance_polygon_network(self, coin: str, signer: Account, w3: Web3):
-        network_config = self.get_network_config()
-        polygon_config = network_config['POLYGON']
-        allowed_tokens = polygon_config['tokens']
-        contract_address = polygon_config['deposit_contract']
+        self.set_allowance(coin, signer, w3, network = "POLYGON")
+    
+    def set_allowance(self, coin: str, signer: Account, w3: Web3, network: str):
+        """
+        Approve unlimited allowance for a specified token on a cross-chain network.
 
-        current_coin = filter_cross_chain_coin(polygon_config, coin, 'DEPOSIT')
+        Args:
+            coin (str): The currency symbol of the token for which unlimited allowance is to be approved.
+            signer (Account): The signer object used to sign the transaction.
+            w3 (Web3): The Web3 provider object used to interact with the blockchain.
+            network (str): The network to which the token belongs.
+
+        Returns:
+            dict: A dictionary containing the status of the approval operation and the transaction hash if successful.
+        """
+
+        # Fetch network configuration
+        network_config = self.get_network_config()
+        cross_network_config = network_config[network]
+        
+        # Retrieve contract address and relevant coin information
+        contract_address = cross_network_config['deposit_contract']
+        current_coin = filter_cross_chain_coin(cross_network_config, coin, 'DEPOSIT')
+        
+        # Extract token contract address
         token_contract = current_coin['token_contract']
+        
+        # Call utility function to approve unlimited allowance
         res = approve_unlimited_allowance_util(contract_address=contract_address, token_contract=token_contract, signer=signer, w3=w3)
+        
+        # Prepare and return response
+        res = {"status": "success", "payload": res}
+    
         return res
 
-    def deposit_from_polygon_network_with_signer(self, signer: Account, provider: Web3, currency:str, amount: float):
-        if float(amount)<=0:
+    
+    def deposit_from_polygon_network_with_signer(self, signer: Account, provider: Web3, currency:str, amount: float, **kargs):
+        self.deposit_from_cross_network_with_signer(signer, provider, currency, amount, network="POLYGON", **kargs)
+        return None
+    
+    def deposit_from_cross_network_with_signer(self, signer: Account, provider: Web3, currency: str, amount: float, network: str, **kwargs):
+        """
+            Deposit funds from a cross-chain network to the platform using the provided signer and provider.
+
+            Args:
+                signer (Account): The signer object used to sign the transaction.
+                provider (Web3): The Web3 provider object used to interact with the blockchain.
+                currency (str): The currency symbol of the funds being deposited.
+                amount (float): The amount of funds being deposited, in the same unit as the currency.
+                network (str): The network to which the funds are being deposited.
+                **kargs: Additional keyword arguments that can be used to specify gas options for the transaction.
+
+            Returns:
+                dict: A dictionary containing the status of the deposit operation and the transaction hash if successful.
+
+            Raises:
+                InvalidAmountError: If the amount to be deposited is less than or equal to zero.
+                BalanceTooLowError: If the balance of the user's account is insufficient for the deposit operation.
+                AllowanceTooLowError: If the allowance for the specified token is insufficient for the deposit operation.
+
+        """
+
+        # Check if amount is valid
+        if float(amount) <= 0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
 
+        # Check authentication status
         self.get_auth_status()
 
         w3 = provider
-
+        network = network.upper()
         network_config = self.get_network_config()
-        polygon_config = network_config['POLYGON']
-        allowed_tokens = polygon_config['tokens']
-        contract_address = polygon_config['deposit_contract']
+        cross_network_config = network_config[network]
+        contract_address = cross_network_config['deposit_contract']
 
-        current_coin = filter_cross_chain_coin(polygon_config, currency, 'DEPOSIT')
-
+        # Fetch relevant coin information
+        currency=currency.lower()
+        current_coin = filter_cross_chain_coin(cross_network_config, currency, 'DEPOSIT')
         decimal = current_coin.get('blockchain_decimal')
         token_contract = current_coin.get('token_contract')
 
-        quantized_amount = amount*(10**int(decimal))
+        # Convert amount to blockchain-specific format
+        quantized_amount = amount * (10 ** int(decimal))
         quantized_amount = int(quantized_amount)
 
-        polygon_contract = w3.eth.contract(address=contract_address, abi=Config.POLYGON_ABI['abi'])
-
+        # Convert amount to wei
         parsed_amount = w3.to_wei(amount, 'ether')
-        gwei = w3.from_wei(parsed_amount, 'gwei')
         nonce = get_nonce(signer=signer, provider=provider)
-
         params = {
-            'from': signer.address,     # type:ignore
-            'nonce': nonce
+            'from': signer.address,  # Sender's address
+            'nonce': nonce,
         }
 
-        balance = self.get_polygon_token_balance(provider, signer.address, currency)    # type:ignore
+        # Include gas options if provided
+        gas_options = kwargs.get("gas_options", None)
+        if gas_options:
+            for key, value in gas_options.items():
+                params[key] = value
+        
+        # Set gas price if network is SCROLL and gas price is not provided
+        if network == 'SCROLL' and 'gasPrice' not in params:
+            params['gasPrice'] = w3.eth.gas_price
 
-        if balance<amount:
+        # Fetch cross network contract
+        cross_network_contract = w3.eth.contract(address=contract_address, abi=Config.CROSS_NETWORK_ABI['abi'])
+
+        # Check balance
+        balance = self.get_network_token_balance(provider, signer.address, currency, network)
+        if balance < amount:
             raise BalanceTooLowError(f'Current Balance {balance} for {currency} is too low, please add balance before deposit')
 
-        deposit_response = None
-
-        if currency == 'matic':
-            params['value']=parsed_amount
-            transaction_pre_build = polygon_contract.functions.depositNative()
-
+        # Check if depositing native currency or token
+        if currency == get_native_currency_by_network(network):
+            params['value'] = parsed_amount  # Include value for native currency transfer
+            transaction_pre_build = cross_network_contract.functions.depositNative()
         else:
-            allowance = get_allowance(user_address=signer.address, stark_contract=contract_address, token_contract=token_contract, decimal=decimal, w3=provider)    # type:ignore
+            # Check allowance for token transfer
+            allowance = get_allowance(user_address=signer.address, stark_contract=contract_address, token_contract=token_contract, decimal=decimal, w3=provider)
             if allowance < amount:
-                raise AllowanceTooLowError(f"Current Allowance ({allowance}) is too low, please use Client.approve_unlimited_allowance_polygon_network")
-            transaction_pre_build = polygon_contract.functions.deposit(
+                raise AllowanceTooLowError(f"Current Allowance ({allowance}) is too low, please use Client.set_allowance()")
+            transaction_pre_build = cross_network_contract.functions.deposit(
                 token_contract,
-                int(quantized_amount)
+                int(quantized_amount),
             )
 
-        transaction = transaction_pre_build.build_transaction(params)    # type:ignore
+        # Build transaction
+        transaction = transaction_pre_build.build_transaction(params)
         signed_tx = signer.sign_transaction(transaction)
-        # send this signed transaction to blockchain
-        w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
+        
+        # Send signed transaction to blockchain
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
         deposit_response = signed_tx
+        
+        # Call cross_chain_deposit_start function
         res = self.cross_chain_deposit_start(
             amount,
             currency,
-            deposit_response['hash'].hex(),
-            transaction['nonce']    # type:ignore
+            tx_hash,
+            transaction['nonce'],
+            network
         )
-
-        res['payload'] = {'transaction_hash': deposit_response['hash'].hex()}
+        
+        # Prepare response
+        res["status"] = "success"
+        res['payload'] = {'transaction_hash': tx_hash}
         return res
+
     
     def deposit_from_polygon_network(self, rpc_url: str, eth_private_key: str, currency: str, amount: float):
+        return self.deposit_from_cross_network(rpc_url, eth_private_key, currency, amount, network="POLYGON")
+
+    def deposit_from_cross_network(self, rpc_url: str, eth_private_key: str, currency: str, amount: float, network: str):
+        """
+            Deposit funds from a cross-chain network to the platform using the provided RPC URL, private key, currency, amount, and network.
+
+            Args:
+                rpc_url (str): The URL of the Ethereum node to interact with.
+                eth_private_key (str): The private key of the user's Ethereum account.
+                currency (str): The currency symbol of the funds being deposited.
+                amount (float): The amount of funds being deposited, in the same unit as the currency.
+                network (str): The network to which the funds are being deposited.
+
+            Returns:
+                dict: A dictionary containing the status of the deposit operation and the transaction hash if successful.
+        """
+        # Check authentication status
         self.get_auth_status()
+
+        # Initialize Web3 provider
         provider = Web3(Web3.HTTPProvider(rpc_url))
+        # Inject middleware for handling POA networks
         provider.middleware_onion.inject(geth_poa_middleware, layer=0)
+
+        # Create signer from private key
         signer = Account.from_key(eth_private_key)
-        return self.deposit_from_polygon_network_with_signer(signer=signer, provider=provider, currency=currency, amount=amount)
+
+        # Call deposit_from_cross_network_with_signer function with provided parameters
+        return self.deposit_from_cross_network_with_signer(signer=signer, provider=provider, currency=currency, amount=amount, network=network)
+
+
+
+
+
+
+
+
 
     def start_fast_withdrawal(self, body: InitiateWithdrawalPayload):
         r = self.session.post('/sapi/v1/payment/fast-withdrawals/v2/initiate/',
