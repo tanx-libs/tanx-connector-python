@@ -223,3 +223,23 @@ class InternalTransferProcessBody(InternalTransferKey):
 class ListInternalTransferParams(TypedDict):
     limit: Optional[int]
     offset: Optional[int]
+
+
+class LayerSwapDepositFeePayload(TypedDict):
+  min_amount: str
+  max_amount: str
+  fee_amount: str
+
+class LayerSwapDepositFeeParams(TypedDict):
+  token_id: str
+  source_network: "STARTNET"
+
+
+class InitiateLayerSwapDepositPayload(TypedDict):
+  ref_id: str
+  ls_data: str
+
+class BulkOrderCancel(TypedDict):
+    market: str
+    limit: int | None
+    side: str | None

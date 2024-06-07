@@ -64,7 +64,8 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     gas_limit = contract_instance.functions.approve(
         contract_address,
         w3.to_int(int(MAX_INT_ALLOWANCE))
-    ).estimateGas({"from": token_contract})
+    ).estimate_gas({"from": token_contract})
+
     # so basically, if token contract is not provided, it'll try to approve from 0 address account,
     # so providing a from account, other way is to initialize web3 using private key
     overrides = {
@@ -74,10 +75,10 @@ def approve_unlimited_allowance_util(contract_address: str, token_contract: str,
     }
     amount = int(MAX_INT_ALLOWANCE)
     transaction_pre_build = contract_instance.functions.approve(contract_address, amount)
-    transaction = transaction_pre_build.buildTransaction(overrides) # type: ignore
+    transaction = transaction_pre_build.build_transaction(overrides) # type: ignore
     signed_tx = signer.sign_transaction(transaction)
     # send this signed transaction to blockchain
-    w3.eth.sendRawTransaction(signed_tx.rawTransaction).hex()
+    w3.eth.send_raw_transaction(signed_tx.rawTransaction).hex()
     approval = signed_tx
     return approval
 
@@ -118,8 +119,31 @@ def filter_cross_chain_coin(config, coin, type):
     else:
         raise CoinNotFoundError('Type not found')
     if not allowed_token:
-        raise CoinNotFoundError(f'Coin {coin} not found')
+        raise CoinNotFoundError(f'Coin {coin} not found, allowed tokens: {allowed_tokens_for_deposit}')
 
     current_coin = allowed_tokens[coin]
     return current_coin
 
+def get_native_currency_by_network(network: str) -> str:
+    """
+    Get the native currency of a given network.
+
+    Args:
+    network (str): The name of the network.
+
+    Returns:
+    str: The native currency of the specified network.
+
+    Raises:
+    KeyError: If the provided network is not in the supported networks.
+    """
+
+    network_to_native_currency = {
+        "POLYGON": 'matic',
+        "OPTIMISM": 'eth',
+        "ARBITRUM": 'eth',
+        "LINEA": 'eth',
+        "SCROLL": 'eth',
+        "MODE": 'eth'
+    }
+    return network_to_native_currency.get(network, None)
