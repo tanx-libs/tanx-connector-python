@@ -767,3 +767,14 @@ def test_deposit_from_cross_network_with_signer_low_balance():
     test_signer = w3.eth.account.create()
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_cross_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic', network='POLYGON')
+
+@responses.activate
+def test_bulk_cancel():
+    responses.post(url=f'{BASE_URL}/sapi/v1/user/bulkcancel/',
+                    json=bulk_cancel_response)
+    res = client.bulk_cancel( {'market': 'btcusdt','limit': 100,'side': 'buy'})
+    print("bulk cancel")
+
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'message' in res
