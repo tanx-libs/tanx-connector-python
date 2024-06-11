@@ -85,7 +85,7 @@ class CreateOrderNonceBody(TypedDict):
     price: float
     side: str
     volume: float
-    stop_price: float | None
+    stop_price: Optional[float]
 
 class Order(TypedDict):
     id: int
@@ -104,8 +104,8 @@ class Order(TypedDict):
     maker_fee: str
     taker_fee: str
     trades_count: int
-    stop_price: float | None 
-    cancel_reason: str | None
+    stop_price: Optional[float]
+    cancel_reason: Optional[str]
 
 
 class OrderPayload(Order):

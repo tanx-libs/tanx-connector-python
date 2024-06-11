@@ -171,7 +171,7 @@ class Client:
     def create_order_nonce(self, body: CreateOrderNonceBody) -> Response[CreateOrderNoncePayload]:
         self.get_auth_status()
         if body['ord_type'] == "stop_limit":
-            if not body['stop_price']:
+            if body.get('stop_price',None) == None:
                 raise ValueError('stop_price is required for stop_limit orders')
         r = self.session.post('/sapi/v1/orders/nonce/',
                               json=body)
