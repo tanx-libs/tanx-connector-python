@@ -146,4 +146,4 @@ def get_native_currency_by_network(network: str) -> str:
         "SCROLL": 'eth',
         "MODE": 'eth'
     }
-    return network_to_native_currency.get(network, None)
+    return network_to_native_currency.get(network, 'eth')

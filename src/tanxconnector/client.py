@@ -10,7 +10,6 @@ from .utils import (
     sign_withdrawal_tx_msg_hash,
     filter_cross_chain_coin,
     sign_internal_tx_msg_hash,
-    filter_cross_chain_coin,
     sign_order_with_stark_private_key,
     get_native_currency_by_network
 )
@@ -43,7 +42,7 @@ from .typings import (
     InitiateWithdrawalPayload,
     ProcessFastWithdrawalPayload,
 )
-# from .starknet import StarkNetHelper
+
 from web3 import Web3, Account
 from .constants import Config
 from web3.middleware.geth_poa import geth_poa_middleware
@@ -589,7 +588,7 @@ class Client:
         contract_address = cross_network_config['deposit_contract']
 
         # Fetch relevant coin information
-        currency=currency.lower()
+        currency = currency.lower()
         current_coin = filter_cross_chain_coin(cross_network_config, currency, 'DEPOSIT')
         decimal = current_coin.get('blockchain_decimal')
         token_contract = current_coin.get('token_contract')
@@ -613,7 +612,8 @@ class Client:
                 params[key] = value
         
         # Set gas price if network is SCROLL and gas price is not provided
-        if network == 'SCROLL' and 'gasPrice' not in params:
+        networks_with_extra_params = ["SCROLL","ZKPOLY"]
+        if network in networks_with_extra_params and 'gasPrice' not in params:
             params['gasPrice'] = w3.eth.gas_price
 
         # Fetch cross network contract

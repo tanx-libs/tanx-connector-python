@@ -15,7 +15,7 @@ ETH_ADDRESS = os.environ['ETH_ADDRESS']
 chain_rpc_provider = os.environ['POLYGON_RPC_PROVIDER']
 
 
-client = Client("testnet")
+client = Client() # "testnet" | "mainnet"
 
 try:
     # login to use private endpoints
