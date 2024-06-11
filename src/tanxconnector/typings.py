@@ -85,6 +85,7 @@ class CreateOrderNonceBody(TypedDict):
     price: float
     side: str
     volume: float
+    stop_price: float | None
 
 class Order(TypedDict):
     id: int
@@ -103,6 +104,8 @@ class Order(TypedDict):
     maker_fee: str
     taker_fee: str
     trades_count: int
+    stop_price: float | None 
+    cancel_reason: str | None
 
 
 class OrderPayload(Order):
@@ -126,6 +129,7 @@ class TradePayload(TypedDict):
     taker_type: str
     side: str
     order_id: int
+
 
 
 class LoginPayload(TypedDict):
@@ -223,3 +227,8 @@ class InternalTransferProcessBody(InternalTransferKey):
 class ListInternalTransferParams(TypedDict):
     limit: Optional[int]
     offset: Optional[int]
+
+class BulkOrderCancel(TypedDict):
+    market: str
+    limit: int | None
+    side: str | None
