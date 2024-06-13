@@ -710,12 +710,14 @@ class Client:
         return r.json()
 
     def fast_withdrawal(self, key_pair: dict, amount: float, coin_symbol: str, network: str):
+        coin_symbol = coin_symbol.lower()
+        network = network.upper()
         if amount<=0:
             raise InvalidAmountError('Please enter a valid amount. It should be a numerical value greater than zero.')
         self.get_auth_status()
-        if network == 'POLYGON':
+        if network:
             network_config = self.get_network_config()
-            polygon_config = network_config['POLYGON']
+            polygon_config = network_config[network]
             _ = filter_cross_chain_coin(polygon_config, coin_symbol, 'WITHDRAWAL')
         else:
             coin_stats = self.get_coin_stats()['payload']
@@ -727,7 +729,6 @@ class Client:
             'network': network
         })
         signature = sign_withdrawal_tx_msg_hash(key_pair, str(int(initiate_response['payload']['msg_hash'], 16)))
-
         validate_response = self.process_fast_withdrawal({
             'msg_hash': initiate_response['payload']['msg_hash'],
             'signature': signature,     # type:ignore

@@ -239,6 +239,41 @@ list_withdrawals_response= {
     }
 }
 
+start_fast_withdrawal_response = {
+   "status":"success",
+   "message":"successfully initiated withdrawal",
+   "payload":{
+      "fastwithdrawal_withdrawal_id":359,
+      "msg_hash":"0x7f3e0f70980d079c4d777dc965ebbf0746f9b0845a3759937e6b7868962d8d6"
+   }
+}
+sign_withdrawal_tx_msg_hash_response = {
+    'r': '0x3a59acad62929e148f4b9711bd03b6b77e4cadc4bacbc8e91914fa2fdde9081',
+    's': '0x4a93cf575b3e3972554b726a7efeeb83a4cecd68962dff3d8497c34313c0d79',
+    'recoveryParam': 0
+}
+process_fast_withdrawal_response = {
+   "status":"success",
+   "message":"successfully processed withdrawal",
+   "payload":{
+      "id":361,
+      "amount":"10.0000000000000000",
+      "fee_amount":"9.470979",
+      "token_id":"usdc",
+      "network":"ETHEREUM",
+      "created_at":"2024-06-13T07:58:47.196361Z",
+      "l1_withdrawal_blockchain_hash":"None",
+      "transaction_status":"PROCESSING",
+      "blockchain_status":"PENDING",
+      "extras":{
+         "errors":[
+            
+         ],
+         "exp_timestamp":3997985,
+         "quantised_amount":19470979
+      }
+   }
+}
 
 coin_stats_response = {
     "status": "success",
@@ -416,20 +451,33 @@ list_polygon_deposits_response = {
 network_config_response = {
     'payload': {
       "network_config":{
-         "ETHEREUM":{
-            "allowed_tokens_for_deposit":[
-               
+        "ETHEREUM": {
+            "deposit_contract": "0xe17F8e501bF5e968e39D8702B30c3A8b955d8f52",
+            "tokens": {
+                "eth": {
+                    "blockchain_decimal": "18",
+                    "token_contract": "0x0000000000000000000000000000000000001010"
+                },
+                "usdc": {
+                    "blockchain_decimal": "6",
+                    "token_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "max_fast_withdrawal_for_platform_per_day": "15000",
+                    "max_fast_withdrawal_for_user_per_day": "12000"
+                }
+            },
+            "allowed_tokens_for_deposit": [
+                "usdc",
+                "eth"
             ],
-            "allowed_tokens_for_deposit_frontend":[
-               
+            "allowed_tokens_for_deposit_frontend": [],
+            "allowed_tokens_for_fast_wd": [
+                "usdc",
+                "eth"
             ],
-            "allowed_tokens_for_fast_wd":[
-               "usdc"
-            ],
-            "allowed_tokens_for_fast_wd_frontend":[
-               "usdc"
+            "allowed_tokens_for_fast_wd_frontend": [
+                "usdc"
             ]
-         },
+        },
          "POLYGON":{
             "deposit_contract":"0x2714C5958e2b1417B3f2b7609202FFAD359a5965",
             "tokens":{

@@ -44,12 +44,12 @@ list_fast_withdrawals_res = client.list_fast_withdrawals({
 }) # type:ignore
 print(list_fast_withdrawals_res)
 
-# Fast Withdrawals on polygon network
+# Fast Withdrawals
 fast_withdrawal_res = client.fast_withdrawal(
     key_pair,
     10,
-    'matic',
-    'POLYGON'
+    'usdc',
+    'ETHEREUM'
 )
 print(fast_withdrawal_res)
 
