@@ -9,7 +9,7 @@ from src.tanxconnector import exception  # noqa: E402
 PRIVATE_KEY = os.environ['PRIVATE_KEY']
 ETH_ADDRESS = os.environ['ETH_ADDRESS']
 
-client = Client('testnet')
+client = Client()
 
 try:
     # login to use private endpoints

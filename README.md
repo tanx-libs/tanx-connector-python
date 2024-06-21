@@ -333,7 +333,7 @@ client.cancel_order(order_id)
 
 #### Bulk Cancel (Private 🔒)
 
-bulkCancel: `POST /sapi/v1/user/bulkcancel/`
+`POST /sapi/v1/user/bulkcancel/`
 
 ```python
 client.bulk_cancel(market,limit)
