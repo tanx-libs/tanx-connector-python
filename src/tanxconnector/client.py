@@ -528,6 +528,8 @@ class Client:
             dict: A dictionary containing the status of the approval operation and the transaction hash if successful.
         """
 
+        network = network.upper()
+        coin = coin.lower()
         # Fetch network configuration
         network_config = self.get_network_config()
         cross_network_config = network_config[network]
@@ -549,8 +551,8 @@ class Client:
 
     
     def deposit_from_polygon_network_with_signer(self, signer: Account, provider: Web3, currency:str, amount: float, **kargs):
-        self.deposit_from_cross_network_with_signer(signer, provider, currency, amount, network="POLYGON", **kargs)
-        return None
+        res = self.deposit_from_cross_network_with_signer(signer, provider, currency, amount, network="POLYGON", **kargs)
+        return res
     
     def deposit_from_cross_network_with_signer(self, signer: Account, provider: Web3, currency: str, amount: float, network: str, **kwargs):
         """

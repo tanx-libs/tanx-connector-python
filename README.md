@@ -735,7 +735,7 @@ To get started with the feature, follow these two steps:
 
 #### Available methods:
 
-1. To process the internal transfer, call the `intiate_and_process_internal_transfers` method and pass the necessary arguments:
+1. To process the internal transfer, call the `initiate_and_process_internal_transfers` method and pass the necessary arguments:
 
 ```python
 key_pair = {
@@ -745,7 +745,7 @@ key_pair = {
 
 ETH_ADDRESS_2 = '(destination Eth wallet address here)'
 
-internal_transfer_response = client.intiate_and_process_internal_transfers(
+internal_transfer_response = client.initiate_and_process_internal_transfers(
   key_pair=key_pair,
   organization_key=TANX_ORGANIZATION_KEY,
   api_key=TANX_API_KEY,
