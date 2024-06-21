@@ -272,8 +272,14 @@ Create Nonce Body
 from tanxconnector.typings import CreateOrderNonceBody
 nonce: CreateOrderNonceBody = {'market': 'btcusdt', 'ord_type': 'market',
                                'price': 29580.51, 'side': 'buy', 'volume': 0.0001}
+```
 
-# if 'ord_type' is 'stop_limit' then 'stop_price' is required
+Stop Limit Order
+
+```py
+from tanxconnector.typings import CreateOrderNonceBody
+nonce: CreateOrderNonceBody = {'market': 'btcusdt', 'ord_type': 'stop_limit',
+                               'stop_price':29800,'price': 29580.51, 'side': 'buy', 'volume': 0.0001}
 ```
 
 Create Order
