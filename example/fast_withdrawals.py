@@ -14,7 +14,7 @@ stark_private_key = os.environ['STARK_PRIVATE_KEY']
 stark_public_key = os.environ['STARK_PUBLIC_KEY']
 
 
-client = Client("testnet")
+client = Client()
 
 try:
     # login to use private endpoints
