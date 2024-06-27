@@ -106,7 +106,7 @@ validate_withdrawal_response= {
         }
     }
 }
-
+bulk_cancel_response ={'status': 'success', 'message': 'Orders are successfully queued for cancellation', 'payload': {}}
 list_withdrawals_response= {
     "status": "success",
     "message": "",

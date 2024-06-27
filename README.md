@@ -50,6 +50,7 @@ Tanx-connector-python includes utility/connector functions which can be used to 
     - [Get Order (Private 🔒)](#get-order-private-)
     - [List Orders (Private 🔒)](#list-orders-)
     - [Cancel Order (Private 🔒)](#cancel-order-private-)
+    - [Bulk Cancel (Private 🔒)](#bulk-cancel-private-)
     - [List Trades (Private 🔒)](#list-trades-private-)
   - [WebSocket Client](#websocket-client)
     - [Connect](#connect)
@@ -337,6 +338,15 @@ client.list_orders(
 ```python
 client.cancel_order(order_id)
 ```
+
+#### Bulk Cancel (Private 🔒)
+
+`POST /sapi/v1/user/bulkcancel/`
+
+```python
+client.bulk_cancel(market,limit)
+```
+
 
 #### List Trades (Private 🔒)
 

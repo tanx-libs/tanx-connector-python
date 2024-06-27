@@ -16,8 +16,8 @@ from web3 import EthereumTesterProvider, Account, Web3
 BASE_URL = 'https://api.tanx.fi'
 
 # load_dotenv()
-PRIVATE_KEY = '7d6384d6877be027aa25bd458f2058e3f7ff68347dc583a9baf96f5f97b413a8'
-ETH_ADDRESS = '0x713Cf80b7c71440E7a09Dede1ee23dCBf862fB66'
+PRIVATE_KEY = '7d6384d6877be027aa25bd458f2058e3f7ff68347dc583a9baf96f5f97b413a8' # noqa:keycheck
+ETH_ADDRESS = '0x713Cf80b7c71440E7a09Dede1ee23dCBf862fB66' # noqa:keycheck
 
 client = Client()
 client2 = Client()
@@ -751,7 +751,6 @@ def test_deposit_from_polygon_network_with_signer_low_balance():
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic')
 
-@responses.activate
 def test_deposit_from_cross_chain_network_with_signer_invalid_amount():
     w3 = Web3()
     # test_signer = "0xb500b7238e2aFbBca678B2A3B462e35ab001A4a0"
@@ -880,3 +879,14 @@ def test_fast_withdrawal_token_network_invalid_casing_success():
     )
     assert 'status' in res
     assert res['status'] == 'success'
+
+@responses.activate
+def test_bulk_cancel():
+    responses.post(url=f'{BASE_URL}/sapi/v1/user/bulkcancel/',
+                    json=bulk_cancel_response)
+    res = client.bulk_cancel( {'market': 'btcusdt','limit': 100,'side': 'buy'})
+    print("bulk cancel")
+
+    assert 'status' in res
+    assert res['status'] == 'success'
+    assert 'message' in res
