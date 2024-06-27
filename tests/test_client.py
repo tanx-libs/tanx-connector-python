@@ -751,7 +751,6 @@ def test_deposit_from_polygon_network_with_signer_low_balance():
     with pytest.raises(BalanceTooLowError):
         client.deposit_from_polygon_network_with_signer(signer=test_signer, provider=test_provider, amount=0.0001, currency='matic')
 
-@responses.activate
 def test_deposit_from_cross_chain_network_with_signer_invalid_amount():
     w3 = Web3()
     # test_signer = "0xb500b7238e2aFbBca678B2A3B462e35ab001A4a0"

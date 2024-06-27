@@ -747,8 +747,6 @@ class Client:
         r = self.session.get('/sapi/v1/payment/fast-withdrawals/', params=params)   # type:ignore
         return r.json()
 
-
-
     def bulk_cancel(self,data: BulkOrderCancel):
         self.get_auth_status()
         r = self.session.post('/sapi/v1/user/bulkcancel/', json=data)

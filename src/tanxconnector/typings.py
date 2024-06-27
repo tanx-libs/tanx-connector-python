@@ -239,7 +239,6 @@ class LayerSwapDepositFeeParams(TypedDict):
 
 class InitiateLayerSwapDepositPayload(TypedDict):
   ref_id: str
-  ls_data: str
 
 class BulkOrderCancel(TypedDict):
     market: str
