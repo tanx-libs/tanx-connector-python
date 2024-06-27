@@ -239,6 +239,41 @@ list_withdrawals_response= {
     }
 }
 
+start_fast_withdrawal_response = {
+   "status":"success",
+   "message":"successfully initiated withdrawal",
+   "payload":{
+      "fastwithdrawal_withdrawal_id":359,
+      "msg_hash":"0x7f3e0f70980d079c4d777dc965ebbf0746f9b0845a3759937e6b7868962d8d6"
+   }
+}
+sign_withdrawal_tx_msg_hash_response = {
+    'r': '0x3a59acad62929e148f4b9711bd03b6b77e4cadc4bacbc8e91914fa2fdde9081',
+    's': '0x4a93cf575b3e3972554b726a7efeeb83a4cecd68962dff3d8497c34313c0d79',
+    'recoveryParam': 0
+}
+process_fast_withdrawal_response = {
+   "status":"success",
+   "message":"successfully processed withdrawal",
+   "payload":{
+      "id":361,
+      "amount":"10.0000000000000000",
+      "fee_amount":"9.470979",
+      "token_id":"usdc",
+      "network":"ETHEREUM",
+      "created_at":"2024-06-13T07:58:47.196361Z",
+      "l1_withdrawal_blockchain_hash":"None",
+      "transaction_status":"PROCESSING",
+      "blockchain_status":"PENDING",
+      "extras":{
+         "errors":[
+            
+         ],
+         "exp_timestamp":3997985,
+         "quantised_amount":19470979
+      }
+   }
+}
 
 coin_stats_response = {
     "status": "success",
@@ -309,7 +344,7 @@ coin_stats_response = {
     }
 }
 
-get_vault_id_response = {"status": "success", "message": "", "payload": {"id": 252, "coin": "eth"}}
+get_vault_id_response = {"status": "success", "message": "", "payload": {"id": 252, "coin": "usdt"}}
 
 list_polygon_deposits_response = {
     "status": "success",
@@ -415,35 +450,312 @@ list_polygon_deposits_response = {
 
 network_config_response = {
     'payload': {
-        'network_config': {
-            'POLYGON': {
-                'deposit_contract': '0x09056dC8E09205eb04C78B9C33df4767B2325cF4',
-                'tokens': {
-                    'btc': {
-                        'blockchain_decimal': '18',
-                        'token_contract': '0x8DB9D35eDFdd2fcEe07A0fa60E864dDCBC4eF68e',
-                        'max_fast_withdrawal_for_platform_per_day': '10000',
-                        'max_fast_withdrawal_for_user_per_day': '4000'
-                    },
-                    'matic': {
-                        'blockchain_decimal': '18',
-                        'token_contract': '0x0000000000000000000000000000000000001010',
-                        'max_fast_withdrawal_for_platform_per_day': '10000',
-                        'max_fast_withdrawal_for_user_per_day': '4000'
-                    },
-                    'usdt': {
-                        'blockchain_decimal': '6',
-                        'token_contract': '0x4d2548DAbF3d662110d70239Bc3531043984644D',
-                        'max_fast_withdrawal_for_platform_per_day': '10000',
-                        'max_fast_withdrawal_for_user_per_day': '4000'
-                    }
+      "network_config":{
+        "ETHEREUM": {
+            "deposit_contract": "0xe17F8e501bF5e968e39D8702B30c3A8b955d8f52",
+            "tokens": {
+                "eth": {
+                    "blockchain_decimal": "18",
+                    "token_contract": "0x0000000000000000000000000000000000001010"
                 },
-                'allowed_tokens_for_deposit': ['btc', 'matic', 'usdt'],
-                'allowed_tokens_for_deposit_frontend': ['btc', 'matic', 'usdt'],
-                'allowed_tokens_for_fast_wd': ['btc', 'matic', 'usdt'],
-                'allowed_tokens_for_fast_wd_frontend': ['btc', 'matic', 'usdt']
+                "usdc": {
+                    "blockchain_decimal": "6",
+                    "token_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                    "max_fast_withdrawal_for_platform_per_day": "15000",
+                    "max_fast_withdrawal_for_user_per_day": "12000"
+                }
             },
-        }
+            "allowed_tokens_for_deposit": [
+                "usdc",
+                "eth"
+            ],
+            "allowed_tokens_for_deposit_frontend": [],
+            "allowed_tokens_for_fast_wd": [
+                "usdc",
+                "eth"
+            ],
+            "allowed_tokens_for_fast_wd_frontend": [
+                "usdc"
+            ]
+        },
+         "POLYGON":{
+            "deposit_contract":"0x2714C5958e2b1417B3f2b7609202FFAD359a5965",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+                  "max_fast_withdrawal_for_platform_per_day":"15000",
+                  "max_fast_withdrawal_for_user_per_day":"12000"
+               },
+               "matic":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010",
+                  "max_fast_withdrawal_for_platform_per_day":"15000",
+                  "max_fast_withdrawal_for_user_per_day":"12000"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+                  "max_fast_withdrawal_for_platform_per_day":"10000",
+                  "max_fast_withdrawal_for_user_per_day":"8000"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "matic",
+               "usdt"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "matic",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "matic",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "matic",
+               "usdt"
+            ]
+         },
+         "STARKNET":{
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x053C91253BC9682c04929cA02ED00b3E423f6710D2ee7e0D5EBB06F3eCF368A8"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc"
+            ]
+         },
+         "SCROLL":{
+            "deposit_contract":"0x1e4a1a0d31cFDDC722965a0c2d3bBecF748252d6",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+                  "max_fast_withdrawal_for_platform_per_day":"8000",
+                  "max_fast_withdrawal_for_user_per_day":"7000"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
+                  "max_fast_withdrawal_for_platform_per_day":"8000",
+                  "max_fast_withdrawal_for_user_per_day":"7000"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "usdt"
+            ]
+         },
+         "OPTIMISM":{
+            "deposit_contract":"0xBdd40916bBC43bE14dd7183C30a64EE4A893D97f",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                  "max_fast_withdrawal_for_platform_per_day":"15000",
+                  "max_fast_withdrawal_for_user_per_day":"12000"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "usdt"
+            ]
+         },
+         "ARBITRUM":{
+            "deposit_contract":"0x149e2C169f10914830EF39B9d184AE62BbCdF526",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+                  "max_fast_withdrawal_for_platform_per_day":"15000",
+                  "max_fast_withdrawal_for_user_per_day":"12000"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "usdt"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "usdt"
+            ]
+         },
+         "LINEA":{
+            "deposit_contract":"0x508f001baa00976fc1d679af880267555900ab09",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x176211869cA2b568f2A7D4EE941E073a821EE1ff"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xA219439258ca9da29E9Cc4cE5596924745e12B93"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010",
+                  "max_fast_withdrawal_for_platform_per_day":"1",
+                  "max_fast_withdrawal_for_user_per_day":"0.8"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "usdt",
+               "eth"
+            ]
+         },
+         "MODE":{
+            "deposit_contract":"0xB884389d818046F48Ca63d4cCAF303ba65f6DbC1",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xd988097fb8612cc24eeC14542bC03424c656005f",
+                  "max_fast_withdrawal_for_platform_per_day":"30000",
+                  "max_fast_withdrawal_for_user_per_day":"25000"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010",
+                  "max_fast_withdrawal_for_platform_per_day":"8",
+                  "max_fast_withdrawal_for_user_per_day":"7"
+               },
+               "usdt":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0xf0F161fDA2712DB8b566946122a5af183995e2eD",
+                  "max_fast_withdrawal_for_platform_per_day":"30000",
+                  "max_fast_withdrawal_for_user_per_day":"25000"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc",
+               "usdt",
+               "eth"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               "usdc",
+               "usdt",
+               "eth"
+            ]
+         },
+         "ZKPOLY":{
+            "deposit_contract":"0xD5FA54014c364a17F120A47117e5312ee858a13C",
+            "tokens":{
+               "usdc":{
+                  "blockchain_decimal":"6",
+                  "token_contract":"0x37eAA0eF3549a5Bb7D431be78a3D99BD360d19e5"
+               },
+               "eth":{
+                  "blockchain_decimal":"18",
+                  "token_contract":"0x0000000000000000000000000000000000001010"
+               }
+            },
+            "allowed_tokens_for_deposit":[
+               "usdc"
+            ],
+            "allowed_tokens_for_deposit_frontend":[
+               
+            ],
+            "allowed_tokens_for_fast_wd":[
+               "usdc"
+            ],
+            "allowed_tokens_for_fast_wd_frontend":[
+               
+            ]
+         }
+      }
     }
 }
 
