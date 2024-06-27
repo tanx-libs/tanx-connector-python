@@ -316,6 +316,10 @@ def test_get_profit_and_loss():
 def test_get_auth_status():
     assert client.get_auth_status()
 
+def test_create_order_nonce_value_error():
+    with pytest.raises(ValueError):
+        client.create_order_nonce({'market': 'btcusdt', 'ord_type': 'stop_limit',
+                                    'price': 29580.51, 'side': 'buy', 'volume': 0.0001})
 
 @responses.activate
 def test_create_complete_order():
