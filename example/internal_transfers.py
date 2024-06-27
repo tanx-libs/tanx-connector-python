@@ -39,7 +39,7 @@ check_user_res = client.check_internal_transfer_user_exists(
 print(check_user_res)
 
 # initiate and process the internal transfer
-internal_transfer_response = client.intiate_and_process_internal_transfers(
+internal_transfer_response = client.initiate_and_process_internal_transfers(
     key_pair=key_pair,
     organization_key=TANX_ORGANIZATION_KEY,
     api_key=TANX_API_KEY,

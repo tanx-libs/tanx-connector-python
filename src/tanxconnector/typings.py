@@ -85,6 +85,7 @@ class CreateOrderNonceBody(TypedDict):
     price: float
     side: str
     volume: float
+    stop_price: Optional[float]
 
 class Order(TypedDict):
     id: int
@@ -103,6 +104,8 @@ class Order(TypedDict):
     maker_fee: str
     taker_fee: str
     trades_count: int
+    stop_price: Optional[float]
+    cancel_reason: Optional[str]
 
 
 class OrderPayload(Order):
@@ -126,6 +129,7 @@ class TradePayload(TypedDict):
     taker_type: str
     side: str
     order_id: int
+
 
 
 class LoginPayload(TypedDict):
@@ -223,7 +227,6 @@ class InternalTransferProcessBody(InternalTransferKey):
 class ListInternalTransferParams(TypedDict):
     limit: Optional[int]
     offset: Optional[int]
-
 
 class LayerSwapDepositFeePayload(TypedDict):
   min_amount: str
