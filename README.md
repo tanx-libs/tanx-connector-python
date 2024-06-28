@@ -62,6 +62,7 @@ Tanx-connector-python includes utility/connector functions which can be used to 
   - [Deposit](#deposit)
     - [Ethereum Network Deposit](#ethereum-network-deposit)
     - [Polygon Network Deposit](#polygon-network-deposit)
+    - [Cross Network Deposit](#cross-network-deposit)
     - [List Deposits](#list-deposits)
   - [Withdrawal](#withdrawal)
     - [Normal Withdrawal](#normal-withdrawal-only-for-ethereum-network)
@@ -623,7 +624,7 @@ provider.middleware_onion.inject(geth_poa_middleware, layer=0)
 signer = Account.from_key(PRIVATE_KEY)
 
 # approval for unlimited allowance for ERC20 contracts
-allowance = client.set_allowance(coin='btc', signer=signer, w3=provider)
+allowance = client.set_allowance(coin='btc', signer=signer, w3=provider, network='ETHEREUM')
 print(allowance)  # prints the hash for the allowance, check on network scan for success
 ```
 
@@ -777,7 +778,7 @@ internal_transfer_response = client.initiate_and_process_internal_transfers(
 2. Retrieve a list of transfers initiated by the authenticated user:
 
 ```python
-internal_trasnfers_list = client.list_internal_transfers({
+internal_transfer_list = client.list_internal_transfers({
   'limit': 10,
   'offset': 10
 })
