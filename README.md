@@ -62,7 +62,7 @@ Tanx-connector-python includes utility/connector functions which can be used to 
   - [Deposit](#deposit)
     - [Ethereum Network Deposit](#ethereum-network-deposit)
     - [Polygon Network Deposit](#polygon-network-deposit)
-    - [Cross chain Deposit](#polygon-network-deposit)
+    - [Cross Network Deposit](#cross-network-deposit)
     - [List Deposits](#list-deposits)
   - [Withdrawal](#withdrawal)
     - [Normal Withdrawal](#normal-withdrawal-only-for-ethereum-network)
